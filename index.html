@@ -90,7 +90,7 @@ auth.onAuthStateChanged(function(user) {
 
 function loginGoogle() {
   var provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(function(e){ toast(e.message, false); });
+  auth.signInWithRedirect(provider).catch(function(e){ toast(e.message, false); });
 }
 
 function logout() { auth.signOut(); }
