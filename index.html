@@ -119,18 +119,21 @@ const APPS = {
     label: "🚚 Reparto Individual",
     collection: "licencias",
     prefix: "SR",
+    tipo: "codigo",
     url: "emmasolucionesdigitales-lang.github.io/sistema-de-reparto-2026"
   },
   multi: {
     label: "👥 Reparto Multi",
     collection: "licencias_multi",
     prefix: "SM",
+    tipo: "codigo",
     url: "emmasolucionesdigitales-lang.github.io/sistema-de-reparto-multiple"
   },
   control: {
     label: "💼 Emma Control",
     collection: "licencias_control",
     prefix: "EC",
+    tipo: "email",
     url: "emmasolucionesdigitales-lang.github.io/emma-control"
   }
 };
@@ -250,7 +253,7 @@ function renderPanel() {
       (filtradas.length === 0
         ? '<div style="text-align:center;padding:40px;color:#4a5568">No hay licencias para mostrar</div>'
         : '<div class="table-wrap"><table>' +
-            '<thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th></tr></thead>' +
+            (APPS[appActiva].tipo==='email' ? '<thead><tr><th>Email</th><th>Negocio</th><th>Estado</th><th>Notas</th><th>Acciones</th></tr></thead>' : '<thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th></tr></thead>') +
             '<tbody>' + rows + '</tbody>' +
           '</table></div>') +
       '<p style="font-size:12px;color:#4a5568;margin-top:12px;text-align:center">' + filtradas.length + ' de ' + total + ' licencias · ' + APPS[appActiva].label + '</p>' +
@@ -269,6 +272,7 @@ function cambiarApp(key) {
 }
 
 function abrirNueva() {
+  var esEmail = APPS[appActiva].tipo === "email";
   var prefix = APPS[appActiva].prefix;
   var codigo = prefix + Math.random().toString(36).slice(2,6).toUpperCase();
   var pin = Math.floor(1000 + Math.random() * 9000);
@@ -276,10 +280,16 @@ function abrirNueva() {
     '<div class="modal-overlay" onclick="cerrarModal(event)">' +
     '<div class="modal">' +
     '<h2>+ Nueva licencia · ' + APPS[appActiva].label + '</h2>' +
-    '<div class="form-group"><label class="form-label">Código de activación</label>' +
-    '<input class="form-input" id="m-cod" value="' + codigo + '"></div>' +
-    '<div class="form-group"><label class="form-label">PIN de acceso</label>' +
-    '<input class="form-input" id="m-pin" type="number" value="' + pin + '"></div>' +
+    (esEmail
+      ? '<div class="form-group"><label class="form-label">Email del cliente</label>' +
+        '<input class="form-input" id="m-cod" placeholder="cliente@email.com"></div>' +
+        '<div class="form-group"><label class="form-label">Nombre del negocio</label>' +
+        '<input class="form-input" id="m-neg" placeholder="Nombre del negocio"></div>'
+      : '<div class="form-group"><label class="form-label">Código de activación</label>' +
+        '<input class="form-input" id="m-cod" value="' + codigo + '"></div>' +
+        '<div class="form-group"><label class="form-label">PIN de acceso</label>' +
+        '<input class="form-input" id="m-pin" type="number" value="' + pin + '"></div>'
+    ) +
     '<div class="form-group"><label class="form-label">Notas (opcional)</label>' +
     '<input class="form-input" id="m-notas" placeholder="Ej: cliente de prueba"></div>' +
     '<div class="modal-btns">' +
@@ -289,18 +299,23 @@ function abrirNueva() {
 }
 
 async function crearLicencia() {
-  var codigo = document.getElementById("m-cod").value.trim().toUpperCase();
-  var pin = Number(document.getElementById("m-pin").value);
+  var esEmail = APPS[appActiva].tipo === "email";
+  var cod = document.getElementById("m-cod").value.trim();
+  var codigo = esEmail ? cod.toLowerCase() : cod.toUpperCase();
   var notas = document.getElementById("m-notas").value.trim();
-  if (!codigo || !pin) { toast("Completá código y PIN", false); return; }
+  if (!codigo) { toast("Completá el " + (esEmail?"email":"código"), false); return; }
+  var datos = { estado: "activo", notas: notas, creadoEn: new Date().toISOString(), app: appActiva };
+  if (esEmail) {
+    var neg = document.getElementById("m-neg") ? document.getElementById("m-neg").value.trim() : "";
+    datos.negocio = neg; datos.email = codigo;
+  } else {
+    var pin = Number(document.getElementById("m-pin").value);
+    if (!pin) { toast("Completá el PIN", false); return; }
+    datos.pin = pin; datos.deviceId = ""; datos.email = ""; datos.celular = ""; datos.negocio = "";
+  }
   try {
     var col = APPS[appActiva].collection;
-    await db.collection(col).doc(codigo).set({
-      estado: "activo", pin: pin, notas: notas,
-      deviceId: "", email: "", celular: "", negocio: "",
-      creadoEn: new Date().toISOString(),
-      app: appActiva
-    });
+    await db.collection(col).doc(codigo).set(datos);
     cerrarModalBtn();
     toast("✅ Licencia " + codigo + " creada", true);
     cargarLicencias();
