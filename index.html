@@ -13,41 +13,175 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0f1a;color:#e2eaf4;min-height:100vh;}
-    .screen{max-width:960px;margin:0 auto;padding:20px 16px;}
-    .header{background:#111c2e;border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-    .header h1{font-size:16px;font-weight:600;color:#e2eaf4;}
-    .header span{font-size:12px;color:#7a9ab8;}
-    .btn{padding:8px 16px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.13);cursor:pointer;font-size:13px;font-weight:500;transition:all 0.15s;background:#1a2b3c;color:#e2eaf4;}
-    .btn:hover{background:#253647;}
+
+    /* ── Variables de escala de texto ── */
+    :root { font-size: 14px; }
+
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0f1a;color:#e2eaf4;min-height:100vh;font-size:1rem;}
+
+    /* ── Layout ── */
+    .screen{max-width:960px;margin:0 auto;padding:16px;}
+
+    /* ── Header ── */
+    .header{
+      background:#111c2e;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position:sticky;top:0;z-index:10;
+      gap:8px;
+    }
+    .header-title{display:flex;align-items:center;gap:10px;min-width:0;}
+    .header-title h1{font-size:1rem;font-weight:600;color:#e2eaf4;white-space:nowrap;}
+    .header-title span{font-size:0.8rem;color:#7a9ab8;display:none;}
+    .header-actions{display:flex;gap:6px;flex-shrink:0;}
+
+    /* ── Botones ── */
+    .btn{
+      padding:10px 16px;
+      border-radius:10px;
+      border:0.5px solid rgba(255,255,255,0.13);
+      cursor:pointer;
+      font-size:0.9rem;
+      font-weight:500;
+      transition:all 0.15s;
+      background:#1a2b3c;
+      color:#e2eaf4;
+      min-height:40px;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn:active{opacity:0.75;transform:scale(0.97);}
     .btn-primary{background:#185FA5;color:#fff;border:none;}
-    .btn-primary:hover{background:#1a6fc0;}
+    .btn-primary:active{background:#1a6fc0;}
     .btn-danger{background:#2e0a0a;color:#f07070;border:0.5px solid #f07070;}
     .btn-success{background:#0a2e1f;color:#4dd9a0;border:0.5px solid #4dd9a0;}
-    .btn-sm{padding:4px 10px;font-size:11px;}
-    .btn-google{background:#fff;color:#333;border:1px solid #ddd;display:flex;align-items:center;gap:10px;padding:12px 24px;font-size:15px;border-radius:10px;cursor:pointer;}
-    .btn-google:hover{background:#f5f5f5;}
-    .card{background:#111c2e;border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:12px;}
-    .badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;display:inline-block;}
+    .btn-sm{padding:8px 12px;font-size:0.8rem;min-height:36px;}
+    .btn-icon{padding:8px 12px;font-size:1rem;}
+    .btn-google{background:#fff;color:#333;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;font-size:1rem;border-radius:12px;cursor:pointer;min-height:50px;width:100%;max-width:360px;}
+
+    /* ── Badges ── */
+    .badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;display:inline-block;}
     .badge-green{background:#0a2e1f;color:#4dd9a0;}
     .badge-red{background:#2e0a0a;color:#f07070;}
     .badge-blue{background:#1e3a5f;color:#5daaff;}
     .badge-gray{background:#1a2b3c;color:#7a9ab8;}
-    input,select{width:100%;padding:9px 12px;background:#1a2b3c;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#e2eaf4;font-size:14px;outline:none;margin-bottom:10px;}
-    input:focus,select:focus{border-color:#185FA5;}
-    label{font-size:12px;color:#7a9ab8;margin-bottom:4px;display:block;}
+
+    /* ── Inputs ── */
+    input,select{
+      width:100%;
+      padding:12px 14px;
+      background:#1a2b3c;
+      border:0.5px solid rgba(255,255,255,0.13);
+      border-radius:10px;
+      color:#e2eaf4;
+      font-size:1rem;
+      outline:none;
+      margin-bottom:12px;
+      min-height:46px;
+      -webkit-appearance:none;
+    }
+    input:focus,select:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.25);}
+    label{font-size:0.8rem;color:#7a9ab8;margin-bottom:5px;display:block;}
+
+    /* ── Stats grid ── */
     .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-    .stat-card{background:#1a2b3c;border-radius:10px;padding:14px;text-align:center;}
-    .stat-num{font-size:28px;font-weight:700;color:#5daaff;}
-    .stat-label{font-size:12px;color:#7a9ab8;margin-top:4px;}
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
-    .modal{background:#111c2e;border-radius:14px;padding:24px;width:100%;max-width:420px;border:0.5px solid rgba(255,255,255,0.12);}
-    .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:24px;padding:40px 20px;}
-    table{width:100%;border-collapse:collapse;font-size:13px;}
-    th{text-align:left;padding:8px 12px;color:#7a9ab8;font-weight:500;font-size:11px;text-transform:uppercase;border-bottom:0.5px solid rgba(255,255,255,0.08);}
+    .stat-card{background:#1a2b3c;border-radius:12px;padding:14px;text-align:center;}
+    .stat-num{font-size:1.8rem;font-weight:700;color:#5daaff;}
+    .stat-label{font-size:0.75rem;color:#7a9ab8;margin-top:4px;}
+
+    /* ── Card genérica ── */
+    .card{background:#111c2e;border:0.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:12px;}
+
+    /* ── Tabla (solo desktop) ── */
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+    th{text-align:left;padding:10px 12px;color:#7a9ab8;font-weight:500;font-size:0.72rem;text-transform:uppercase;border-bottom:0.5px solid rgba(255,255,255,0.08);}
     td{padding:10px 12px;border-bottom:0.5px solid rgba(255,255,255,0.05);vertical-align:middle;}
     tr:hover td{background:rgba(255,255,255,0.02);}
-    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#185FA5;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+    .desktop-only{display:table;}
+    .mobile-only{display:none;}
+
+    /* ── CARDS MOBILE (reemplaza la tabla) ── */
+    .lic-card{
+      background:#111c2e;
+      border:0.5px solid rgba(255,255,255,0.1);
+      border-radius:14px;
+      padding:14px 16px;
+      margin-bottom:10px;
+    }
+    .lic-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .lic-codigo{font-family:monospace;color:#5daaff;font-size:0.95rem;font-weight:700;}
+    .lic-card-fila{display:flex;gap:6px;align-items:center;margin-bottom:6px;font-size:0.85rem;}
+    .lic-card-fila .lbl{color:#7a9ab8;min-width:60px;font-size:0.75rem;}
+    .lic-card-fila .val{color:#e2eaf4;}
+    .lic-card-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+    .lic-card-actions .btn{flex:1;min-width:80px;text-align:center;justify-content:center;}
+
+    /* ── Modal ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;justify-content:center;z-index:100;padding:0;}
+    .modal{
+      background:#111c2e;
+      border-radius:20px 20px 0 0;
+      padding:24px 20px 32px;
+      width:100%;
+      max-width:480px;
+      border:0.5px solid rgba(255,255,255,0.12);
+      border-bottom:none;
+      max-height:92vh;
+      overflow-y:auto;
+    }
+    .modal-drag{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 18px;}
+
+    /* ── Login ── */
+    .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;padding:40px 20px;}
+    .login-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:0;}
+
+    /* ── Toast ── */
+    #toast{
+      position:fixed;bottom:88px;left:50%;transform:translateX(-50%);
+      background:#185FA5;color:#fff;
+      padding:12px 22px;border-radius:24px;
+      font-size:0.9rem;z-index:200;opacity:0;
+      transition:opacity 0.3s;pointer-events:none;
+      white-space:nowrap;max-width:90vw;text-overflow:ellipsis;overflow:hidden;
+    }
+
+    /* ── Botón flotante de escala ── */
+    #btn-escala{
+      position:fixed;bottom:20px;right:16px;z-index:300;
+      background:#1a2b3c;border:1px solid rgba(255,255,255,0.18);
+      border-radius:50px;padding:10px 16px;
+      font-size:0.85rem;font-weight:700;color:#5daaff;
+      cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);
+      touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+      display:none; /* se muestra cuando hay sesión */
+    }
+    #btn-escala:active{transform:scale(0.95);}
+
+    /* ── Búsqueda con ícono ── */
+    .search-wrap{position:relative;margin-bottom:14px;}
+    .search-wrap input{padding-left:38px;margin-bottom:0;}
+    .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7a9ab8;font-size:1rem;pointer-events:none;}
+
+    /* ── Responsive mobile ── */
+    @media (max-width: 620px) {
+      .desktop-only{display:none;}
+      .mobile-only{display:block;}
+      .header-title span{display:block;}
+      .header-title h1{font-size:0.9rem;}
+      .grid3{gap:8px;}
+      .stat-num{font-size:1.5rem;}
+      .stat-card{padding:12px 8px;}
+      .screen{padding:12px;}
+    }
+    @media (min-width: 621px) {
+      .modal-overlay{align-items:center;padding:20px;}
+      .modal{border-radius:18px;border-bottom:0.5px solid rgba(255,255,255,0.12);}
+      .modal-drag{display:none;}
+    }
   </style>
 </head>
 <body>
@@ -55,10 +189,39 @@
 <div id="app"></div>
 <div id="modal-container"></div>
 
+<!-- Botón flotante S/M/L/XL -->
+<button id="btn-escala" onclick="ciclarEscala()">M</button>
+
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script>
+/* ─────────────────────────────────────────
+   ESCALA DE TEXTO  S / M / L / XL
+───────────────────────────────────────── */
+var ESCALAS = {S:12, M:14, L:16, XL:18};
+var ORDEN_ESCALA = ["S","M","L","XL"];
+var escalaActual = localStorage.getItem("adminEscala") || "M";
+
+function aplicarEscala(s) {
+  escalaActual = s;
+  document.documentElement.style.fontSize = ESCALAS[s] + "px";
+  var btn = document.getElementById("btn-escala");
+  if(btn) btn.textContent = s;
+  localStorage.setItem("adminEscala", s);
+}
+
+function ciclarEscala() {
+  var idx = ORDEN_ESCALA.indexOf(escalaActual);
+  var siguiente = ORDEN_ESCALA[(idx + 1) % ORDEN_ESCALA.length];
+  aplicarEscala(siguiente);
+}
+
+aplicarEscala(escalaActual);
+
+/* ─────────────────────────────────────────
+   FIREBASE
+───────────────────────────────────────── */
 const ADMIN_UID = "cuPGzTs8wGbWMVYRajqXY7B46hr1";
 firebase.initializeApp({
   apiKey:"AIzaSyB8BB_xFyXCobGHoMj_dFOTA1n76FROfS4",
@@ -83,35 +246,57 @@ function toast(msg, ok) {
 }
 
 auth.onAuthStateChanged(function(user) {
-  if(!user) { renderLogin(""); return; }
-  if(user.uid !== ADMIN_UID) { auth.signOut(); renderLogin("Acceso denegado."); return; }
+  var btn = document.getElementById("btn-escala");
+  if(!user) {
+    if(btn) btn.style.display = "none";
+    renderLogin("");
+    return;
+  }
+  if(user.uid !== ADMIN_UID) {
+    auth.signOut();
+    renderLogin("Acceso denegado.");
+    return;
+  }
+  if(btn) btn.style.display = "flex";
   cargarLicencias();
 });
 
 function loginGoogle() {
   var email = document.getElementById('adminEmail') ? document.getElementById('adminEmail').value : '';
-  var pass = document.getElementById('adminPass') ? document.getElementById('adminPass').value : '';
+  var pass  = document.getElementById('adminPass')  ? document.getElementById('adminPass').value  : '';
   if(!email||!pass){toast('Completá email y contraseña',false);return;}
-  auth.signInWithEmailAndPassword(email, pass).catch(function(e){ toast('Email o contraseña incorrectos', false); });
+  auth.signInWithEmailAndPassword(email, pass)
+    .catch(function(e){ toast('Email o contraseña incorrectos', false); });
 }
 
-function logout() { auth.signOut(); }
+function logout() { auth.signOut(); document.getElementById("btn-escala").style.display="none"; }
 
+/* ─────────────────────────────────────────
+   PANTALLA DE LOGIN
+───────────────────────────────────────── */
 function renderLogin(err) {
   document.getElementById("app").innerHTML =
     '<div class="login-screen">' +
-    '<div style="text-align:center"><div style="margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="72" height="72"><line x1="12" y1="16" x2="34" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/><line x1="76" y1="16" x2="54" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/><line x1="12" y1="72" x2="34" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/><line x1="76" y1="72" x2="54" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/><circle cx="10" cy="14" r="8" fill="#c9a5f5"/><circle cx="78" cy="14" r="8" fill="#9d65e0"/><circle cx="10" cy="74" r="8" fill="#9d65e0"/><circle cx="78" cy="74" r="8" fill="#c9a5f5"/><circle cx="44" cy="44" r="22" fill="#7b3fc9"/><rect x="33" y="34" width="16" height="3" rx="1.5" fill="white"/><rect x="33" y="42.5" width="12" height="3" rx="1.5" fill="white"/><rect x="33" y="51" width="16" height="3" rx="1.5" fill="white"/></svg></div>' +
-    '<h1 style="font-size:22px;font-weight:700;color:#e2eaf4;margin-bottom:4px">Panel de Administración</h1>' +
-    '<p style="font-size:14px;color:#7a9ab8">Sistema de Reparto 2026</p></div>' +
-    (err ? '<p style="color:#f07070;font-size:13px">'+err+'</p>' : '') +
-    '<button class="btn-google" onclick="loginGoogle()">' +
-    '<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.31z"/></svg>' +
-    '<input id="adminEmail" type="email" placeholder="Email de administrador" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:15px;margin-bottom:10px;box-sizing:border-box">' +
-    '<input id="adminPass" type="password" placeholder="Contraseña" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:15px;margin-bottom:14px;box-sizing:border-box">' +
-    '<button onclick="loginGoogle()" style="width:100%;background:#7b3fc9;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer">Ingresar</button>' +
-    '<p style="font-size:11px;color:#4a6a85;margin-top:10px">Solo el administrador tiene acceso</p></div>';
+      '<div style="text-align:center">' +
+        logoSVG(72) +
+        '<h1 style="font-size:1.4rem;font-weight:700;color:#e2eaf4;margin:12px 0 4px">Panel de Administración</h1>' +
+        '<p style="font-size:0.9rem;color:#7a9ab8">Sistema de Reparto 2026</p>' +
+      '</div>' +
+      (err ? '<p style="color:#f07070;font-size:0.85rem;text-align:center">'+err+'</p>' : '') +
+      '<div class="login-box">' +
+        '<label>Email de administrador</label>' +
+        '<input id="adminEmail" type="email" placeholder="admin@ejemplo.com" autocomplete="username" />' +
+        '<label>Contraseña</label>' +
+        '<input id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')loginGoogle()" />' +
+        '<button class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem;border-radius:12px;margin-top:4px" onclick="loginGoogle()">Ingresar</button>' +
+        '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:12px">Solo el administrador tiene acceso</p>' +
+      '</div>' +
+    '</div>';
 }
 
+/* ─────────────────────────────────────────
+   CARGAR DATOS
+───────────────────────────────────────── */
 async function cargarLicencias() {
   try {
     var snap = await db.collection("licencias").get();
@@ -126,10 +311,13 @@ function estadoBadge(estado) {
   return '<span class="badge badge-red">Inactiva</span>';
 }
 
+/* ─────────────────────────────────────────
+   PANEL PRINCIPAL
+───────────────────────────────────────── */
 function renderPanel() {
-  var total   = licencias.length;
-  var activos = licencias.filter(function(l){ return l.estado==="activo"||l.estado==="usado"; }).length;
-  var inact   = licencias.filter(function(l){ return l.estado==="inactivo"; }).length;
+  var total    = licencias.length;
+  var activos  = licencias.filter(function(l){ return l.estado==="activo"||l.estado==="usado"; }).length;
+  var inact    = licencias.filter(function(l){ return l.estado==="inactivo"; }).length;
   var filtrados = licencias.filter(function(l){
     if(!filtro) return true;
     return (l.id||"").toLowerCase().indexOf(filtro)>=0 ||
@@ -138,70 +326,124 @@ function renderPanel() {
            (l.celular||"").indexOf(filtro)>=0;
   });
 
+  /* ── Filas de tabla (desktop) ── */
   var filas = filtrados.map(function(l){
     var acciones =
-      '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:3px" onclick="abrirEditar(\''+l.id+'\')">Editar</button>' +
+      '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditar(\''+l.id+'\')">✏️ Editar</button>' +
       (l.estado==="inactivo"
-        ? '<button class="btn btn-sm btn-success" style="margin-right:3px" onclick="cambiarEstado(\''+l.id+'\',\'activo\')">Activar</button>'
-        : '<button class="btn btn-sm btn-danger" style="margin-right:3px" onclick="cambiarEstado(\''+l.id+'\',\'inactivo\')">Desactivar</button>'
+        ? '<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstado(\''+l.id+'\',\'activo\')">✅ Activar</button>'
+        : '<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstado(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>'
       ) +
-      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">Reset</button>';
+      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button>';
     return '<tr>' +
-      '<td><code style="color:#5daaff;font-size:12px">'+l.id+'</code></td>' +
+      '<td><code style="color:#5daaff;font-size:0.85rem">'+l.id+'</code></td>' +
       '<td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td>' +
-      '<td style="color:#7a9ab8;font-size:12px">'+(l.email||"—")+'</td>' +
-      '<td style="color:#7a9ab8;font-size:12px">'+(l.celular||"—")+'</td>' +
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td>' +
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td>' +
       '<td>'+estadoBadge(l.estado)+'</td>' +
       '<td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td>' +
       '<td>'+acciones+'</td>' +
       '</tr>';
   }).join("");
 
+  /* ── Cards mobile ── */
+  var cards = filtrados.map(function(l){
+    var accionEstado = l.estado==="inactivo"
+      ? '<button class="btn btn-sm btn-success" onclick="cambiarEstado(\''+l.id+'\',\'activo\')">✅ Activar</button>'
+      : '<button class="btn btn-sm btn-danger" onclick="cambiarEstado(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
+    return '<div class="lic-card">' +
+      '<div class="lic-card-top">' +
+        '<span class="lic-codigo">'+l.id+'</span>' +
+        estadoBadge(l.estado) +
+      '</div>' +
+      (l.negocio ? '<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>' : '') +
+      (l.email   ? '<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>' : '') +
+      (l.celular ? '<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>' : '') +
+      '<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div>' +
+      '<div class="lic-card-actions">' +
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditar(\''+l.id+'\')">✏️ Editar</button>' +
+        accionEstado +
+        '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+
   document.getElementById("app").innerHTML =
+    /* Header */
     '<div class="header">' +
-    '<div><div style="display:flex;align-items:center;gap:10px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="40" height="40"><line x1="12" y1="16" x2="34" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/><line x1="76" y1="16" x2="54" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/><line x1="12" y1="72" x2="34" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/><line x1="76" y1="72" x2="54" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/><circle cx="10" cy="14" r="8" fill="#c9a5f5"/><circle cx="78" cy="14" r="8" fill="#9d65e0"/><circle cx="10" cy="74" r="8" fill="#9d65e0"/><circle cx="78" cy="74" r="8" fill="#c9a5f5"/><circle cx="44" cy="44" r="22" fill="#7b3fc9"/><rect x="33" y="34" width="16" height="3" rx="1.5" fill="white"/><rect x="33" y="42.5" width="12" height="3" rx="1.5" fill="white"/><rect x="33" y="51" width="16" height="3" rx="1.5" fill="white"/></svg><h1 style="margin:0">Panel de Administración</h1></div><span>Sistema de Reparto 2026</span></div>' +
-    '<div style="display:flex;gap:8px">' +
-    '<button class="btn btn-primary btn-sm" onclick="abrirNueva()">+ Nueva licencia</button>' +
-    '<button class="btn btn-sm" onclick="cargarLicencias()" title="Actualizar">&#8635;</button>' +
-    '<button class="btn btn-sm" onclick="logout()">Salir</button>' +
-    '</div></div>' +
-    '<div class="screen">' +
-    '<div class="grid3" style="margin:16px 0">' +
-    '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total licencias</div></div>' +
-    '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div>' +
-    '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div>' +
+      '<div class="header-title">' +
+        logoSVG(36) +
+        '<div><h1>Panel Admin</h1><span>Sistema de Reparto 2026</span></div>' +
+      '</div>' +
+      '<div class="header-actions">' +
+        '<button class="btn btn-primary btn-sm" onclick="abrirNueva()">+ Nueva</button>' +
+        '<button class="btn btn-sm btn-icon" onclick="cargarLicencias()" title="Actualizar">↻</button>' +
+        '<button class="btn btn-sm" onclick="logout()">Salir</button>' +
+      '</div>' +
     '</div>' +
-    '<input placeholder="Buscar por código, negocio, email o celular..." style="margin-bottom:16px" oninput="filtro=this.value.toLowerCase();renderPanel()" value="'+filtro+'" />' +
-    '<div class="card" style="padding:0;overflow:hidden">' +
-    '<table><thead><tr>' +
-    '<th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th>' +
-    '</tr></thead><tbody>' +
-    (filas || '<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin resultados</td></tr>') +
-    '</tbody></table></div>' +
-    '<p style="font-size:11px;color:#4a6a85;text-align:center;margin-top:12px">'+filtrados.length+' de '+total+' licencias</p>' +
+
+    /* Body */
+    '<div class="screen">' +
+
+      /* Stats */
+      '<div class="grid3" style="margin:14px 0">' +
+        '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>' +
+        '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div>' +
+        '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div>' +
+      '</div>' +
+
+      /* Buscador */
+      '<div class="search-wrap">' +
+        '<span class="search-icon">🔍</span>' +
+        '<input placeholder="Buscar por código, negocio, email, celular..." oninput="filtro=this.value.toLowerCase();renderPanel()" value="'+filtro+'" />' +
+      '</div>' +
+
+      /* Tabla — solo desktop */
+      '<div class="desktop-only card" style="padding:0;overflow:hidden">' +
+        '<div class="table-wrap">' +
+          '<table><thead><tr>' +
+            '<th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th>' +
+          '</tr></thead><tbody>' +
+          (filas || '<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin resultados</td></tr>') +
+          '</tbody></table>' +
+        '</div>' +
+      '</div>' +
+
+      /* Cards — solo mobile */
+      '<div class="mobile-only">' +
+        (cards || '<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin resultados</div>') +
+      '</div>' +
+
+      '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias</p>' +
     '</div>';
 }
 
+/* ─────────────────────────────────────────
+   MODALES
+───────────────────────────────────────── */
 function abrirNueva() {
   var codigo = "SR2026-" + Math.random().toString(36).slice(2,6).toUpperCase();
   var pin = Math.floor(1000 + Math.random()*9000);
   document.getElementById("modal-container").innerHTML =
     '<div class="modal-overlay" onclick="cerrarModal(event)">' +
-    '<div class="modal">' +
-    '<h2 style="font-size:16px;font-weight:600;margin-bottom:16px">+ Nueva licencia</h2>' +
-    '<label>Código de activación</label><input id="m-cod" value="'+codigo+'" />' +
-    '<label>PIN de acceso</label><input id="m-pin" type="number" value="'+pin+'" />' +
-    '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Cliente de prueba" />' +
-    '<div style="display:flex;gap:8px;margin-top:4px">' +
-    '<button class="btn btn-primary" style="flex:1" onclick="crearLicencia()">Crear</button>' +
-    '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>' +
-    '</div></div></div>';
+      '<div class="modal">' +
+        '<div class="modal-drag"></div>' +
+        '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">➕ Nueva licencia</h2>' +
+        '<label>Código de activación</label><input id="m-cod" value="'+codigo+'" />' +
+        '<label>PIN de acceso</label><input id="m-pin" type="number" value="'+pin+'" />' +
+        '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Cliente de prueba" />' +
+        '<div style="display:flex;gap:10px;margin-top:6px">' +
+          '<button class="btn btn-primary" style="flex:1" onclick="crearLicencia()">Crear</button>' +
+          '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
 }
 
 async function crearLicencia() {
   var codigo = document.getElementById("m-cod").value.trim().toUpperCase();
-  var pin = Number(document.getElementById("m-pin").value);
-  var notas = document.getElementById("m-notas").value.trim();
+  var pin    = Number(document.getElementById("m-pin").value);
+  var notas  = document.getElementById("m-notas").value.trim();
   if(!codigo||!pin){ toast("Completá código y PIN", false); return; }
   try {
     await db.collection("licencias").doc(codigo).set({
@@ -220,18 +462,21 @@ function abrirEditar(id) {
   if(!l) return;
   document.getElementById("modal-container").innerHTML =
     '<div class="modal-overlay" onclick="cerrarModal(event)">' +
-    '<div class="modal">' +
-    '<h2 style="font-size:16px;font-weight:600;margin-bottom:4px">Editar licencia</h2>' +
-    '<p style="font-size:12px;color:#5daaff;margin-bottom:16px">'+l.id+'</p>' +
-    '<label>PIN</label><input id="e-pin" type="number" value="'+(l.pin||'')+'" />' +
-    '<label>Negocio</label><input id="e-neg" value="'+(l.negocio||'')+'" />' +
-    '<label>Email</label><input id="e-ema" value="'+(l.email||'')+'" />' +
-    '<label>Celular</label><input id="e-cel" value="'+(l.celular||'')+'" />' +
-    '<label>Notas</label><input id="e-not" value="'+(l.notas||'')+'" />' +
-    '<div style="display:flex;gap:8px;margin-top:4px">' +
-    '<button class="btn btn-primary" style="flex:1" onclick="guardarEdicion(\''+id+'\')">Guardar</button>' +
-    '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>' +
-    '</div></div></div>';
+      '<div class="modal">' +
+        '<div class="modal-drag"></div>' +
+        '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar licencia</h2>' +
+        '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:18px;font-family:monospace">'+l.id+'</p>' +
+        '<label>PIN</label><input id="e-pin" type="number" value="'+(l.pin||'')+'" />' +
+        '<label>Negocio</label><input id="e-neg" value="'+(l.negocio||'')+'" />' +
+        '<label>Email</label><input id="e-ema" type="email" value="'+(l.email||'')+'" />' +
+        '<label>Celular</label><input id="e-cel" type="tel" value="'+(l.celular||'')+'" />' +
+        '<label>Notas</label><input id="e-not" value="'+(l.notas||'')+'" />' +
+        '<div style="display:flex;gap:10px;margin-top:6px">' +
+          '<button class="btn btn-primary" style="flex:1" onclick="guardarEdicion(\''+id+'\')">Guardar</button>' +
+          '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
 }
 
 async function guardarEdicion(id) {
@@ -269,6 +514,24 @@ async function resetDispositivo(id) {
 
 function cerrarModal(e) { if(e.target.classList.contains("modal-overlay")) cerrarModalBtn(); }
 function cerrarModalBtn() { document.getElementById("modal-container").innerHTML=""; }
+
+/* Logo SVG reutilizable */
+function logoSVG(size) {
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="'+size+'" height="'+size+'" style="flex-shrink:0">' +
+    '<line x1="12" y1="16" x2="34" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/>' +
+    '<line x1="76" y1="16" x2="54" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/>' +
+    '<line x1="12" y1="72" x2="34" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/>' +
+    '<line x1="76" y1="72" x2="54" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/>' +
+    '<circle cx="10" cy="14" r="8" fill="#c9a5f5"/>' +
+    '<circle cx="78" cy="14" r="8" fill="#9d65e0"/>' +
+    '<circle cx="10" cy="74" r="8" fill="#9d65e0"/>' +
+    '<circle cx="78" cy="74" r="8" fill="#c9a5f5"/>' +
+    '<circle cx="44" cy="44" r="22" fill="#7b3fc9"/>' +
+    '<rect x="33" y="34" width="16" height="3" rx="1.5" fill="white"/>' +
+    '<rect x="33" y="42.5" width="12" height="3" rx="1.5" fill="white"/>' +
+    '<rect x="33" y="51" width="16" height="3" rx="1.5" fill="white"/>' +
+    '</svg>';
+}
 </script>
 
 <script>
