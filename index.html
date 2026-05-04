@@ -16,15 +16,11 @@
     :root { font-size: 14px; }
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0f1a;color:#e2eaf4;min-height:100vh;font-size:1rem;}
     .screen{max-width:960px;margin:0 auto;padding:16px;}
-
-    /* ── Header ── */
     .header{background:#111c2e;border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:8px;}
     .header-title{display:flex;align-items:center;gap:10px;min-width:0;}
     .header-title h1{font-size:1rem;font-weight:600;color:#e2eaf4;white-space:nowrap;}
     .header-title span{font-size:0.8rem;color:#7a9ab8;display:none;}
     .header-actions{display:flex;gap:6px;flex-shrink:0;}
-
-    /* ── PRODUCT TABS ── */
     .product-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:#111c2e;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
     .product-tabs::-webkit-scrollbar{display:none;}
     .ptab{padding:12px 16px;font-size:0.85rem;font-weight:600;color:#7a9ab8;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;transition:color .15s;-webkit-tap-highlight-color:transparent;}
@@ -32,8 +28,6 @@
     .ptab.activo{color:#fff;border-bottom-color:#7b3fc9;}
     .ptab .ptab-badge{background:#7b3fc9;color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:99px;}
     .ptab-coming{opacity:.45;cursor:default;}
-
-    /* ── Botones ── */
     .btn{padding:10px 16px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.13);cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.15s;background:#1a2b3c;color:#e2eaf4;min-height:40px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
     .btn:active{opacity:0.75;transform:scale(0.97);}
     .btn-primary{background:#185FA5;color:#fff;border:none;}
@@ -43,8 +37,6 @@
     .btn-success{background:#0a2e1f;color:#4dd9a0;border:0.5px solid #4dd9a0;}
     .btn-sm{padding:8px 12px;font-size:0.8rem;min-height:36px;}
     .btn-icon{padding:8px 12px;font-size:1rem;}
-
-    /* ── Badges ── */
     .badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;display:inline-block;}
     .badge-green{background:#0a2e1f;color:#4dd9a0;}
     .badge-red{background:#2e0a0a;color:#f07070;}
@@ -52,23 +44,15 @@
     .badge-gray{background:#1a2b3c;color:#7a9ab8;}
     .badge-purple{background:#2d1a4a;color:#c9a5f5;}
     .badge-orange{background:#2e1800;color:#f5a442;}
-
-    /* ── Inputs ── */
     input,select{width:100%;padding:12px 14px;background:#1a2b3c;border:0.5px solid rgba(255,255,255,0.13);border-radius:10px;color:#e2eaf4;font-size:1rem;outline:none;margin-bottom:12px;min-height:46px;-webkit-appearance:none;}
     input:focus,select:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.25);}
     label{font-size:0.8rem;color:#7a9ab8;margin-bottom:5px;display:block;}
-
-    /* ── Stats grid ── */
     .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
     .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
     .stat-card{background:#1a2b3c;border-radius:12px;padding:14px;text-align:center;}
     .stat-num{font-size:1.8rem;font-weight:700;color:#5daaff;}
     .stat-label{font-size:0.75rem;color:#7a9ab8;margin-top:4px;}
-
-    /* ── Card ── */
     .card{background:#111c2e;border:0.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:12px;}
-
-    /* ── Tabla ── */
     .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
     table{width:100%;border-collapse:collapse;font-size:0.85rem;}
     th{text-align:left;padding:10px 12px;color:#7a9ab8;font-weight:500;font-size:0.72rem;text-transform:uppercase;border-bottom:0.5px solid rgba(255,255,255,0.08);}
@@ -76,8 +60,6 @@
     tr:hover td{background:rgba(255,255,255,0.02);}
     .desktop-only{display:table;}
     .mobile-only{display:none;}
-
-    /* ── Kiosco cards mobile ── */
     .lic-card{background:#111c2e;border:0.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 16px;margin-bottom:10px;}
     .lic-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
     .lic-codigo{font-family:monospace;color:#5daaff;font-size:0.95rem;font-weight:700;}
@@ -86,50 +68,33 @@
     .lic-card-fila .val{color:#e2eaf4;}
     .lic-card-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
     .lic-card-actions .btn{flex:1;min-width:80px;text-align:center;justify-content:center;}
-
-    /* ── Link box ── */
     .link-box{background:#0d1929;border:0.5px solid rgba(93,170,255,0.3);border-radius:8px;padding:10px 12px;font-size:0.78rem;font-family:monospace;color:#5daaff;word-break:break-all;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;}
     .btn-copy{background:#185FA5;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-
-    /* ── Stats negocio kiosco ── */
     .negocio-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
     .ns{background:#1a2b3c;border-radius:10px;padding:10px 12px;text-align:center;}
     .ns-val{font-size:1.2rem;font-weight:700;color:#5daaff;}
     .ns-label{font-size:0.7rem;color:#7a9ab8;margin-top:2px;}
-
-    /* ── Modal ── */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;justify-content:center;z-index:100;padding:0;}
     .modal{background:#111c2e;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;border:0.5px solid rgba(255,255,255,0.12);border-bottom:none;max-height:92vh;overflow-y:auto;}
     .modal-drag{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 18px;}
-
-    /* ── Login ── */
     .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;padding:40px 20px;}
     .login-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:0;}
-
-    /* ── Coming soon ── */
     .coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px;}
     .coming-icon{font-size:64px;}
     .coming-title{font-size:1.4rem;font-weight:700;color:#e2eaf4;}
     .coming-sub{font-size:0.9rem;color:#7a9ab8;max-width:320px;line-height:1.6;}
     .coming-badge{background:#2d1a4a;color:#c9a5f5;padding:6px 16px;border-radius:99px;font-size:0.8rem;font-weight:700;}
-
-    /* ── Vencimiento ── */
     .venc-ok{color:#4dd9a0;font-weight:700;}
     .venc-warn{color:#f5a442;font-weight:700;}
     .venc-bad{color:#f07070;font-weight:700;}
-
-    /* ── Toast ── */
     #toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#185FA5;color:#fff;padding:12px 22px;border-radius:24px;font-size:0.9rem;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
-
-    /* ── Escala ── */
     #btn-escala{position:fixed;bottom:20px;right:16px;z-index:300;background:#1a2b3c;border:1px solid rgba(255,255,255,0.18);border-radius:50px;padding:10px 16px;font-size:0.85rem;font-weight:700;color:#5daaff;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:none;}
     #btn-escala:active{transform:scale(0.95);}
-
-    /* ── Search ── */
     .search-wrap{position:relative;margin-bottom:14px;}
     .search-wrap input{padding-left:38px;margin-bottom:0;}
     .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7a9ab8;font-size:1rem;pointer-events:none;}
-
+    /* Info badge Firebase */
+    .firebase-tag{display:inline-flex;align-items:center;gap:5px;background:#1a2b3c;border:0.5px solid rgba(255,200,0,0.3);border-radius:8px;padding:4px 10px;font-size:0.72rem;color:#f5c842;font-family:monospace;margin-left:8px;}
     @media (max-width: 620px) {
       .desktop-only{display:none;}
       .mobile-only{display:block;}
@@ -168,21 +133,42 @@ function aplicarEscala(s){escalaActual=s;document.documentElement.style.fontSize
 function ciclarEscala(){var idx=ORDEN_ESCALA.indexOf(escalaActual);aplicarEscala(ORDEN_ESCALA[(idx+1)%ORDEN_ESCALA.length]);}
 aplicarEscala(escalaActual);
 
-/* ── FIREBASE EMMA (Reparto) ── */
-const ADMIN_UID="cuPGzTs8wGbWMVYRajqXY7B46hr1";
+/* ════════════════════════════════════════
+   FIREBASE — AUTENTICACIÓN ADMIN
+   Proyecto: app-control-de-apps (no cambiar)
+════════════════════════════════════════ */
+const ADMIN_UID="A10EnUcd3ngbzmFNwWgSFuWj1OR2";
 firebase.initializeApp({
-  apiKey:"AIzaSyB8BB_xFyXCobGHoMj_dFOTA1n76FROfS4",
-  authDomain:"emma-soluciones.firebaseapp.com",
-  projectId:"emma-soluciones",
-  storageBucket:"emma-soluciones.firebasestorage.app",
-  messagingSenderId:"611618583352",
-  appId:"1:611618583352:web:90f0f3a0248bc016c087cd"
-},"emma");
+  apiKey:"AIzaSyAFQ4ybqIoVV3rWe1FMjMVUZ-qzLNZbdBk",
+  authDomain:"app-control-de-apps.firebaseapp.com",
+  projectId:"app-control-de-apps",
+  storageBucket:"app-control-de-apps.firebasestorage.app",
+  messagingSenderId:"761424199819",
+  appId:"1:761424199819:web:513eeaf0e54f4e1401d48e"
+},"admin");
 
-const dbEmma=firebase.app("emma").firestore();
-const auth=firebase.app("emma").auth();
+const auth=firebase.app("admin").auth();
 
-/* ── FIREBASE KIOSCO ── */
+/* ════════════════════════════════════════
+   FIREBASE — APP REPARTO
+   Proyecto: app-reparto-65035
+   Gestiona: licencias de Sistema de Reparto
+════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:"AIzaSyDV1i35MLw74hjnSg6rRZgQFIAI8hsJllI",
+  authDomain:"app-reparto-65035.firebaseapp.com",
+  projectId:"app-reparto-65035",
+  storageBucket:"app-reparto-65035.firebasestorage.app",
+  messagingSenderId:"162304851374",
+  appId:"1:162304851374:web:0a60847807c8fe9a7a1c3f"
+},"reparto");
+
+const dbReparto=firebase.app("reparto").firestore();
+
+/* ════════════════════════════════════════
+   FIREBASE — APP KIOSCO
+   Proyecto: app-kiosco-c9482
+════════════════════════════════════════ */
 firebase.initializeApp({
   apiKey:"AIzaSyAI3bPrAZlAvduooCaUZPF1LNeJcriL-WI",
   authDomain:"app-kiosco-c9482.firebaseapp.com",
@@ -305,11 +291,13 @@ function renderComingSoon(icon,titulo,desc,badge){
 }
 
 /* ════════════════════════════════════════
-   REPARTO (sistema existente)
+   REPARTO — usa dbReparto (app-reparto-65035)
 ════════════════════════════════════════ */
 async function cargarLicencias(){
-  try{var snap=await dbEmma.collection("licencias").get();licencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
-  catch(e){console.warn("Licencias error:",e);}
+  try{
+    var snap=await dbReparto.collection("licencias").get();
+    licencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+  }catch(e){console.warn("Licencias Reparto error:",e);}
 }
 
 function estadoBadgeRep(estado){
@@ -339,7 +327,10 @@ function renderReparto(){
     return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+(l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>':'')+(l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+(l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+'<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div><div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarRep(\''+l.id+'\')">✏️ Editar</button>'+accionEstado+'<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button></div></div>';
   }).join("");
 
-  return'<div class="grid3" style="margin:14px 0">'+
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'+
+      '<span class="firebase-tag">🔥 app-reparto-65035</span>'+
+    '</div>'+
+    '<div class="grid3" style="margin-bottom:14px">'+
       '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
       '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div>'+
       '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div>'+
@@ -362,7 +353,10 @@ function abrirNuevaRep(){
       '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">➕ Nueva licencia Reparto</h2>'+
       '<label>Código de activación</label><input id="m-cod" value="'+codigo+'"/>'+
       '<label>PIN de acceso</label><input id="m-pin" type="number" value="'+pin+'"/>'+
-      '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Cliente de prueba"/>'+
+      '<label>Negocio</label><input id="m-neg" placeholder="Ej: Distribuidora El Sol"/>'+
+      '<label>Email</label><input id="m-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
+      '<label>Celular</label><input id="m-cel" type="tel" placeholder="381 123-4567"/>'+
+      '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Plan mensual - vence 30/06"/>'+
       '<div style="display:flex;gap:10px;margin-top:6px">'+
         '<button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button>'+
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
@@ -371,11 +365,19 @@ function abrirNuevaRep(){
 async function crearLicenciaRep(){
   var codigo=document.getElementById("m-cod").value.trim().toUpperCase();
   var pin=Number(document.getElementById("m-pin").value);
+  var neg=document.getElementById("m-neg").value.trim();
+  var ema=document.getElementById("m-ema").value.trim();
+  var cel=document.getElementById("m-cel").value.trim();
   var notas=document.getElementById("m-notas").value.trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
   try{
-    await dbEmma.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,plan:"individual",notas:notas,deviceId:"",email:"",celular:"",negocio:"",creadoEn:new Date().toISOString()});
-    toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();
+    await dbReparto.collection("licencias").doc(codigo).set({
+      estado:"activo",pin:pin,plan:"individual",
+      negocio:neg,email:ema,celular:cel,notas:notas,
+      deviceId:"",creadoEn:new Date().toISOString()
+    });
+    toast("✅ Licencia "+codigo+" creada — PIN: "+pin);
+    cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
 function abrirEditarRep(id){
@@ -396,29 +398,44 @@ function abrirEditarRep(id){
 }
 async function guardarEdicionRep(id){
   try{
-    await dbEmma.collection("licencias").doc(id).update({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()});
+    await dbReparto.collection("licencias").doc(id).update({
+      pin:Number(document.getElementById("e-pin").value),
+      negocio:document.getElementById("e-neg").value.trim(),
+      email:document.getElementById("e-ema").value.trim(),
+      celular:document.getElementById("e-cel").value.trim(),
+      notas:document.getElementById("e-not").value.trim()
+    });
     toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
 async function cambiarEstadoRep(id,estado){
   if(!confirm(estado==="inactivo"?"¿Desactivar? El cliente perderá el acceso.":"¿Activar esta licencia?"))return;
-  try{await dbEmma.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");cargarTodo();}catch(e){toast(e.message,false);}
+  try{
+    await dbReparto.collection("licencias").doc(id).update({estado:estado});
+    toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 async function resetDispositivo(id){
   if(!confirm("¿Resetear dispositivo? El cliente podrá activar desde un celular nuevo."))return;
-  try{await dbEmma.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}
+  try{
+    await dbReparto.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
+    toast("✅ Dispositivo reseteado");cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 
 /* ════════════════════════════════════════
-   KIOSCO
+   KIOSCO — usa dbKiosco (app-kiosco-c9482)
 ════════════════════════════════════════ */
 function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function diasRestantes(f){if(!f)return null;return Math.ceil((new Date(f)-new Date())/(1000*60*60*24));}
 function formatFecha(f){if(!f)return"—";return new Date(f).toLocaleDateString("es-AR");}
 
 async function cargarKioscoClientes(){
-  try{var snap=await dbKiosco.collection("clientes").get();kioscoClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
-  catch(e){console.warn("Kiosco clientes error:",e);}
+  try{
+    var snap=await dbKiosco.collection("clientes").get();
+    kioscoClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+  }catch(e){console.warn("Kiosco clientes error:",e);}
 }
 
 function estadoBadgeKio(c){
@@ -428,20 +445,17 @@ function estadoBadgeKio(c){
   if(d!==null&&d<=7)return'<span class="badge badge-orange">'+d+'d restantes</span>';
   return'<span class="badge badge-green">Activo</span>';
 }
-
 function planBadge(plan){
   if(plan==="pro")return'<span class="badge" style="background:#2d1a4a;color:#c9a5f5">PRO</span>';
   if(plan==="basic")return'<span class="badge badge-blue">BASIC</span>';
   return'<span class="badge badge-gray">DEMO</span>';
 }
-
 function vencLabel(c){
   if(!c.vencimiento)return'<span style="color:#4a6a85">Sin venc.</span>';
   var d=diasRestantes(c.vencimiento);
   var cls=d<0?"venc-bad":d<=7?"venc-warn":"venc-ok";
   return'<span class="'+cls+'">'+formatFecha(c.vencimiento)+(d!==null?" ("+(d<0?"venció":d+"d")+")":" ")+'</span>';
 }
-
 function getKioscoUrl(c){
   var base=window.location.origin+window.location.pathname.replace("admin_emma.html","").replace("admin.html","");
   return base+"kiosco.html?id="+(c.negocioId||c.id);
@@ -464,10 +478,7 @@ function renderKiosco(){
       '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;margin-right:4px" onclick="verStatsKio(\''+c.id+'\')">📊</button>'+
       '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkKio(\''+c.id+'\')">🔗</button>'+
       '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderKio(\''+c.id+'\')">📅</button>'+
-      (c.activo
-        ?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>'
-        :'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>'
-      );
+      (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>');
     return'<tr>'+
       '<td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#5daaff;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td>'+
       '<td>'+planBadge(c.plan)+'</td>'+
@@ -495,7 +506,10 @@ function renderKiosco(){
     '</div>';
   }).join("");
 
-  return'<div class="grid4" style="margin:14px 0">'+
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'+
+      '<span class="firebase-tag" style="border-color:rgba(100,200,255,0.3);color:#5daaff">🔥 app-kiosco-c9482</span>'+
+    '</div>'+
+    '<div class="grid4" style="margin-bottom:14px">'+
       '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
       '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div>'+
       '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+suspendidos+'</div><div class="stat-label">Suspendidos</div></div>'+
@@ -505,7 +519,7 @@ function renderKiosco(){
       '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email, ID..." oninput="filtroKiosco=this.value.toLowerCase();renderMain()" value="'+filtroKiosco+'"/></div>'+
       '<button class="btn btn-sm btn-purple" onclick="abrirNuevoKio()">+ Nuevo cliente</button>'+
     '</div>'+
-    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin clientes todavía. Creá el primero.</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin clientes todavía.</td></tr>')+'</tbody></table></div></div>'+
     '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0;line-height:2">Sin clientes todavía.<br>Tocá <b>+ Nuevo cliente</b> para agregar el primero.</div>')+'</div>'+
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes kiosco</p>';
 }
@@ -526,7 +540,6 @@ function abrirNuevoKio(){
         '<button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear</button>'+
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
-  // autogenerar slug cuando escriben el nombre
   setTimeout(function(){
     var nomEl=document.getElementById("k-nom");
     var idEl=document.getElementById("k-id");
@@ -534,7 +547,6 @@ function abrirNuevoKio(){
     if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};
   },100);
 }
-
 async function crearClienteKio(){
   var nom=(document.getElementById("k-nom").value||"").trim();
   var id=(document.getElementById("k-id").value||"").trim()||toSlug(nom);
@@ -544,15 +556,10 @@ async function crearClienteKio(){
   var venc=document.getElementById("k-venc").value||null;
   if(!nom||!id){toast("Completá nombre del negocio",false);return;}
   try{
-    await dbKiosco.collection("clientes").doc(id).set({
-      nombre:nom,negocioId:id,email:ema,telefono:tel,
-      plan:plan,activo:true,vencimiento:venc,
-      fechaAlta:new Date().toISOString()
-    });
+    await dbKiosco.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,fechaAlta:new Date().toISOString()});
     toast("✅ Cliente "+nom+" creado");cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
-
 function abrirEditarKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
   document.getElementById("modal-container").innerHTML=
@@ -575,33 +582,22 @@ function abrirEditarKio(id){
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
 }
-
 async function guardarEdicionKio(id){
   try{
-    await dbKiosco.collection("clientes").doc(id).update({
-      nombre:document.getElementById("ke-nom").value.trim(),
-      email:document.getElementById("ke-ema").value.trim(),
-      telefono:document.getElementById("ke-tel").value.trim(),
-      plan:document.getElementById("ke-plan").value,
-      vencimiento:document.getElementById("ke-venc").value||null,
-      activo:document.getElementById("ke-activo").value==="1"
-    });
+    await dbKiosco.collection("clientes").doc(id).update({nombre:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),telefono:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,activo:document.getElementById("ke-activo").value==="1"});
     toast("✅ Cliente actualizado");cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
-
 async function eliminarKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});
   if(!confirm("¿Eliminar permanentemente a "+(c?c.nombre:id)+"? No se puede deshacer."))return;
   try{await dbKiosco.collection("clientes").doc(id).delete();toast("✅ Cliente eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
 }
-
 async function suspenderKio(id,activo){
   var c=kioscoClientes.find(function(x){return x.id===id;});
   if(!confirm((activo?"¿Activar":"¿Suspender")+" a "+(c?c.nombre:id)+"?"))return;
   try{await dbKiosco.collection("clientes").doc(id).update({activo:activo});toast(activo?"✅ Activado":"🔴 Suspendido");cargarTodo();}catch(e){toast(e.message,false);}
 }
-
 async function extenderKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});
   var dias=prompt("¿Cuántos días extender la suscripción de "+(c?c.nombre:id)+"?","30");
@@ -610,13 +606,11 @@ async function extenderKio(id){
   base.setDate(base.getDate()+parseInt(dias));
   try{await dbKiosco.collection("clientes").doc(id).update({vencimiento:base.toISOString().slice(0,10)});toast("✅ Vencimiento extendido "+dias+" días");cargarTodo();}catch(e){toast(e.message,false);}
 }
-
 function copiarLinkKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
   var url=getKioscoUrl(c);
   navigator.clipboard.writeText(url).then(function(){toast("✅ Link copiado: "+url);}).catch(function(){prompt("Copiá este link:",url);});
 }
-
 async function verStatsKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
   document.getElementById("modal-container").innerHTML=
