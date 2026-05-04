@@ -13,54 +13,36 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-
-    /* ── Variables de escala de texto ── */
     :root { font-size: 14px; }
-
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0f1a;color:#e2eaf4;min-height:100vh;font-size:1rem;}
-
-    /* ── Layout ── */
     .screen{max-width:960px;margin:0 auto;padding:16px;}
 
     /* ── Header ── */
-    .header{
-      background:#111c2e;
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      padding:12px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      position:sticky;top:0;z-index:10;
-      gap:8px;
-    }
+    .header{background:#111c2e;border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:8px;}
     .header-title{display:flex;align-items:center;gap:10px;min-width:0;}
     .header-title h1{font-size:1rem;font-weight:600;color:#e2eaf4;white-space:nowrap;}
     .header-title span{font-size:0.8rem;color:#7a9ab8;display:none;}
     .header-actions{display:flex;gap:6px;flex-shrink:0;}
 
+    /* ── PRODUCT TABS ── */
+    .product-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:#111c2e;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .product-tabs::-webkit-scrollbar{display:none;}
+    .ptab{padding:12px 16px;font-size:0.85rem;font-weight:600;color:#7a9ab8;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;transition:color .15s;-webkit-tap-highlight-color:transparent;}
+    .ptab:hover{color:#e2eaf4;}
+    .ptab.activo{color:#fff;border-bottom-color:#7b3fc9;}
+    .ptab .ptab-badge{background:#7b3fc9;color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:99px;}
+    .ptab-coming{opacity:.45;cursor:default;}
+
     /* ── Botones ── */
-    .btn{
-      padding:10px 16px;
-      border-radius:10px;
-      border:0.5px solid rgba(255,255,255,0.13);
-      cursor:pointer;
-      font-size:0.9rem;
-      font-weight:500;
-      transition:all 0.15s;
-      background:#1a2b3c;
-      color:#e2eaf4;
-      min-height:40px;
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-    }
+    .btn{padding:10px 16px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.13);cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.15s;background:#1a2b3c;color:#e2eaf4;min-height:40px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
     .btn:active{opacity:0.75;transform:scale(0.97);}
     .btn-primary{background:#185FA5;color:#fff;border:none;}
     .btn-primary:active{background:#1a6fc0;}
+    .btn-purple{background:#7b3fc9;color:#fff;border:none;}
     .btn-danger{background:#2e0a0a;color:#f07070;border:0.5px solid #f07070;}
     .btn-success{background:#0a2e1f;color:#4dd9a0;border:0.5px solid #4dd9a0;}
     .btn-sm{padding:8px 12px;font-size:0.8rem;min-height:36px;}
     .btn-icon{padding:8px 12px;font-size:1rem;}
-    .btn-google{background:#fff;color:#333;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;font-size:1rem;border-radius:12px;cursor:pointer;min-height:50px;width:100%;max-width:360px;}
 
     /* ── Badges ── */
     .badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;display:inline-block;}
@@ -68,34 +50,25 @@
     .badge-red{background:#2e0a0a;color:#f07070;}
     .badge-blue{background:#1e3a5f;color:#5daaff;}
     .badge-gray{background:#1a2b3c;color:#7a9ab8;}
+    .badge-purple{background:#2d1a4a;color:#c9a5f5;}
+    .badge-orange{background:#2e1800;color:#f5a442;}
 
     /* ── Inputs ── */
-    input,select{
-      width:100%;
-      padding:12px 14px;
-      background:#1a2b3c;
-      border:0.5px solid rgba(255,255,255,0.13);
-      border-radius:10px;
-      color:#e2eaf4;
-      font-size:1rem;
-      outline:none;
-      margin-bottom:12px;
-      min-height:46px;
-      -webkit-appearance:none;
-    }
+    input,select{width:100%;padding:12px 14px;background:#1a2b3c;border:0.5px solid rgba(255,255,255,0.13);border-radius:10px;color:#e2eaf4;font-size:1rem;outline:none;margin-bottom:12px;min-height:46px;-webkit-appearance:none;}
     input:focus,select:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.25);}
     label{font-size:0.8rem;color:#7a9ab8;margin-bottom:5px;display:block;}
 
     /* ── Stats grid ── */
     .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
     .stat-card{background:#1a2b3c;border-radius:12px;padding:14px;text-align:center;}
     .stat-num{font-size:1.8rem;font-weight:700;color:#5daaff;}
     .stat-label{font-size:0.75rem;color:#7a9ab8;margin-top:4px;}
 
-    /* ── Card genérica ── */
+    /* ── Card ── */
     .card{background:#111c2e;border:0.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;margin-bottom:12px;}
 
-    /* ── Tabla (solo desktop) ── */
+    /* ── Tabla ── */
     .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
     table{width:100%;border-collapse:collapse;font-size:0.85rem;}
     th{text-align:left;padding:10px 12px;color:#7a9ab8;font-weight:500;font-size:0.72rem;text-transform:uppercase;border-bottom:0.5px solid rgba(255,255,255,0.08);}
@@ -104,14 +77,8 @@
     .desktop-only{display:table;}
     .mobile-only{display:none;}
 
-    /* ── CARDS MOBILE (reemplaza la tabla) ── */
-    .lic-card{
-      background:#111c2e;
-      border:0.5px solid rgba(255,255,255,0.1);
-      border-radius:14px;
-      padding:14px 16px;
-      margin-bottom:10px;
-    }
+    /* ── Kiosco cards mobile ── */
+    .lic-card{background:#111c2e;border:0.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 16px;margin-bottom:10px;}
     .lic-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
     .lic-codigo{font-family:monospace;color:#5daaff;font-size:0.95rem;font-weight:700;}
     .lic-card-fila{display:flex;gap:6px;align-items:center;margin-bottom:6px;font-size:0.85rem;}
@@ -120,62 +87,60 @@
     .lic-card-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
     .lic-card-actions .btn{flex:1;min-width:80px;text-align:center;justify-content:center;}
 
+    /* ── Link box ── */
+    .link-box{background:#0d1929;border:0.5px solid rgba(93,170,255,0.3);border-radius:8px;padding:10px 12px;font-size:0.78rem;font-family:monospace;color:#5daaff;word-break:break-all;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+    .btn-copy{background:#185FA5;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+    /* ── Stats negocio kiosco ── */
+    .negocio-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+    .ns{background:#1a2b3c;border-radius:10px;padding:10px 12px;text-align:center;}
+    .ns-val{font-size:1.2rem;font-weight:700;color:#5daaff;}
+    .ns-label{font-size:0.7rem;color:#7a9ab8;margin-top:2px;}
+
     /* ── Modal ── */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;justify-content:center;z-index:100;padding:0;}
-    .modal{
-      background:#111c2e;
-      border-radius:20px 20px 0 0;
-      padding:24px 20px 32px;
-      width:100%;
-      max-width:480px;
-      border:0.5px solid rgba(255,255,255,0.12);
-      border-bottom:none;
-      max-height:92vh;
-      overflow-y:auto;
-    }
+    .modal{background:#111c2e;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;border:0.5px solid rgba(255,255,255,0.12);border-bottom:none;max-height:92vh;overflow-y:auto;}
     .modal-drag{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 18px;}
 
     /* ── Login ── */
     .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;padding:40px 20px;}
     .login-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:0;}
 
-    /* ── Toast ── */
-    #toast{
-      position:fixed;bottom:88px;left:50%;transform:translateX(-50%);
-      background:#185FA5;color:#fff;
-      padding:12px 22px;border-radius:24px;
-      font-size:0.9rem;z-index:200;opacity:0;
-      transition:opacity 0.3s;pointer-events:none;
-      white-space:nowrap;max-width:90vw;text-overflow:ellipsis;overflow:hidden;
-    }
+    /* ── Coming soon ── */
+    .coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px;}
+    .coming-icon{font-size:64px;}
+    .coming-title{font-size:1.4rem;font-weight:700;color:#e2eaf4;}
+    .coming-sub{font-size:0.9rem;color:#7a9ab8;max-width:320px;line-height:1.6;}
+    .coming-badge{background:#2d1a4a;color:#c9a5f5;padding:6px 16px;border-radius:99px;font-size:0.8rem;font-weight:700;}
 
-    /* ── Botón flotante de escala ── */
-    #btn-escala{
-      position:fixed;bottom:20px;right:16px;z-index:300;
-      background:#1a2b3c;border:1px solid rgba(255,255,255,0.18);
-      border-radius:50px;padding:10px 16px;
-      font-size:0.85rem;font-weight:700;color:#5daaff;
-      cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);
-      touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-      display:none; /* se muestra cuando hay sesión */
-    }
+    /* ── Vencimiento ── */
+    .venc-ok{color:#4dd9a0;font-weight:700;}
+    .venc-warn{color:#f5a442;font-weight:700;}
+    .venc-bad{color:#f07070;font-weight:700;}
+
+    /* ── Toast ── */
+    #toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#185FA5;color:#fff;padding:12px 22px;border-radius:24px;font-size:0.9rem;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
+
+    /* ── Escala ── */
+    #btn-escala{position:fixed;bottom:20px;right:16px;z-index:300;background:#1a2b3c;border:1px solid rgba(255,255,255,0.18);border-radius:50px;padding:10px 16px;font-size:0.85rem;font-weight:700;color:#5daaff;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:none;}
     #btn-escala:active{transform:scale(0.95);}
 
-    /* ── Búsqueda con ícono ── */
+    /* ── Search ── */
     .search-wrap{position:relative;margin-bottom:14px;}
     .search-wrap input{padding-left:38px;margin-bottom:0;}
     .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7a9ab8;font-size:1rem;pointer-events:none;}
 
-    /* ── Responsive mobile ── */
     @media (max-width: 620px) {
       .desktop-only{display:none;}
       .mobile-only{display:block;}
       .header-title span{display:block;}
       .header-title h1{font-size:0.9rem;}
-      .grid3{gap:8px;}
+      .grid3,.grid4{gap:8px;}
+      .grid4{grid-template-columns:1fr 1fr;}
       .stat-num{font-size:1.5rem;}
       .stat-card{padding:12px 8px;}
       .screen{padding:12px;}
+      .ptab{padding:10px 12px;font-size:0.8rem;}
     }
     @media (min-width: 621px) {
       .modal-overlay{align-items:center;padding:20px;}
@@ -188,41 +153,23 @@
 <div id="toast"></div>
 <div id="app"></div>
 <div id="modal-container"></div>
-
-<!-- Botón flotante S/M/L/XL -->
 <button id="btn-escala" onclick="ciclarEscala()">M</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
 <script>
-/* ─────────────────────────────────────────
-   ESCALA DE TEXTO  S / M / L / XL
-───────────────────────────────────────── */
-var ESCALAS = {S:12, M:14, L:16, XL:18};
-var ORDEN_ESCALA = ["S","M","L","XL"];
-var escalaActual = localStorage.getItem("adminEscala") || "M";
-
-function aplicarEscala(s) {
-  escalaActual = s;
-  document.documentElement.style.fontSize = ESCALAS[s] + "px";
-  var btn = document.getElementById("btn-escala");
-  if(btn) btn.textContent = s;
-  localStorage.setItem("adminEscala", s);
-}
-
-function ciclarEscala() {
-  var idx = ORDEN_ESCALA.indexOf(escalaActual);
-  var siguiente = ORDEN_ESCALA[(idx + 1) % ORDEN_ESCALA.length];
-  aplicarEscala(siguiente);
-}
-
+/* ── ESCALA ── */
+var ESCALAS={S:12,M:14,L:16,XL:18};
+var ORDEN_ESCALA=["S","M","L","XL"];
+var escalaActual=localStorage.getItem("adminEscala")||"M";
+function aplicarEscala(s){escalaActual=s;document.documentElement.style.fontSize=ESCALAS[s]+"px";var btn=document.getElementById("btn-escala");if(btn)btn.textContent=s;localStorage.setItem("adminEscala",s);}
+function ciclarEscala(){var idx=ORDEN_ESCALA.indexOf(escalaActual);aplicarEscala(ORDEN_ESCALA[(idx+1)%ORDEN_ESCALA.length]);}
 aplicarEscala(escalaActual);
 
-/* ─────────────────────────────────────────
-   FIREBASE
-───────────────────────────────────────── */
-const ADMIN_UID = "cuPGzTs8wGbWMVYRajqXY7B46hr1";
+/* ── FIREBASE EMMA (Reparto) ── */
+const ADMIN_UID="cuPGzTs8wGbWMVYRajqXY7B46hr1";
 firebase.initializeApp({
   apiKey:"AIzaSyB8BB_xFyXCobGHoMj_dFOTA1n76FROfS4",
   authDomain:"emma-soluciones.firebaseapp.com",
@@ -230,316 +177,494 @@ firebase.initializeApp({
   storageBucket:"emma-soluciones.firebasestorage.app",
   messagingSenderId:"611618583352",
   appId:"1:611618583352:web:90f0f3a0248bc016c087cd"
+},"emma");
+
+const dbEmma=firebase.app("emma").firestore();
+const auth=firebase.app("emma").auth();
+
+/* ── FIREBASE KIOSCO ── */
+firebase.initializeApp({
+  apiKey:"AIzaSyAI3bPrAZlAvduooCaUZPF1LNeJcriL-WI",
+  authDomain:"app-kiosco-c9482.firebaseapp.com",
+  projectId:"app-kiosco-c9482",
+  storageBucket:"app-kiosco-c9482.firebasestorage.app",
+  messagingSenderId:"511057681349",
+  appId:"1:511057681349:web:49c18f441f1700416989ac"
+},"kiosco");
+const dbKiosco=firebase.app("kiosco").firestore();
+
+/* ── ESTADO GLOBAL ── */
+var productoActivo="reparto";
+var licencias=[];
+var kioscoClientes=[];
+var filtroReparto="";
+var filtroKiosco="";
+
+/* ── TOAST ── */
+function toast(msg,ok){var t=document.getElementById("toast");t.textContent=msg;t.style.background=(ok===false)?"#c93030":"#185FA5";t.style.opacity="1";setTimeout(function(){t.style.opacity="0";},3000);}
+
+/* ── AUTH ── */
+auth.onAuthStateChanged(function(user){
+  var btn=document.getElementById("btn-escala");
+  if(!user){if(btn)btn.style.display="none";renderLogin("");return;}
+  if(user.uid!==ADMIN_UID){auth.signOut();renderLogin("Acceso denegado.");return;}
+  if(btn)btn.style.display="flex";
+  cargarTodo();
 });
-const db = firebase.firestore();
-const auth = firebase.auth();
 
-let licencias = [];
-let filtro = "";
+function loginGoogle(){
+  var email=document.getElementById("adminEmail")?document.getElementById("adminEmail").value:"";
+  var pass=document.getElementById("adminPass")?document.getElementById("adminPass").value:"";
+  if(!email||!pass){toast("Completá email y contraseña",false);return;}
+  auth.signInWithEmailAndPassword(email,pass).catch(function(e){toast("Email o contraseña incorrectos",false);});
+}
+function logout(){auth.signOut();document.getElementById("btn-escala").style.display="none";}
 
-function toast(msg, ok) {
-  var t = document.getElementById("toast");
-  t.textContent = msg;
-  t.style.background = (ok===false) ? "#c93030" : "#185FA5";
-  t.style.opacity = "1";
-  setTimeout(function(){ t.style.opacity = "0"; }, 3000);
+async function cargarTodo(){
+  await Promise.all([cargarLicencias(),cargarKioscoClientes()]);
+  renderMain();
 }
 
-auth.onAuthStateChanged(function(user) {
-  var btn = document.getElementById("btn-escala");
-  if(!user) {
-    if(btn) btn.style.display = "none";
-    renderLogin("");
-    return;
-  }
-  if(user.uid !== ADMIN_UID) {
-    auth.signOut();
-    renderLogin("Acceso denegado.");
-    return;
-  }
-  if(btn) btn.style.display = "flex";
-  cargarLicencias();
-});
+/* ── LOGO ── */
+function logoSVG(size){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="'+size+'" height="'+size+'" style="flex-shrink:0"><line x1="12" y1="16" x2="34" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/><line x1="76" y1="16" x2="54" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/><line x1="12" y1="72" x2="34" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/><line x1="76" y1="72" x2="54" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/><circle cx="10" cy="14" r="8" fill="#c9a5f5"/><circle cx="78" cy="14" r="8" fill="#9d65e0"/><circle cx="10" cy="74" r="8" fill="#9d65e0"/><circle cx="78" cy="74" r="8" fill="#c9a5f5"/><circle cx="44" cy="44" r="22" fill="#7b3fc9"/><rect x="33" y="34" width="16" height="3" rx="1.5" fill="white"/><rect x="33" y="42.5" width="12" height="3" rx="1.5" fill="white"/><rect x="33" y="51" width="16" height="3" rx="1.5" fill="white"/></svg>';}
 
-function loginGoogle() {
-  var email = document.getElementById('adminEmail') ? document.getElementById('adminEmail').value : '';
-  var pass  = document.getElementById('adminPass')  ? document.getElementById('adminPass').value  : '';
-  if(!email||!pass){toast('Completá email y contraseña',false);return;}
-  auth.signInWithEmailAndPassword(email, pass)
-    .catch(function(e){ toast('Email o contraseña incorrectos', false); });
-}
-
-function logout() { auth.signOut(); document.getElementById("btn-escala").style.display="none"; }
-
-/* ─────────────────────────────────────────
-   PANTALLA DE LOGIN
-───────────────────────────────────────── */
-function renderLogin(err) {
-  document.getElementById("app").innerHTML =
-    '<div class="login-screen">' +
-      '<div style="text-align:center">' +
-        logoSVG(72) +
-        '<h1 style="font-size:1.4rem;font-weight:700;color:#e2eaf4;margin:12px 0 4px">Panel de Administración</h1>' +
-        '<p style="font-size:0.9rem;color:#7a9ab8">Sistema de Reparto 2026</p>' +
-      '</div>' +
-      (err ? '<p style="color:#f07070;font-size:0.85rem;text-align:center">'+err+'</p>' : '') +
-      '<div class="login-box">' +
-        '<label>Email de administrador</label>' +
-        '<input id="adminEmail" type="email" placeholder="admin@ejemplo.com" autocomplete="username" />' +
-        '<label>Contraseña</label>' +
-        '<input id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')loginGoogle()" />' +
-        '<button class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem;border-radius:12px;margin-top:4px" onclick="loginGoogle()">Ingresar</button>' +
-        '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:12px">Solo el administrador tiene acceso</p>' +
-      '</div>' +
+/* ── LOGIN ── */
+function renderLogin(err){
+  document.getElementById("app").innerHTML=
+    '<div class="login-screen">'+
+      '<div style="text-align:center">'+logoSVG(72)+
+        '<h1 style="font-size:1.4rem;font-weight:700;color:#e2eaf4;margin:12px 0 4px">Panel de Administración</h1>'+
+        '<p style="font-size:0.9rem;color:#7a9ab8">Emma Soluciones Digitales</p>'+
+      '</div>'+
+      (err?'<p style="color:#f07070;font-size:0.85rem;text-align:center">'+err+'</p>':'')+
+      '<div class="login-box">'+
+        '<label>Email de administrador</label>'+
+        '<input id="adminEmail" type="email" placeholder="admin@ejemplo.com" autocomplete="username"/>'+
+        '<label>Contraseña</label>'+
+        '<input id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')loginGoogle()"/>'+
+        '<button class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem;border-radius:12px;margin-top:4px" onclick="loginGoogle()">Ingresar</button>'+
+        '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:12px">Solo el administrador tiene acceso</p>'+
+      '</div>'+
     '</div>';
 }
 
-/* ─────────────────────────────────────────
-   CARGAR DATOS
-───────────────────────────────────────── */
-async function cargarLicencias() {
-  try {
-    var snap = await db.collection("licencias").get();
-    licencias = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-    renderPanel();
-  } catch(e) { toast("Error: "+e.message, false); }
+/* ════════════════════════════════════════
+   RENDER PRINCIPAL
+════════════════════════════════════════ */
+function renderMain(){
+  var totalRep=licencias.length;
+  var totalKio=kioscoClientes.length;
+
+  var tabs=[
+    {key:"reparto",icon:"🚚",label:"Reparto",count:totalRep},
+    {key:"kiosco",icon:"🏪",label:"Kiosco",count:totalKio},
+    {key:"polleria",icon:"🍗",label:"Pollería",count:0,coming:true},
+    {key:"reposteria",icon:"🎂",label:"Repostería",count:0,coming:true},
+  ];
+
+  var tabsHtml=tabs.map(function(t){
+    var cls="ptab"+(productoActivo===t.key?" activo":"")+(t.coming?" ptab-coming":"");
+    var onclick=t.coming?"":"onclick=\"cambiarProducto('"+t.key+"')\"";
+    var badge=t.count>0?'<span class="ptab-badge">'+t.count+'</span>':"";
+    return '<div class="'+cls+'" '+onclick+'>'+t.icon+' '+t.label+badge+(t.coming?' <span style="font-size:0.65rem;color:#7a9ab8">(pronto)</span>':'')+' </div>';
+  }).join("");
+
+  var bodyContent="";
+  if(productoActivo==="reparto") bodyContent=renderReparto();
+  else if(productoActivo==="kiosco") bodyContent=renderKiosco();
+  else if(productoActivo==="polleria") bodyContent=renderComingSoon("🍗","App Pollería","Sistema de gestión de pedidos, producción y ventas para pollerías.","En desarrollo");
+  else if(productoActivo==="reposteria") bodyContent=renderComingSoon("🎂","App Repostería","Gestión de pedidos personalizados, recetas y ventas para reposterías.","En desarrollo");
+
+  document.getElementById("app").innerHTML=
+    '<div class="header">'+
+      '<div class="header-title">'+logoSVG(36)+
+        '<div><h1>Panel Admin</h1><span>Emma Soluciones Digitales</span></div>'+
+      '</div>'+
+      '<div class="header-actions">'+
+        '<button class="btn btn-sm btn-icon" onclick="cargarTodo()" title="Actualizar">↻</button>'+
+        '<button class="btn btn-sm" onclick="logout()">Salir</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="product-tabs">'+tabsHtml+'</div>'+
+    '<div class="screen">'+bodyContent+'</div>';
 }
 
-function estadoBadge(estado) {
-  if(estado === "activo")   return '<span class="badge badge-blue">Disponible</span>';
-  if(estado === "usado")    return '<span class="badge badge-green">En uso</span>';
-  return '<span class="badge badge-red">Inactiva</span>';
+function cambiarProducto(p){productoActivo=p;renderMain();}
+
+/* ════════════════════════════════════════
+   COMING SOON
+════════════════════════════════════════ */
+function renderComingSoon(icon,titulo,desc,badge){
+  return '<div class="coming-soon">'+
+    '<div class="coming-icon">'+icon+'</div>'+
+    '<div class="coming-title">'+titulo+'</div>'+
+    '<div class="coming-sub">'+desc+'</div>'+
+    '<div class="coming-badge">'+badge+'</div>'+
+    '<p style="font-size:0.8rem;color:#4a6a85;margin-top:8px">Contactá a Emma Soluciones Digitales para más info.</p>'+
+  '</div>';
 }
 
-/* ─────────────────────────────────────────
-   PANEL PRINCIPAL
-───────────────────────────────────────── */
-function renderPanel() {
-  var total    = licencias.length;
-  var activos  = licencias.filter(function(l){ return l.estado==="activo"||l.estado==="usado"; }).length;
-  var inact    = licencias.filter(function(l){ return l.estado==="inactivo"; }).length;
-  var filtrados = licencias.filter(function(l){
-    if(!filtro) return true;
-    return (l.id||"").toLowerCase().indexOf(filtro)>=0 ||
-           (l.negocio||"").toLowerCase().indexOf(filtro)>=0 ||
-           (l.email||"").toLowerCase().indexOf(filtro)>=0 ||
-           (l.celular||"").indexOf(filtro)>=0;
+/* ════════════════════════════════════════
+   REPARTO (sistema existente)
+════════════════════════════════════════ */
+async function cargarLicencias(){
+  try{var snap=await dbEmma.collection("licencias").get();licencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
+  catch(e){console.warn("Licencias error:",e);}
+}
+
+function estadoBadgeRep(estado){
+  if(estado==="activo")return'<span class="badge badge-blue">Disponible</span>';
+  if(estado==="usado")return'<span class="badge badge-green">En uso</span>';
+  return'<span class="badge badge-red">Inactiva</span>';
+}
+
+function renderReparto(){
+  var total=licencias.length;
+  var activos=licencias.filter(function(l){return l.estado==="activo"||l.estado==="usado";}).length;
+  var inact=licencias.filter(function(l){return l.estado==="inactivo";}).length;
+  var filtrados=licencias.filter(function(l){
+    if(!filtroReparto)return true;
+    return(l.id||"").toLowerCase().indexOf(filtroReparto)>=0||(l.negocio||"").toLowerCase().indexOf(filtroReparto)>=0||(l.email||"").toLowerCase().indexOf(filtroReparto)>=0||(l.celular||"").indexOf(filtroReparto)>=0;
   });
 
-  /* ── Filas de tabla (desktop) ── */
-  var filas = filtrados.map(function(l){
-    var acciones =
-      '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditar(\''+l.id+'\')">✏️ Editar</button>' +
-      (l.estado==="inactivo"
-        ? '<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstado(\''+l.id+'\',\'activo\')">✅ Activar</button>'
-        : '<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstado(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>'
-      ) +
-      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button>';
-    return '<tr>' +
-      '<td><code style="color:#5daaff;font-size:0.85rem">'+l.id+'</code></td>' +
-      '<td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td>' +
-      '<td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td>' +
-      '<td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td>' +
-      '<td>'+estadoBadge(l.estado)+'</td>' +
-      '<td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td>' +
-      '<td>'+acciones+'</td>' +
-      '</tr>';
+  var filas=filtrados.map(function(l){
+    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarRep(\''+l.id+'\')">✏️</button>'+
+      (l.estado==="inactivo"?'<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱</button>';
+    return'<tr><td><code style="color:#5daaff;font-size:0.85rem">'+l.id+'</code></td><td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td><td>'+estadoBadgeRep(l.estado)+'</td><td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td><td>'+acc+'</td></tr>';
   }).join("");
 
-  /* ── Cards mobile ── */
-  var cards = filtrados.map(function(l){
-    var accionEstado = l.estado==="inactivo"
-      ? '<button class="btn btn-sm btn-success" onclick="cambiarEstado(\''+l.id+'\',\'activo\')">✅ Activar</button>'
-      : '<button class="btn btn-sm btn-danger" onclick="cambiarEstado(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
-    return '<div class="lic-card">' +
-      '<div class="lic-card-top">' +
-        '<span class="lic-codigo">'+l.id+'</span>' +
-        estadoBadge(l.estado) +
-      '</div>' +
-      (l.negocio ? '<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>' : '') +
-      (l.email   ? '<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>' : '') +
-      (l.celular ? '<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>' : '') +
-      '<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div>' +
-      '<div class="lic-card-actions">' +
-        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditar(\''+l.id+'\')">✏️ Editar</button>' +
-        accionEstado +
-        '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button>' +
-      '</div>' +
+  var cards=filtrados.map(function(l){
+    var accionEstado=l.estado==="inactivo"?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
+    return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+(l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>':'')+(l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+(l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+'<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div><div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarRep(\''+l.id+'\')">✏️ Editar</button>'+accionEstado+'<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button></div></div>';
+  }).join("");
+
+  return'<div class="grid3" style="margin:14px 0">'+
+      '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
+      '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar código, negocio, email..." oninput="filtroReparto=this.value.toLowerCase();renderMain()" value="'+filtroReparto+'"/></div>'+
+      '<button class="btn btn-sm btn-primary" onclick="abrirNuevaRep()">+ Nueva</button>'+
+    '</div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin resultados</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin resultados</div>')+'</div>'+
+    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias</p>';
+}
+
+/* Modales Reparto */
+function abrirNuevaRep(){
+  var codigo="SR2026-"+Math.random().toString(36).slice(2,6).toUpperCase();
+  var pin=Math.floor(1000+Math.random()*9000);
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">➕ Nueva licencia Reparto</h2>'+
+      '<label>Código de activación</label><input id="m-cod" value="'+codigo+'"/>'+
+      '<label>PIN de acceso</label><input id="m-pin" type="number" value="'+pin+'"/>'+
+      '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Cliente de prueba"/>'+
+      '<div style="display:flex;gap:10px;margin-top:6px">'+
+        '<button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+}
+async function crearLicenciaRep(){
+  var codigo=document.getElementById("m-cod").value.trim().toUpperCase();
+  var pin=Number(document.getElementById("m-pin").value);
+  var notas=document.getElementById("m-notas").value.trim();
+  if(!codigo||!pin){toast("Completá código y PIN",false);return;}
+  try{
+    await dbEmma.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,plan:"individual",notas:notas,deviceId:"",email:"",celular:"",negocio:"",creadoEn:new Date().toISOString()});
+    toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+function abrirEditarRep(id){
+  var l=licencias.find(function(x){return x.id===id;});if(!l)return;
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar licencia</h2>'+
+      '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:18px;font-family:monospace">'+l.id+'</p>'+
+      '<label>PIN</label><input id="e-pin" type="number" value="'+(l.pin||'')+'"/>'+
+      '<label>Negocio</label><input id="e-neg" value="'+(l.negocio||'')+'"/>'+
+      '<label>Email</label><input id="e-ema" type="email" value="'+(l.email||'')+'"/>'+
+      '<label>Celular</label><input id="e-cel" type="tel" value="'+(l.celular||'')+'"/>'+
+      '<label>Notas</label><input id="e-not" value="'+(l.notas||'')+'"/>'+
+      '<div style="display:flex;gap:10px;margin-top:6px">'+
+        '<button class="btn btn-primary" style="flex:1" onclick="guardarEdicionRep(\''+id+'\')">Guardar</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+}
+async function guardarEdicionRep(id){
+  try{
+    await dbEmma.collection("licencias").doc(id).update({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()});
+    toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+async function cambiarEstadoRep(id,estado){
+  if(!confirm(estado==="inactivo"?"¿Desactivar? El cliente perderá el acceso.":"¿Activar esta licencia?"))return;
+  try{await dbEmma.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");cargarTodo();}catch(e){toast(e.message,false);}
+}
+async function resetDispositivo(id){
+  if(!confirm("¿Resetear dispositivo? El cliente podrá activar desde un celular nuevo."))return;
+  try{await dbEmma.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}
+}
+
+/* ════════════════════════════════════════
+   KIOSCO
+════════════════════════════════════════ */
+function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+function diasRestantes(f){if(!f)return null;return Math.ceil((new Date(f)-new Date())/(1000*60*60*24));}
+function formatFecha(f){if(!f)return"—";return new Date(f).toLocaleDateString("es-AR");}
+
+async function cargarKioscoClientes(){
+  try{var snap=await dbKiosco.collection("clientes").get();kioscoClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
+  catch(e){console.warn("Kiosco clientes error:",e);}
+}
+
+function estadoBadgeKio(c){
+  if(!c.activo)return'<span class="badge badge-red">Suspendido</span>';
+  var d=diasRestantes(c.vencimiento);
+  if(d!==null&&d<0)return'<span class="badge badge-orange">Vencido</span>';
+  if(d!==null&&d<=7)return'<span class="badge badge-orange">'+d+'d restantes</span>';
+  return'<span class="badge badge-green">Activo</span>';
+}
+
+function planBadge(plan){
+  if(plan==="pro")return'<span class="badge" style="background:#2d1a4a;color:#c9a5f5">PRO</span>';
+  if(plan==="basic")return'<span class="badge badge-blue">BASIC</span>';
+  return'<span class="badge badge-gray">DEMO</span>';
+}
+
+function vencLabel(c){
+  if(!c.vencimiento)return'<span style="color:#4a6a85">Sin venc.</span>';
+  var d=diasRestantes(c.vencimiento);
+  var cls=d<0?"venc-bad":d<=7?"venc-warn":"venc-ok";
+  return'<span class="'+cls+'">'+formatFecha(c.vencimiento)+(d!==null?" ("+(d<0?"venció":d+"d")+")":" ")+'</span>';
+}
+
+function getKioscoUrl(c){
+  var base=window.location.origin+window.location.pathname.replace("admin_emma.html","").replace("admin.html","");
+  return base+"kiosco.html?id="+(c.negocioId||c.id);
+}
+
+function renderKiosco(){
+  var total=kioscoClientes.length;
+  var activos=kioscoClientes.filter(function(c){return c.activo;}).length;
+  var suspendidos=kioscoClientes.filter(function(c){return!c.activo;}).length;
+  var porVencer=kioscoClientes.filter(function(c){var d=diasRestantes(c.vencimiento);return d!==null&&d<=7&&d>=0;}).length;
+
+  var filtrados=kioscoClientes.filter(function(c){
+    if(!filtroKiosco)return true;
+    return(c.nombre||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.email||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.negocioId||c.id||"").toLowerCase().indexOf(filtroKiosco)>=0;
+  });
+
+  var filas=filtrados.map(function(c){
+    var acc=
+      '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarKio(\''+c.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;margin-right:4px" onclick="verStatsKio(\''+c.id+'\')">📊</button>'+
+      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkKio(\''+c.id+'\')">🔗</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderKio(\''+c.id+'\')">📅</button>'+
+      (c.activo
+        ?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>'
+        :'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>'
+      );
+    return'<tr>'+
+      '<td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#5daaff;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td>'+
+      '<td>'+planBadge(c.plan)+'</td>'+
+      '<td>'+estadoBadgeKio(c)+'</td>'+
+      '<td>'+vencLabel(c)+'</td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'<br>'+(c.telefono?'<span style="font-size:0.75rem">'+c.telefono+'</span>':"")+'</td>'+
+      '<td>'+acc+'</td>'+
+    '</tr>';
+  }).join("");
+
+  var cards=filtrados.map(function(c){
+    return'<div class="lic-card">'+
+      '<div class="lic-card-top"><span class="lic-codigo">'+(c.negocioId||c.id)+'</span>'+estadoBadgeKio(c)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+c.nombre+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Plan</span>'+planBadge(c.plan)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Vence</span><span>'+vencLabel(c)+'</span></div>'+
+      (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
+      '<div class="lic-card-actions">'+
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarKio(\''+c.id+'\')">✏️ Editar</button>'+
+        '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none" onclick="verStatsKio(\''+c.id+'\')">📊 Stats</button>'+
+        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" onclick="copiarLinkKio(\''+c.id+'\')">🔗 Link</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderKio(\''+c.id+'\')">📅 Extender</button>'+
+        (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅ Activar</button>')+
+      '</div>'+
     '</div>';
   }).join("");
 
-  document.getElementById("app").innerHTML =
-    /* Header */
-    '<div class="header">' +
-      '<div class="header-title">' +
-        logoSVG(36) +
-        '<div><h1>Panel Admin</h1><span>Sistema de Reparto 2026</span></div>' +
-      '</div>' +
-      '<div class="header-actions">' +
-        '<button class="btn btn-primary btn-sm" onclick="abrirNueva()">+ Nueva</button>' +
-        '<button class="btn btn-sm btn-icon" onclick="cargarLicencias()" title="Actualizar">↻</button>' +
-        '<button class="btn btn-sm" onclick="logout()">Salir</button>' +
-      '</div>' +
-    '</div>' +
-
-    /* Body */
-    '<div class="screen">' +
-
-      /* Stats */
-      '<div class="grid3" style="margin:14px 0">' +
-        '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>' +
-        '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div>' +
-        '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div>' +
-      '</div>' +
-
-      /* Buscador */
-      '<div class="search-wrap">' +
-        '<span class="search-icon">🔍</span>' +
-        '<input placeholder="Buscar por código, negocio, email, celular..." oninput="filtro=this.value.toLowerCase();renderPanel()" value="'+filtro+'" />' +
-      '</div>' +
-
-      /* Tabla — solo desktop */
-      '<div class="desktop-only card" style="padding:0;overflow:hidden">' +
-        '<div class="table-wrap">' +
-          '<table><thead><tr>' +
-            '<th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th>' +
-          '</tr></thead><tbody>' +
-          (filas || '<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin resultados</td></tr>') +
-          '</tbody></table>' +
-        '</div>' +
-      '</div>' +
-
-      /* Cards — solo mobile */
-      '<div class="mobile-only">' +
-        (cards || '<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin resultados</div>') +
-      '</div>' +
-
-      '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias</p>' +
-    '</div>';
+  return'<div class="grid4" style="margin:14px 0">'+
+      '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+suspendidos+'</div><div class="stat-label">Suspendidos</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#f5a442">'+porVencer+'</div><div class="stat-label">Por vencer</div></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
+      '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email, ID..." oninput="filtroKiosco=this.value.toLowerCase();renderMain()" value="'+filtroKiosco+'"/></div>'+
+      '<button class="btn btn-sm btn-purple" onclick="abrirNuevoKio()">+ Nuevo cliente</button>'+
+    '</div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin clientes todavía. Creá el primero.</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0;line-height:2">Sin clientes todavía.<br>Tocá <b>+ Nuevo cliente</b> para agregar el primero.</div>')+'</div>'+
+    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes kiosco</p>';
 }
 
-/* ─────────────────────────────────────────
-   MODALES
-───────────────────────────────────────── */
-function abrirNueva() {
-  var codigo = "SR2026-" + Math.random().toString(36).slice(2,6).toUpperCase();
-  var pin = Math.floor(1000 + Math.random()*9000);
-  document.getElementById("modal-container").innerHTML =
-    '<div class="modal-overlay" onclick="cerrarModal(event)">' +
-      '<div class="modal">' +
-        '<div class="modal-drag"></div>' +
-        '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">➕ Nueva licencia</h2>' +
-        '<label>Código de activación</label><input id="m-cod" value="'+codigo+'" />' +
-        '<label>PIN de acceso</label><input id="m-pin" type="number" value="'+pin+'" />' +
-        '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Cliente de prueba" />' +
-        '<div style="display:flex;gap:10px;margin-top:6px">' +
-          '<button class="btn btn-primary" style="flex:1" onclick="crearLicencia()">Crear</button>' +
-          '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+/* ── Modales Kiosco ── */
+function abrirNuevoKio(){
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🏪 Nuevo cliente Kiosco</h2>'+
+      '<label>Nombre del negocio</label><input id="k-nom" placeholder="Ej: Kiosco El Sol"/>'+
+      '<label>ID único (se genera solo)</label><input id="k-id" placeholder="kiosco-el-sol" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,\'-\')"/>'+
+      '<label>Email</label><input id="k-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
+      '<label>Teléfono</label><input id="k-tel" type="tel" placeholder="381 123-4567"/>'+
+      '<label>Plan</label>'+
+      '<select id="k-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
+      '<label>Fecha de vencimiento</label><input id="k-venc" type="date"/>'+
+      '<div style="display:flex;gap:10px;margin-top:6px">'+
+        '<button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+  // autogenerar slug cuando escriben el nombre
+  setTimeout(function(){
+    var nomEl=document.getElementById("k-nom");
+    var idEl=document.getElementById("k-id");
+    if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};
+    if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};
+  },100);
 }
 
-async function crearLicencia() {
-  var codigo = document.getElementById("m-cod").value.trim().toUpperCase();
-  var pin    = Number(document.getElementById("m-pin").value);
-  var notas  = document.getElementById("m-notas").value.trim();
-  if(!codigo||!pin){ toast("Completá código y PIN", false); return; }
-  try {
-    await db.collection("licencias").doc(codigo).set({
-      estado:"activo", pin:pin, plan:"individual", notas:notas,
-      deviceId:"", email:"", celular:"", negocio:"",
-      creadoEn: new Date().toISOString()
+async function crearClienteKio(){
+  var nom=(document.getElementById("k-nom").value||"").trim();
+  var id=(document.getElementById("k-id").value||"").trim()||toSlug(nom);
+  var ema=(document.getElementById("k-ema").value||"").trim();
+  var tel=(document.getElementById("k-tel").value||"").trim();
+  var plan=document.getElementById("k-plan").value;
+  var venc=document.getElementById("k-venc").value||null;
+  if(!nom||!id){toast("Completá nombre del negocio",false);return;}
+  try{
+    await dbKiosco.collection("clientes").doc(id).set({
+      nombre:nom,negocioId:id,email:ema,telefono:tel,
+      plan:plan,activo:true,vencimiento:venc,
+      fechaAlta:new Date().toISOString()
     });
-    toast("✅ Licencia "+codigo+" creada — PIN: "+pin);
-    cerrarModalBtn();
-    cargarLicencias();
-  } catch(e){ toast(e.message, false); }
+    toast("✅ Cliente "+nom+" creado");cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 
-function abrirEditar(id) {
-  var l = licencias.find(function(x){ return x.id===id; });
-  if(!l) return;
-  document.getElementById("modal-container").innerHTML =
-    '<div class="modal-overlay" onclick="cerrarModal(event)">' +
-      '<div class="modal">' +
-        '<div class="modal-drag"></div>' +
-        '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar licencia</h2>' +
-        '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:18px;font-family:monospace">'+l.id+'</p>' +
-        '<label>PIN</label><input id="e-pin" type="number" value="'+(l.pin||'')+'" />' +
-        '<label>Negocio</label><input id="e-neg" value="'+(l.negocio||'')+'" />' +
-        '<label>Email</label><input id="e-ema" type="email" value="'+(l.email||'')+'" />' +
-        '<label>Celular</label><input id="e-cel" type="tel" value="'+(l.celular||'')+'" />' +
-        '<label>Notas</label><input id="e-not" value="'+(l.notas||'')+'" />' +
-        '<div style="display:flex;gap:10px;margin-top:6px">' +
-          '<button class="btn btn-primary" style="flex:1" onclick="guardarEdicion(\''+id+'\')">Guardar</button>' +
-          '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+function abrirEditarKio(id){
+  var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar cliente</h2>'+
+      '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:14px;font-family:monospace">'+(c.negocioId||c.id)+'</p>'+
+      '<label>Nombre del negocio</label><input id="ke-nom" value="'+(c.nombre||"")+'"/>'+
+      '<label>Email</label><input id="ke-ema" type="email" value="'+(c.email||"")+'"/>'+
+      '<label>Teléfono</label><input id="ke-tel" type="tel" value="'+(c.telefono||"")+'"/>'+
+      '<label>Plan</label>'+
+      '<select id="ke-plan"><option value="demo"'+(c.plan==="demo"?" selected":"")+'>Demo</option><option value="basic"'+(c.plan==="basic"?" selected":"")+'>Basic</option><option value="pro"'+(c.plan==="pro"?" selected":"")+'>Pro</option></select>'+
+      '<label>Fecha de vencimiento</label><input id="ke-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
+      '<label>Estado</label>'+
+      '<select id="ke-activo"><option value="1"'+(c.activo?" selected":"")+'>✅ Activo</option><option value="0"'+(!c.activo?" selected":"")+'>🔴 Suspendido</option></select>'+
+      '<div style="font-size:0.8rem;color:#7a9ab8;margin-bottom:12px">Link del cliente:</div>'+
+      '<div class="link-box"><span>'+getKioscoUrl(c)+'</span><button class="btn-copy" onclick="navigator.clipboard.writeText(\''+getKioscoUrl(c)+'\');toast(\'✅ Link copiado\')">Copiar</button></div>'+
+      '<div style="display:flex;gap:10px;margin-top:12px">'+
+        '<button class="btn btn-purple" style="flex:1" onclick="guardarEdicionKio(\''+id+'\')">Guardar</button>'+
+        '<button class="btn btn-danger btn-sm" onclick="eliminarKio(\''+id+'\')">🗑️</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
 }
 
-async function guardarEdicion(id) {
-  var pin = Number(document.getElementById("e-pin").value);
-  var neg = document.getElementById("e-neg").value.trim();
-  var ema = document.getElementById("e-ema").value.trim();
-  var cel = document.getElementById("e-cel").value.trim();
-  var not = document.getElementById("e-not").value.trim();
-  try {
-    await db.collection("licencias").doc(id).update({pin:pin,negocio:neg,email:ema,celular:cel,notas:not});
-    toast("✅ Licencia actualizada");
-    cerrarModalBtn();
-    cargarLicencias();
-  } catch(e){ toast(e.message, false); }
+async function guardarEdicionKio(id){
+  try{
+    await dbKiosco.collection("clientes").doc(id).update({
+      nombre:document.getElementById("ke-nom").value.trim(),
+      email:document.getElementById("ke-ema").value.trim(),
+      telefono:document.getElementById("ke-tel").value.trim(),
+      plan:document.getElementById("ke-plan").value,
+      vencimiento:document.getElementById("ke-venc").value||null,
+      activo:document.getElementById("ke-activo").value==="1"
+    });
+    toast("✅ Cliente actualizado");cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 
-async function cambiarEstado(id, estado) {
-  var msg = estado==="inactivo" ? "¿Desactivar? El cliente perderá el acceso." : "¿Activar esta licencia?";
-  if(!confirm(msg)) return;
-  try {
-    await db.collection("licencias").doc(id).update({estado:estado});
-    toast(estado==="inactivo" ? "🔴 Desactivada" : "✅ Activada");
-    cargarLicencias();
-  } catch(e){ toast(e.message, false); }
+async function eliminarKio(id){
+  var c=kioscoClientes.find(function(x){return x.id===id;});
+  if(!confirm("¿Eliminar permanentemente a "+(c?c.nombre:id)+"? No se puede deshacer."))return;
+  try{await dbKiosco.collection("clientes").doc(id).delete();toast("✅ Cliente eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
 }
 
-async function resetDispositivo(id) {
-  if(!confirm("¿Resetear dispositivo? El cliente podrá activar desde un celular nuevo.")) return;
-  try {
-    await db.collection("licencias").doc(id).update({deviceId:"", estado:"activo"});
-    toast("✅ Dispositivo reseteado");
-    cargarLicencias();
-  } catch(e){ toast(e.message, false); }
+async function suspenderKio(id,activo){
+  var c=kioscoClientes.find(function(x){return x.id===id;});
+  if(!confirm((activo?"¿Activar":"¿Suspender")+" a "+(c?c.nombre:id)+"?"))return;
+  try{await dbKiosco.collection("clientes").doc(id).update({activo:activo});toast(activo?"✅ Activado":"🔴 Suspendido");cargarTodo();}catch(e){toast(e.message,false);}
 }
 
-function cerrarModal(e) { if(e.target.classList.contains("modal-overlay")) cerrarModalBtn(); }
-function cerrarModalBtn() { document.getElementById("modal-container").innerHTML=""; }
-
-/* Logo SVG reutilizable */
-function logoSVG(size) {
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="'+size+'" height="'+size+'" style="flex-shrink:0">' +
-    '<line x1="12" y1="16" x2="34" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/>' +
-    '<line x1="76" y1="16" x2="54" y2="38" stroke="#7b3fc9" stroke-width="2" opacity="0.5"/>' +
-    '<line x1="12" y1="72" x2="34" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/>' +
-    '<line x1="76" y1="72" x2="54" y2="50" stroke="#9d65e0" stroke-width="2" opacity="0.5"/>' +
-    '<circle cx="10" cy="14" r="8" fill="#c9a5f5"/>' +
-    '<circle cx="78" cy="14" r="8" fill="#9d65e0"/>' +
-    '<circle cx="10" cy="74" r="8" fill="#9d65e0"/>' +
-    '<circle cx="78" cy="74" r="8" fill="#c9a5f5"/>' +
-    '<circle cx="44" cy="44" r="22" fill="#7b3fc9"/>' +
-    '<rect x="33" y="34" width="16" height="3" rx="1.5" fill="white"/>' +
-    '<rect x="33" y="42.5" width="12" height="3" rx="1.5" fill="white"/>' +
-    '<rect x="33" y="51" width="16" height="3" rx="1.5" fill="white"/>' +
-    '</svg>';
+async function extenderKio(id){
+  var c=kioscoClientes.find(function(x){return x.id===id;});
+  var dias=prompt("¿Cuántos días extender la suscripción de "+(c?c.nombre:id)+"?","30");
+  if(!dias)return;
+  var base=c&&c.vencimiento&&new Date(c.vencimiento)>new Date()?new Date(c.vencimiento):new Date();
+  base.setDate(base.getDate()+parseInt(dias));
+  try{await dbKiosco.collection("clientes").doc(id).update({vencimiento:base.toISOString().slice(0,10)});toast("✅ Vencimiento extendido "+dias+" días");cargarTodo();}catch(e){toast(e.message,false);}
 }
+
+function copiarLinkKio(id){
+  var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
+  var url=getKioscoUrl(c);
+  navigator.clipboard.writeText(url).then(function(){toast("✅ Link copiado: "+url);}).catch(function(){prompt("Copiá este link:",url);});
+}
+
+async function verStatsKio(id){
+  var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">📊 '+c.nombre+'</h2>'+
+      '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:14px;font-family:monospace">'+(c.negocioId||c.id)+'</p>'+
+      '<div id="stats-content" style="text-align:center;padding:20px;color:#7a9ab8">Cargando estadísticas...</div>'+
+      '<div style="display:flex;gap:10px;margin-top:12px">'+
+        '<button class="btn" style="flex:1" onclick="cerrarModalBtn()">Cerrar</button>'+
+      '</div></div></div>';
+  try{
+    var hoy=new Date().toISOString().slice(0,10);
+    var negId=c.negocioId||c.id;
+    var results=await Promise.all([
+      dbKiosco.collection("negocios").doc(negId).collection("datos").doc("stock").get(),
+      dbKiosco.collection("negocios").doc(negId).collection("datos").doc("ventas_"+hoy).get(),
+      dbKiosco.collection("negocios").doc(negId).collection("datos").doc("fiados").get(),
+    ]);
+    var stock=results[0].exists()?JSON.parse(results[0].data().data):[];
+    var ventas=results[1].exists()?JSON.parse(results[1].data().data):[];
+    var fiados=results[2].exists()?JSON.parse(results[2].data().data):[];
+    var totalV=ventas.reduce(function(s,v){return s+v.total;},0);
+    var totalF=fiados.reduce(function(s,cl){return s+cl.movimientos.reduce(function(ss,m){return m.tipo==="fiado"?ss+m.monto:ss-m.monto;},0);},0);
+    var sinStock=stock.filter(function(p){return(p.cantidadExhibido||0)===0;}).length;
+    document.getElementById("stats-content").innerHTML=
+      '<div class="negocio-stats">'+
+        '<div class="ns"><div class="ns-val">$'+totalV.toLocaleString("es-AR",{maximumFractionDigits:0})+'</div><div class="ns-label">Ventas hoy</div></div>'+
+        '<div class="ns"><div class="ns-val">'+ventas.length+'</div><div class="ns-label">Transacciones</div></div>'+
+        '<div class="ns"><div class="ns-val">'+stock.length+'</div><div class="ns-label">Productos</div></div>'+
+        '<div class="ns"><div class="ns-val" style="color:#f07070">'+sinStock+'</div><div class="ns-label">Sin exhibido</div></div>'+
+        '<div class="ns"><div class="ns-val" style="color:#f5a442">$'+Math.max(0,totalF).toLocaleString("es-AR",{maximumFractionDigits:0})+'</div><div class="ns-label">Total fiados</div></div>'+
+        '<div class="ns"><div class="ns-val">'+planBadge(c.plan)+'</div><div class="ns-label">Plan</div></div>'+
+      '</div>'+
+      '<p style="font-size:0.75rem;color:#4a6a85;text-align:center">Datos en tiempo real del día de hoy</p>';
+  }catch(e){document.getElementById("stats-content").innerHTML='<p style="color:#f07070">Error al cargar: '+e.message+'</p>';}
+}
+
+/* ── Helpers modales ── */
+function cerrarModal(e){if(e.target.classList.contains("modal-overlay"))cerrarModalBtn();}
+function cerrarModalBtn(){document.getElementById("modal-container").innerHTML="";}
 </script>
 
 <script>
-if('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
     navigator.serviceWorker.register('/departamento-administrativo/sw.js')
-      .then(function(reg) { console.log('SW registrado:', reg.scope); })
-      .catch(function(err) { console.log('SW error:', err); });
+      .then(function(reg){console.log('SW registrado:',reg.scope);})
+      .catch(function(err){console.log('SW error:',err);});
   });
 }
 </script>
