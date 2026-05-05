@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    :root{font-size:14px;}
+    :root { font-size: 14px; }
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0f1a;color:#e2eaf4;min-height:100vh;font-size:1rem;}
     .screen{max-width:960px;margin:0 auto;padding:16px;}
     .header{background:#111c2e;border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;gap:8px;}
@@ -27,12 +27,13 @@
     .ptab:hover{color:#e2eaf4;}
     .ptab.activo{color:#fff;border-bottom-color:#7b3fc9;}
     .ptab .ptab-badge{background:#7b3fc9;color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:99px;}
+    .ptab-coming{opacity:.45;cursor:default;}
     .btn{padding:10px 16px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.13);cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.15s;background:#1a2b3c;color:#e2eaf4;min-height:40px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
     .btn:active{opacity:0.75;transform:scale(0.97);}
     .btn-primary{background:#185FA5;color:#fff;border:none;}
+    .btn-primary:active{background:#1a6fc0;}
     .btn-purple{background:#7b3fc9;color:#fff;border:none;}
-    .btn-green{background:#0a5c2e;color:#4dd9a0;border:0.5px solid #4dd9a0;}
-    .btn-orange{background:#5c2e0a;color:#f5a442;border:0.5px solid #f5a442;}
+    .btn-orange{background:#c96a1a;color:#fff;border:none;}
     .btn-danger{background:#2e0a0a;color:#f07070;border:0.5px solid #f07070;}
     .btn-success{background:#0a2e1f;color:#4dd9a0;border:0.5px solid #4dd9a0;}
     .btn-sm{padding:8px 12px;font-size:0.8rem;min-height:36px;}
@@ -44,7 +45,6 @@
     .badge-gray{background:#1a2b3c;color:#7a9ab8;}
     .badge-purple{background:#2d1a4a;color:#c9a5f5;}
     .badge-orange{background:#2e1800;color:#f5a442;}
-    .badge-brown{background:#2e1a0a;color:#f5b07a;}
     input,select{width:100%;padding:12px 14px;background:#1a2b3c;border:0.5px solid rgba(255,255,255,0.13);border-radius:10px;color:#e2eaf4;font-size:1rem;outline:none;margin-bottom:12px;min-height:46px;-webkit-appearance:none;}
     input:focus,select:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.25);}
     label{font-size:0.8rem;color:#7a9ab8;margin-bottom:5px;display:block;}
@@ -68,7 +68,7 @@
     .lic-card-fila .lbl{color:#7a9ab8;min-width:60px;font-size:0.75rem;}
     .lic-card-fila .val{color:#e2eaf4;}
     .lic-card-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
-    .lic-card-actions .btn{flex:1;min-width:80px;text-align:center;}
+    .lic-card-actions .btn{flex:1;min-width:80px;text-align:center;justify-content:center;}
     .link-box{background:#0d1929;border:0.5px solid rgba(93,170,255,0.3);border-radius:8px;padding:10px 12px;font-size:0.78rem;font-family:monospace;color:#5daaff;word-break:break-all;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;}
     .btn-copy{background:#185FA5;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;cursor:pointer;white-space:nowrap;flex-shrink:0;}
     .negocio-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
@@ -80,22 +80,22 @@
     .modal-drag{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 18px;}
     .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;padding:40px 20px;}
     .login-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:0;}
+    .coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px;}
+    .coming-icon{font-size:64px;}
+    .coming-title{font-size:1.4rem;font-weight:700;color:#e2eaf4;}
+    .coming-sub{font-size:0.9rem;color:#7a9ab8;max-width:320px;line-height:1.6;}
+    .coming-badge{background:#2d1a4a;color:#c9a5f5;padding:6px 16px;border-radius:99px;font-size:0.8rem;font-weight:700;}
     .venc-ok{color:#4dd9a0;font-weight:700;}
     .venc-warn{color:#f5a442;font-weight:700;}
     .venc-bad{color:#f07070;font-weight:700;}
     #toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#185FA5;color:#fff;padding:12px 22px;border-radius:24px;font-size:0.9rem;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
     #btn-escala{position:fixed;bottom:20px;right:16px;z-index:300;background:#1a2b3c;border:1px solid rgba(255,255,255,0.18);border-radius:50px;padding:10px 16px;font-size:0.85rem;font-weight:700;color:#5daaff;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:none;}
+    #btn-escala:active{transform:scale(0.95);}
     .search-wrap{position:relative;margin-bottom:14px;}
     .search-wrap input{padding-left:38px;margin-bottom:0;}
     .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7a9ab8;font-size:1rem;pointer-events:none;}
-    /* App cards para pollería y repostería */
-    .app-cliente-card{background:#111c2e;border:0.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 16px;margin-bottom:10px;}
-    .app-cliente-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-    .app-cliente-nombre{font-weight:700;font-size:1rem;color:#e2eaf4;}
-    .app-cliente-sub{font-size:0.78rem;color:#7a9ab8;margin-top:2px;}
-    .app-cliente-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
-
-    @media (max-width:620px){
+    .firebase-tag{display:inline-flex;align-items:center;gap:5px;background:#1a2b3c;border:0.5px solid rgba(255,200,0,0.3);border-radius:8px;padding:4px 10px;font-size:0.72rem;color:#f5c842;font-family:monospace;margin-left:8px;}
+    @media (max-width: 620px) {
       .desktop-only{display:none;}
       .mobile-only{display:block;}
       .header-title span{display:block;}
@@ -107,7 +107,7 @@
       .screen{padding:12px;}
       .ptab{padding:10px 12px;font-size:0.8rem;}
     }
-    @media (min-width:621px){
+    @media (min-width: 621px) {
       .modal-overlay{align-items:center;padding:20px;}
       .modal{border-radius:18px;border-bottom:0.5px solid rgba(255,255,255,0.12);}
       .modal-drag{display:none;}
@@ -133,24 +133,39 @@ function aplicarEscala(s){escalaActual=s;document.documentElement.style.fontSize
 function ciclarEscala(){var idx=ORDEN_ESCALA.indexOf(escalaActual);aplicarEscala(ORDEN_ESCALA[(idx+1)%ORDEN_ESCALA.length]);}
 aplicarEscala(escalaActual);
 
-/* ══════════════════════════════════════════════════════
-   FIREBASE — 4 proyectos
-══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   FIREBASE — AUTENTICACIÓN ADMIN
+   Proyecto: app-control-de-apps
+════════════════════════════════════════ */
 const ADMIN_UID="A10EnUcd3ngbzmFNwWgSFuWj1OR2";
-
-// 1. Emma (Reparto)
 firebase.initializeApp({
-  apiKey:"AIzaSyB8BB_xFyXCobGHoMj_dFOTA1n76FROfS4",
-  authDomain:"emma-soluciones.firebaseapp.com",
-  projectId:"emma-soluciones",
-  storageBucket:"emma-soluciones.firebasestorage.app",
-  messagingSenderId:"611618583352",
-  appId:"1:611618583352:web:90f0f3a0248bc016c087cd"
-},"emma");
-const dbEmma=firebase.app("emma").firestore();
-const auth=firebase.app("emma").auth();
+  apiKey:"AIzaSyAFQ4ybqIoVV3rWe1FMjMVUZ-qzLNZbdBk",
+  authDomain:"app-control-de-apps.firebaseapp.com",
+  projectId:"app-control-de-apps",
+  storageBucket:"app-control-de-apps.firebasestorage.app",
+  messagingSenderId:"761424199819",
+  appId:"1:761424199819:web:513eeaf0e54f4e1401d48e"
+},"admin");
+const auth=firebase.app("admin").auth();
 
-// 2. Kiosco
+/* ════════════════════════════════════════
+   FIREBASE — APP REPARTO
+   Proyecto: app-reparto-65035
+════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:"AIzaSyDV1i35MLw74hjnSg6rRZgQFIAI8hsJllI",
+  authDomain:"app-reparto-65035.firebaseapp.com",
+  projectId:"app-reparto-65035",
+  storageBucket:"app-reparto-65035.firebasestorage.app",
+  messagingSenderId:"162304851374",
+  appId:"1:162304851374:web:0a60847807c8fe9a7a1c3f"
+},"reparto");
+const dbReparto=firebase.app("reparto").firestore();
+
+/* ════════════════════════════════════════
+   FIREBASE — APP KIOSCO
+   Proyecto: app-kiosco-c9482
+════════════════════════════════════════ */
 firebase.initializeApp({
   apiKey:"AIzaSyAI3bPrAZlAvduooCaUZPF1LNeJcriL-WI",
   authDomain:"app-kiosco-c9482.firebaseapp.com",
@@ -161,7 +176,24 @@ firebase.initializeApp({
 },"kiosco");
 const dbKiosco=firebase.app("kiosco").firestore();
 
-// 3. Pollería
+/* ════════════════════════════════════════
+   FIREBASE — EMMA CONTROL (Gestión Diaria)
+   Proyecto: sistema-de-gestion-diario
+════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:"AIzaSyBDz-IH9yrOBxkH10rpvDxZ12tyxeG_wSY",
+  authDomain:"sistema-de-gestion-diario.firebaseapp.com",
+  projectId:"sistema-de-gestion-diario",
+  storageBucket:"sistema-de-gestion-diario.firebasestorage.app",
+  messagingSenderId:"708942111150",
+  appId:"1:708942111150:web:f568d5fad93d7e7eb1683f"
+},"gestion");
+const dbGestion=firebase.app("gestion").firestore();
+
+/* ════════════════════════════════════════
+   FIREBASE — APP POLLERÍA
+   Proyecto: app-polleria-f349b
+════════════════════════════════════════ */
 firebase.initializeApp({
   apiKey:"AIzaSyDl2QhPwVToc4t6UQEGlCydRLzdE4oAx8A",
   authDomain:"app-polleria-f349b.firebaseapp.com",
@@ -172,27 +204,16 @@ firebase.initializeApp({
 },"polleria");
 const dbPolleria=firebase.app("polleria").firestore();
 
-// 4. Repostería
-firebase.initializeApp({
-  apiKey:"AIzaSyD1CqN9t984CCgZsnxTYiv-DIexEVHj2t4",
-  authDomain:"app-reposteria-7e31e.firebaseapp.com",
-  projectId:"app-reposteria-7e31e",
-  storageBucket:"app-reposteria-7e31e.firebasestorage.app",
-  messagingSenderId:"767790519277",
-  appId:"1:767790519277:web:76e0e8194e5f10d0998de4"
-},"reposteria");
-const dbReposteria=firebase.app("reposteria").firestore();
-
 /* ── ESTADO GLOBAL ── */
 var productoActivo="reparto";
 var licencias=[];
 var kioscoClientes=[];
-var polleriaUsuarios=[];
-var reposteriaUsuarios=[];
+var gestionUsuarios=[];
+var polleriaClientes=[];
 var filtroReparto="";
 var filtroKiosco="";
-var filtroPolleria="";
-var filtroReposteria="";
+var filtroGestion="";
+var filtroPolleriaClientes="";
 
 /* ── TOAST ── */
 function toast(msg,ok){var t=document.getElementById("toast");t.textContent=msg;t.style.background=(ok===false)?"#c93030":"#185FA5";t.style.opacity="1";setTimeout(function(){t.style.opacity="0";},3000);}
@@ -210,12 +231,12 @@ function loginGoogle(){
   var email=document.getElementById("adminEmail")?document.getElementById("adminEmail").value:"";
   var pass=document.getElementById("adminPass")?document.getElementById("adminPass").value:"";
   if(!email||!pass){toast("Completá email y contraseña",false);return;}
-  auth.signInWithEmailAndPassword(email,pass).catch(function(){toast("Email o contraseña incorrectos",false);});
+  auth.signInWithEmailAndPassword(email,pass).catch(function(e){toast("Email o contraseña incorrectos",false);});
 }
 function logout(){auth.signOut();document.getElementById("btn-escala").style.display="none";}
 
 async function cargarTodo(){
-  await Promise.all([cargarLicencias(),cargarKioscoClientes(),cargarPolleriaUsuarios(),cargarReposteriaUsuarios()]);
+  await Promise.all([cargarLicencias(),cargarKioscoClientes(),cargarGestionUsuarios(),cargarPolleriaClientes()]);
   renderMain();
 }
 
@@ -242,28 +263,35 @@ function renderLogin(err){
     '</div>';
 }
 
-/* ══════════════════════════════════════════════════════
+/* ════════════════════════════════════════
    RENDER PRINCIPAL
-══════════════════════════════════════════════════════ */
+════════════════════════════════════════ */
 function renderMain(){
+  var totalRep=licencias.length;
+  var totalKio=kioscoClientes.length;
+  var totalPoll=polleriaClientes.length;
+
   var tabs=[
-    {key:"reparto",    icon:"🚚", label:"Reparto",    count:licencias.length},
-    {key:"kiosco",     icon:"🏪", label:"Kiosco",     count:kioscoClientes.length},
-    {key:"polleria",   icon:"🐔", label:"Pollería",   count:polleriaUsuarios.length},
-    {key:"reposteria", icon:"🎂", label:"Repostería", count:reposteriaUsuarios.length},
+    {key:"reparto",  icon:"🚚", label:"Reparto",       count:totalRep},
+    {key:"kiosco",   icon:"🏪", label:"Kiosco",         count:totalKio},
+    {key:"gestion",  icon:"💰", label:"Gestión Diaria", count:gestionUsuarios.length},
+    {key:"polleria", icon:"🍗", label:"Pollería",        count:totalPoll},
+    {key:"reposteria",icon:"🎂",label:"Repostería",      count:0, coming:true},
   ];
 
   var tabsHtml=tabs.map(function(t){
-    var cls="ptab"+(productoActivo===t.key?" activo":"");
+    var cls="ptab"+(productoActivo===t.key?" activo":"")+(t.coming?" ptab-coming":"");
+    var onclick=t.coming?"":"onclick=\"cambiarProducto('"+t.key+"')\"";
     var badge=t.count>0?'<span class="ptab-badge">'+t.count+'</span>':"";
-    return '<div class="'+cls+'" onclick="cambiarProducto(\''+t.key+'\')">'+t.icon+' '+t.label+badge+'</div>';
+    return '<div class="'+cls+'" '+onclick+'>'+t.icon+' '+t.label+badge+(t.coming?' <span style="font-size:0.65rem;color:#7a9ab8">(pronto)</span>':'')+' </div>';
   }).join("");
 
   var bodyContent="";
   if(productoActivo==="reparto")    bodyContent=renderReparto();
-  else if(productoActivo==="kiosco")     bodyContent=renderKiosco();
-  else if(productoActivo==="polleria")   bodyContent=renderPolleria();
-  else if(productoActivo==="reposteria") bodyContent=renderReposteria();
+  else if(productoActivo==="kiosco")   bodyContent=renderKiosco();
+  else if(productoActivo==="gestion")  bodyContent=renderGestion();
+  else if(productoActivo==="polleria") bodyContent=renderPolleria();
+  else if(productoActivo==="reposteria") bodyContent=renderComingSoon("🎂","App Repostería","Gestión de pedidos personalizados, recetas y ventas para reposterías.","En desarrollo");
 
   document.getElementById("app").innerHTML=
     '<div class="header">'+
@@ -281,55 +309,86 @@ function renderMain(){
 
 function cambiarProducto(p){productoActivo=p;renderMain();}
 
-/* ══════════════════════════════════════════════════════
-   REPARTO
-══════════════════════════════════════════════════════ */
-async function cargarLicencias(){
-  try{var snap=await dbEmma.collection("licencias").get();licencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
-  catch(e){console.warn("Licencias error:",e);}
+/* ════════════════════════════════════════
+   COMING SOON
+════════════════════════════════════════ */
+function renderComingSoon(icon,titulo,desc,badge){
+  return '<div class="coming-soon">'+
+    '<div class="coming-icon">'+icon+'</div>'+
+    '<div class="coming-title">'+titulo+'</div>'+
+    '<div class="coming-sub">'+desc+'</div>'+
+    '<div class="coming-badge">'+badge+'</div>'+
+    '<p style="font-size:0.8rem;color:#4a6a85;margin-top:8px">Contactá a Emma Soluciones Digitales para más info.</p>'+
+  '</div>';
 }
 
+/* ════════════════════════════════════════
+   HELPERS COMPARTIDOS
+════════════════════════════════════════ */
+function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+function diasRestantes(f){if(!f)return null;return Math.ceil((new Date(f)-new Date())/(1000*60*60*24));}
+function formatFecha(f){if(!f)return"—";return new Date(f).toLocaleDateString("es-AR");}
+
+function estadoBadgeActivo(c){
+  if(c.pendiente)return'<span class="badge badge-orange">⏳ Pendiente</span>';
+  if(!c.activo)return'<span class="badge badge-red">Suspendido</span>';
+  var d=diasRestantes(c.vencimiento);
+  if(d!==null&&d<0)return'<span class="badge badge-orange">Vencido</span>';
+  if(d!==null&&d<=7)return'<span class="badge badge-orange">'+d+'d restantes</span>';
+  return'<span class="badge badge-green">Activo</span>';
+}
+function planBadge(plan){
+  if(plan==="pro")return'<span class="badge" style="background:#2d1a4a;color:#c9a5f5">PRO</span>';
+  if(plan==="basic")return'<span class="badge badge-blue">BASIC</span>';
+  return'<span class="badge badge-gray">DEMO</span>';
+}
+function vencLabel(c){
+  if(!c.vencimiento)return'<span style="color:#4a6a85">Sin venc.</span>';
+  var d=diasRestantes(c.vencimiento);
+  var cls=d<0?"venc-bad":d<=7?"venc-warn":"venc-ok";
+  return'<span class="'+cls+'">'+formatFecha(c.vencimiento)+(d!==null?" ("+(d<0?"venció":d+"d")+")":" ")+'</span>';
+}
+
+/* ════════════════════════════════════════
+   REPARTO — usa dbReparto (app-reparto-65035)
+════════════════════════════════════════ */
+async function cargarLicencias(){
+  try{var snap=await dbReparto.collection("licencias").get();licencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
+  catch(e){console.warn("Licencias Reparto error:",e);}
+}
 function estadoBadgeRep(estado){
+  if(estado==="pendiente")return'<span class="badge badge-orange">⏳ Pendiente</span>';
   if(estado==="activo")return'<span class="badge badge-blue">Disponible</span>';
   if(estado==="usado")return'<span class="badge badge-green">En uso</span>';
   return'<span class="badge badge-red">Inactiva</span>';
 }
-
 function renderReparto(){
   var total=licencias.length;
   var activos=licencias.filter(function(l){return l.estado==="activo"||l.estado==="usado";}).length;
+  var pendientes=licencias.filter(function(l){return l.estado==="pendiente";}).length;
   var inact=licencias.filter(function(l){return l.estado==="inactivo";}).length;
   var filtrados=licencias.filter(function(l){
     if(!filtroReparto)return true;
     return(l.id||"").toLowerCase().indexOf(filtroReparto)>=0||(l.negocio||"").toLowerCase().indexOf(filtroReparto)>=0||(l.email||"").toLowerCase().indexOf(filtroReparto)>=0||(l.celular||"").indexOf(filtroReparto)>=0;
   });
-
   var filas=filtrados.map(function(l){
     var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarRep(\''+l.id+'\')">✏️</button>'+
-      (l.estado==="inactivo"?'<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴</button>')+
       '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱</button>';
     return'<tr><td><code style="color:#5daaff;font-size:0.85rem">'+l.id+'</code></td><td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td><td>'+estadoBadgeRep(l.estado)+'</td><td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td><td>'+acc+'</td></tr>';
   }).join("");
-
   var cards=filtrados.map(function(l){
-    var accionEstado=l.estado==="inactivo"?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
+    var accionEstado=(l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
     return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+(l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>':'')+(l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+(l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+'<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div><div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarRep(\''+l.id+'\')">✏️ Editar</button>'+accionEstado+'<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button></div></div>';
   }).join("");
-
-  return'<div class="grid3" style="margin:14px 0">'+
-      '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div>'+
-    '</div>'+
-    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
-      '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar código, negocio, email..." oninput="filtroReparto=this.value.toLowerCase();renderMain()" value="'+filtroReparto+'"/></div>'+
-      '<button class="btn btn-sm btn-primary" onclick="abrirNuevaRep()">+ Nueva</button>'+
-    '</div>'+
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span class="firebase-tag">🔥 app-reparto-65035</span></div>'+
+    '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div></div>'+
+    (pendientes>0?'<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a442">⚠️ Tenés <strong>'+pendientes+'</strong> licencia(s) pendiente(s) de activación</div>':'')+
+    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center"><div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar código, negocio, email..." oninput="filtroReparto=this.value.toLowerCase();renderMain()" value="'+filtroReparto+'"/></div><button class="btn btn-sm btn-primary" onclick="abrirNuevaRep()">+ Nueva</button></div>'+
     '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin resultados</td></tr>')+'</tbody></table></div></div>'+
     '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin resultados</div>')+'</div>'+
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias</p>';
 }
-
 function abrirNuevaRep(){
   var codigo="SR2026-"+Math.random().toString(36).slice(2,6).toUpperCase();
   var pin=Math.floor(1000+Math.random()*9000);
@@ -338,21 +397,22 @@ function abrirNuevaRep(){
       '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">➕ Nueva licencia Reparto</h2>'+
       '<label>Código de activación</label><input id="m-cod" value="'+codigo+'"/>'+
       '<label>PIN de acceso</label><input id="m-pin" type="number" value="'+pin+'"/>'+
-      '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Cliente de prueba"/>'+
-      '<div style="display:flex;gap:10px;margin-top:6px">'+
-        '<button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button>'+
-        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
-      '</div></div></div>';
+      '<label>Negocio</label><input id="m-neg" placeholder="Ej: Distribuidora El Sol"/>'+
+      '<label>Email</label><input id="m-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
+      '<label>Celular</label><input id="m-cel" type="tel" placeholder="381 123-4567"/>'+
+      '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Plan mensual - vence 30/06"/>'+
+      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function crearLicenciaRep(){
   var codigo=document.getElementById("m-cod").value.trim().toUpperCase();
   var pin=Number(document.getElementById("m-pin").value);
+  var neg=document.getElementById("m-neg").value.trim();
+  var ema=document.getElementById("m-ema").value.trim();
+  var cel=document.getElementById("m-cel").value.trim();
   var notas=document.getElementById("m-notas").value.trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
-  try{
-    await dbEmma.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,plan:"individual",notas:notas,deviceId:"",email:"",celular:"",negocio:"",creadoEn:new Date().toISOString()});
-    toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();
-  }catch(e){toast(e.message,false);}
+  try{await dbReparto.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()});toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();}
+  catch(e){toast(e.message,false);}
 }
 function abrirEditarRep(id){
   var l=licencias.find(function(x){return x.id===id;});if(!l)return;
@@ -365,124 +425,79 @@ function abrirEditarRep(id){
       '<label>Email</label><input id="e-ema" type="email" value="'+(l.email||'')+'"/>'+
       '<label>Celular</label><input id="e-cel" type="tel" value="'+(l.celular||'')+'"/>'+
       '<label>Notas</label><input id="e-not" value="'+(l.notas||'')+'"/>'+
-      '<div style="display:flex;gap:10px;margin-top:6px">'+
-        '<button class="btn btn-primary" style="flex:1" onclick="guardarEdicionRep(\''+id+'\')">Guardar</button>'+
-        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
-      '</div></div></div>';
+      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="guardarEdicionRep(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function guardarEdicionRep(id){
-  try{
-    await dbEmma.collection("licencias").doc(id).update({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()});
-    toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();
-  }catch(e){toast(e.message,false);}
+  try{await dbReparto.collection("licencias").doc(id).update({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()});toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();}
+  catch(e){toast(e.message,false);}
 }
 async function cambiarEstadoRep(id,estado){
   if(!confirm(estado==="inactivo"?"¿Desactivar? El cliente perderá el acceso.":"¿Activar esta licencia?"))return;
-  try{await dbEmma.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");cargarTodo();}catch(e){toast(e.message,false);}
+  try{await dbReparto.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");cargarTodo();}
+  catch(e){toast(e.message,false);}
 }
 async function resetDispositivo(id){
   if(!confirm("¿Resetear dispositivo? El cliente podrá activar desde un celular nuevo."))return;
-  try{await dbEmma.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}
+  try{await dbReparto.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}
+  catch(e){toast(e.message,false);}
 }
 
-/* ══════════════════════════════════════════════════════
-   KIOSCO
-══════════════════════════════════════════════════════ */
-function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
-function diasRestantes(f){if(!f)return null;return Math.ceil((new Date(f)-new Date())/(1000*60*60*24));}
-function formatFecha(f){if(!f)return"—";return new Date(f).toLocaleDateString("es-AR");}
-
+/* ════════════════════════════════════════
+   KIOSCO — usa dbKiosco (app-kiosco-c9482)
+════════════════════════════════════════ */
 async function cargarKioscoClientes(){
   try{var snap=await dbKiosco.collection("clientes").get();kioscoClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
   catch(e){console.warn("Kiosco clientes error:",e);}
 }
-
-function estadoBadgeKio(c){
-  if(!c.activo)return'<span class="badge badge-red">Suspendido</span>';
-  var d=diasRestantes(c.vencimiento);
-  if(d!==null&&d<0)return'<span class="badge badge-orange">Vencido</span>';
-  if(d!==null&&d<=7)return'<span class="badge badge-orange">'+d+'d restantes</span>';
-  return'<span class="badge badge-green">Activo</span>';
-}
-
-function planBadge(plan){
-  if(plan==="pro")return'<span class="badge" style="background:#2d1a4a;color:#c9a5f5">PRO</span>';
-  if(plan==="basic")return'<span class="badge badge-blue">BASIC</span>';
-  return'<span class="badge badge-gray">DEMO</span>';
-}
-
-function vencLabel(c){
-  if(!c.vencimiento)return'<span style="color:#4a6a85">Sin venc.</span>';
-  var d=diasRestantes(c.vencimiento);
-  var cls=d<0?"venc-bad":d<=7?"venc-warn":"venc-ok";
-  return'<span class="'+cls+'">'+formatFecha(c.vencimiento)+(d!==null?" ("+(d<0?"venció":d+"d")+")":" ")+'</span>';
-}
-
-function getKioscoUrl(c){
-  var base=window.location.origin+window.location.pathname.replace("index.html","");
-  return base+"kiosco.html?id="+(c.negocioId||c.id);
-}
-
+function getKioscoUrl(c){var base=window.location.origin+window.location.pathname.replace("admin_emma.html","").replace("admin.html","");return base+"kiosco.html?id="+(c.negocioId||c.id);}
 function renderKiosco(){
   var total=kioscoClientes.length;
-  var activos=kioscoClientes.filter(function(c){return c.activo;}).length;
-  var suspendidos=kioscoClientes.filter(function(c){return!c.activo;}).length;
-  var porVencer=kioscoClientes.filter(function(c){var d=diasRestantes(c.vencimiento);return d!==null&&d<=7&&d>=0;}).length;
-
-  var filtrados=kioscoClientes.filter(function(c){
-    if(!filtroKiosco)return true;
-    return(c.nombre||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.email||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.negocioId||c.id||"").toLowerCase().indexOf(filtroKiosco)>=0;
-  });
-
+  var activos=kioscoClientes.filter(function(c){return c.activo&&!c.pendiente;}).length;
+  var suspendidos=kioscoClientes.filter(function(c){return!c.activo&&!c.pendiente;}).length;
+  var pendientes=kioscoClientes.filter(function(c){return c.pendiente;}).length;
+  var filtrados=kioscoClientes.filter(function(c){if(!filtroKiosco)return true;return(c.nombre||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.email||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.negocioId||c.id||"").toLowerCase().indexOf(filtroKiosco)>=0;});
+  var filas=filtrados.map(function(c){
+    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarKio(\''+c.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;margin-right:4px" onclick="verStatsKio(\''+c.id+'\')">📊</button>'+
+      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkKio(\''+c.id+'\')">🔗</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderKio(\''+c.id+'\')">📅</button>'+
+      (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>');
+    return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#5daaff;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td>'+acc+'</td></tr>';
+  }).join("");
   var cards=filtrados.map(function(c){
-    return'<div class="lic-card">'+
-      '<div class="lic-card-top"><span class="lic-codigo">'+(c.negocioId||c.id)+'</span>'+estadoBadgeKio(c)+'</div>'+
+    return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+(c.negocioId||c.id)+'</span>'+estadoBadgeActivo(c)+'</div>'+
       '<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+c.nombre+'</span></div>'+
       '<div class="lic-card-fila"><span class="lbl">Plan</span>'+planBadge(c.plan)+'</div>'+
-      '<div class="lic-card-fila"><span class="lbl">Vence</span><span>'+vencLabel(c)+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Vence</span>'+vencLabel(c)+'</div>'+
       (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarKio(\''+c.id+'\')">✏️ Editar</button>'+
+        '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none" onclick="verStatsKio(\''+c.id+'\')">📊 Stats</button>'+
         '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" onclick="copiarLinkKio(\''+c.id+'\')">🔗 Link</button>'+
         '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderKio(\''+c.id+'\')">📅 Extender</button>'+
         (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅ Activar</button>')+
-      '</div>'+
-    '</div>';
+      '</div></div>';
   }).join("");
-
-  return'<div class="grid4" style="margin:14px 0">'+
-      '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+suspendidos+'</div><div class="stat-label">Suspendidos</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#f5a442">'+porVencer+'</div><div class="stat-label">Por vencer</div></div>'+
-    '</div>'+
-    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
-      '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email, ID..." oninput="filtroKiosco=this.value.toLowerCase();renderMain()" value="'+filtroKiosco+'"/></div>'+
-      '<button class="btn btn-sm btn-purple" onclick="abrirNuevoKio()">+ Nuevo</button>'+
-    '</div>'+
-    '<div>'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin clientes todavía.</div>')+'</div>'+
-    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes</p>';
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span class="firebase-tag" style="border-color:rgba(100,200,255,0.3);color:#5daaff">🔥 app-kiosco-c9482</span></div>'+
+    '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+suspendidos+'</div><div class="stat-label">Suspendidos</div></div></div>'+
+    (pendientes>0?'<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a442">⚠️ Tenés <strong>'+pendientes+'</strong> cliente(s) kiosco pendiente(s) de activación</div>':'')+
+    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center"><div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email, ID..." oninput="filtroKiosco=this.value.toLowerCase();renderMain()" value="'+filtroKiosco+'"/></div><button class="btn btn-sm btn-purple" onclick="abrirNuevoKio()">+ Nuevo cliente</button></div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin clientes todavía.</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin clientes todavía.</div>')+'</div>'+
+    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes kiosco</p>';
 }
-
 function abrirNuevoKio(){
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🏪 Nuevo cliente Kiosco</h2>'+
       '<label>Nombre del negocio</label><input id="k-nom" placeholder="Ej: Kiosco El Sol"/>'+
-      '<label>ID único</label><input id="k-id" placeholder="kiosco-el-sol"/>'+
-      '<label>Email</label><input id="k-ema" type="email"/>'+
-      '<label>Teléfono</label><input id="k-tel" type="tel"/>'+
+      '<label>ID único (se genera solo)</label><input id="k-id" placeholder="kiosco-el-sol" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,\'-\')"/>'+
+      '<label>Email</label><input id="k-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
+      '<label>Teléfono</label><input id="k-tel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Plan</label><select id="k-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Fecha de vencimiento</label><input id="k-venc" type="date"/>'+
-      '<div style="display:flex;gap:10px;margin-top:6px">'+
-        '<button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear</button>'+
-        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
-      '</div></div></div>';
-  setTimeout(function(){
-    var nomEl=document.getElementById("k-nom");var idEl=document.getElementById("k-id");
-    if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};
-    if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};
-  },100);
+      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
+  setTimeout(function(){var nomEl=document.getElementById("k-nom");var idEl=document.getElementById("k-id");if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};},100);
 }
 async function crearClienteKio(){
   var nom=(document.getElementById("k-nom").value||"").trim();
@@ -492,10 +507,8 @@ async function crearClienteKio(){
   var plan=document.getElementById("k-plan").value;
   var venc=document.getElementById("k-venc").value||null;
   if(!nom||!id){toast("Completá nombre del negocio",false);return;}
-  try{
-    await dbKiosco.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,fechaAlta:new Date().toISOString()});
-    toast("✅ Cliente "+nom+" creado");cerrarModalBtn();cargarTodo();
-  }catch(e){toast(e.message,false);}
+  try{await dbKiosco.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,fechaAlta:new Date().toISOString()});toast("✅ Cliente "+nom+" creado");cerrarModalBtn();cargarTodo();}
+  catch(e){toast(e.message,false);}
 }
 function abrirEditarKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
@@ -503,28 +516,24 @@ function abrirEditarKio(id){
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar cliente</h2>'+
       '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:14px;font-family:monospace">'+(c.negocioId||c.id)+'</p>'+
-      '<label>Nombre</label><input id="ke-nom" value="'+(c.nombre||"")+'"/>'+
+      '<label>Nombre del negocio</label><input id="ke-nom" value="'+(c.nombre||"")+'"/>'+
       '<label>Email</label><input id="ke-ema" type="email" value="'+(c.email||"")+'"/>'+
       '<label>Teléfono</label><input id="ke-tel" type="tel" value="'+(c.telefono||"")+'"/>'+
       '<label>Plan</label><select id="ke-plan"><option value="demo"'+(c.plan==="demo"?" selected":"")+'>Demo</option><option value="basic"'+(c.plan==="basic"?" selected":"")+'>Basic</option><option value="pro"'+(c.plan==="pro"?" selected":"")+'>Pro</option></select>'+
-      '<label>Vencimiento</label><input id="ke-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
+      '<label>Fecha de vencimiento</label><input id="ke-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
       '<label>Estado</label><select id="ke-activo"><option value="1"'+(c.activo?" selected":"")+'>✅ Activo</option><option value="0"'+(!c.activo?" selected":"")+'>🔴 Suspendido</option></select>'+
-      '<div style="display:flex;gap:10px;margin-top:12px">'+
-        '<button class="btn btn-purple" style="flex:1" onclick="guardarEdicionKio(\''+id+'\')">Guardar</button>'+
-        '<button class="btn btn-danger btn-sm" onclick="eliminarKio(\''+id+'\')">🗑️</button>'+
-        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
-      '</div></div></div>';
+      '<div style="font-size:0.8rem;color:#7a9ab8;margin-bottom:12px">Link del cliente:</div>'+
+      '<div class="link-box"><span>'+getKioscoUrl(c)+'</span><button class="btn-copy" onclick="navigator.clipboard.writeText(\''+getKioscoUrl(c)+'\');toast(\'✅ Link copiado\')">Copiar</button></div>'+
+      '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-purple" style="flex:1" onclick="guardarEdicionKio(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarKio(\''+id+'\')">🗑️</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function guardarEdicionKio(id){
-  try{
-    await dbKiosco.collection("clientes").doc(id).update({nombre:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),telefono:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,activo:document.getElementById("ke-activo").value==="1"});
-    toast("✅ Actualizado");cerrarModalBtn();cargarTodo();
-  }catch(e){toast(e.message,false);}
+  try{await dbKiosco.collection("clientes").doc(id).update({nombre:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),telefono:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,activo:document.getElementById("ke-activo").value==="1"});toast("✅ Cliente actualizado");cerrarModalBtn();cargarTodo();}
+  catch(e){toast(e.message,false);}
 }
 async function eliminarKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});
   if(!confirm("¿Eliminar permanentemente a "+(c?c.nombre:id)+"?"))return;
-  try{await dbKiosco.collection("clientes").doc(id).delete();toast("✅ Eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
+  try{await dbKiosco.collection("clientes").doc(id).delete();toast("✅ Cliente eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
 }
 async function suspenderKio(id,activo){
   var c=kioscoClientes.find(function(x){return x.id===id;});
@@ -533,245 +542,316 @@ async function suspenderKio(id,activo){
 }
 async function extenderKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});
-  var dias=prompt("¿Cuántos días extender a "+(c?c.nombre:id)+"?","30");
+  var dias=prompt("¿Cuántos días extender la suscripción de "+(c?c.nombre:id)+"?","30");
   if(!dias)return;
   var base=c&&c.vencimiento&&new Date(c.vencimiento)>new Date()?new Date(c.vencimiento):new Date();
   base.setDate(base.getDate()+parseInt(dias));
-  try{await dbKiosco.collection("clientes").doc(id).update({vencimiento:base.toISOString().slice(0,10)});toast("✅ Extendido "+dias+" días");cargarTodo();}catch(e){toast(e.message,false);}
+  try{await dbKiosco.collection("clientes").doc(id).update({vencimiento:base.toISOString().slice(0,10)});toast("✅ Vencimiento extendido "+dias+" días");cargarTodo();}catch(e){toast(e.message,false);}
 }
 function copiarLinkKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
   var url=getKioscoUrl(c);
+  navigator.clipboard.writeText(url).then(function(){toast("✅ Link copiado: "+url);}).catch(function(){prompt("Copiá este link:",url);});
+}
+async function verStatsKio(id){
+  var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">📊 '+c.nombre+'</h2>'+
+      '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:14px;font-family:monospace">'+(c.negocioId||c.id)+'</p>'+
+      '<div id="stats-content" style="text-align:center;padding:20px;color:#7a9ab8">Cargando estadísticas...</div>'+
+      '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn" style="flex:1" onclick="cerrarModalBtn()">Cerrar</button></div></div></div>';
+  try{
+    var hoy=new Date().toISOString().slice(0,10);
+    var negId=c.negocioId||c.id;
+    var results=await Promise.all([
+      dbKiosco.collection("negocios").doc(negId).collection("datos").doc("stock").get(),
+      dbKiosco.collection("negocios").doc(negId).collection("datos").doc("ventas_"+hoy).get(),
+      dbKiosco.collection("negocios").doc(negId).collection("datos").doc("fiados").get(),
+    ]);
+    var stock=results[0].exists()?JSON.parse(results[0].data().data):[];
+    var ventas=results[1].exists()?JSON.parse(results[1].data().data):[];
+    var fiados=results[2].exists()?JSON.parse(results[2].data().data):[];
+    var totalV=ventas.reduce(function(s,v){return s+v.total;},0);
+    var totalF=fiados.reduce(function(s,cl){return s+cl.movimientos.reduce(function(ss,m){return m.tipo==="fiado"?ss+m.monto:ss-m.monto;},0);},0);
+    var sinStock=stock.filter(function(p){return(p.cantidadExhibido||0)===0;}).length;
+    document.getElementById("stats-content").innerHTML=
+      '<div class="negocio-stats">'+
+        '<div class="ns"><div class="ns-val">$'+totalV.toLocaleString("es-AR",{maximumFractionDigits:0})+'</div><div class="ns-label">Ventas hoy</div></div>'+
+        '<div class="ns"><div class="ns-val">'+ventas.length+'</div><div class="ns-label">Transacciones</div></div>'+
+        '<div class="ns"><div class="ns-val">'+stock.length+'</div><div class="ns-label">Productos</div></div>'+
+        '<div class="ns"><div class="ns-val" style="color:#f07070">'+sinStock+'</div><div class="ns-label">Sin exhibido</div></div>'+
+        '<div class="ns"><div class="ns-val" style="color:#f5a442">$'+Math.max(0,totalF).toLocaleString("es-AR",{maximumFractionDigits:0})+'</div><div class="ns-label">Total fiados</div></div>'+
+        '<div class="ns"><div class="ns-val">'+planBadge(c.plan)+'</div><div class="ns-label">Plan</div></div>'+
+      '</div>'+
+      '<p style="font-size:0.75rem;color:#4a6a85;text-align:center">Datos en tiempo real del día de hoy</p>';
+  }catch(e){document.getElementById("stats-content").innerHTML='<p style="color:#f07070">Error al cargar: '+e.message+'</p>';}
+}
+
+/* ════════════════════════════════════════
+   GESTIÓN DIARIA — usa dbGestion
+════════════════════════════════════════ */
+async function cargarGestionUsuarios(){
+  try{var snap=await dbGestion.collection("licencias").get();gestionUsuarios=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
+  catch(e){console.warn("Gestión Diaria error:",e);}
+}
+function estadoBadgeGestion(estado){
+  if(estado==="pendiente")return'<span class="badge badge-orange">⏳ Pendiente</span>';
+  if(estado==="activo")return'<span class="badge badge-green">✅ Activo</span>';
+  if(estado==="inactivo")return'<span class="badge badge-red">🔴 Suspendido</span>';
+  return'<span class="badge badge-gray">—</span>';
+}
+function renderGestion(){
+  var total=gestionUsuarios.length;
+  var pendientes=gestionUsuarios.filter(function(u){return u.estado==="pendiente";}).length;
+  var activos=gestionUsuarios.filter(function(u){return u.estado==="activo";}).length;
+  var inactivos=gestionUsuarios.filter(function(u){return u.estado==="inactivo";}).length;
+  var filtrados=gestionUsuarios.filter(function(u){if(!filtroGestion)return true;return(u.nombre||"").toLowerCase().indexOf(filtroGestion)>=0||(u.email||"").toLowerCase().indexOf(filtroGestion)>=0||(u.id||"").toLowerCase().indexOf(filtroGestion)>=0;});
+  var filas=filtrados.map(function(u){
+    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarGestion(\''+u.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderGestion(\''+u.id+'\')">📅</button>'+
+      (u.estado!=="activo"?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoGestion(\''+u.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴</button>');
+    return'<tr><td><div style="font-weight:600">'+(u.nombre||"—")+'</div><code style="color:#5daaff;font-size:0.72rem">'+u.id+'</code></td><td style="color:#7a9ab8;font-size:0.8rem">'+(u.email||"—")+'</td><td>'+planBadge(u.plan||"demo")+'</td><td>'+estadoBadgeGestion(u.estado)+'</td><td>'+vencLabel(u)+'</td><td>'+acc+'</td></tr>';
+  }).join("");
+  var cards=filtrados.map(function(u){
+    return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+(u.nombre||u.id)+'</span>'+estadoBadgeGestion(u.estado)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+(u.email||"—")+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Plan</span>'+planBadge(u.plan||"demo")+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Vence</span>'+vencLabel(u)+'</div>'+
+      '<div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarGestion(\''+u.id+'\')">✏️ Editar</button><button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderGestion(\''+u.id+'\')">📅 Extender</button>'+(u.estado!=="activo"?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoGestion(\''+u.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴 Suspender</button>')+'</div></div>';
+  }).join("");
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span class="firebase-tag" style="border-color:rgba(100,255,150,0.3);color:#4dd9a0">🔥 sistema-de-gestion-diario</span></div>'+
+    '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+inactivos+'</div><div class="stat-label">Suspendidos</div></div></div>'+
+    (pendientes>0?'<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a442">⚠️ Tenés <strong>'+pendientes+'</strong> usuario(s) esperando activación</div>':'')+
+    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center"><div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar nombre, email, UID..." oninput="filtroGestion=this.value.toLowerCase();renderMain()" value="'+filtroGestion+'"/></div></div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Email</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin usuarios todavía.</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin usuarios todavía.</div>')+'</div>'+
+    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' usuarios Emma Control</p>';
+}
+async function cambiarEstadoGestion(uid,estado){
+  var u=gestionUsuarios.find(function(x){return x.id===uid;});
+  if(!confirm((estado==="activo"?"¿Activar a ":"¿Suspender a ")+(u?u.nombre:uid)+"?"))return;
+  try{await dbGestion.collection("licencias").doc(uid).update({estado:estado});toast(estado==="activo"?"✅ Activado":"🔴 Suspendido");cargarTodo();}catch(e){toast(e.message,false);}
+}
+async function extenderGestion(uid){
+  var u=gestionUsuarios.find(function(x){return x.id===uid;});
+  var dias=prompt("¿Cuántos días extender?","30");if(!dias)return;
+  var base=u&&u.vencimiento&&new Date(u.vencimiento)>new Date()?new Date(u.vencimiento):new Date();
+  base.setDate(base.getDate()+parseInt(dias));
+  try{await dbGestion.collection("licencias").doc(uid).update({vencimiento:base.toISOString().slice(0,10)});toast("✅ Vencimiento extendido "+dias+" días");cargarTodo();}catch(e){toast(e.message,false);}
+}
+function abrirEditarGestion(uid){
+  var u=gestionUsuarios.find(function(x){return x.id===uid;});if(!u)return;
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar usuario</h2>'+
+      '<p style="font-size:0.8rem;color:#5daaff;margin-bottom:14px;font-family:monospace">'+uid+'</p>'+
+      '<label>Nombre</label><input id="ge-nom" value="'+(u.nombre||"")+'"/>'+
+      '<label>Email</label><input id="ge-ema" type="email" value="'+(u.email||"")+'"/>'+
+      '<label>Plan</label><select id="ge-plan"><option value="demo"'+(u.plan==="demo"?" selected":"")+'>Demo</option><option value="basic"'+(u.plan==="basic"?" selected":"")+'>Basic</option><option value="pro"'+(u.plan==="pro"?" selected":"")+'>Pro</option></select>'+
+      '<label>Fecha de vencimiento</label><input id="ge-venc" type="date" value="'+(u.vencimiento||"")+'"/>'+
+      '<label>Estado</label><select id="ge-est"><option value="pendiente"'+(u.estado==="pendiente"?" selected":"")+'>⏳ Pendiente</option><option value="activo"'+(u.estado==="activo"?" selected":"")+'>✅ Activo</option><option value="inactivo"'+(u.estado==="inactivo"?" selected":"")+'>🔴 Suspendido</option></select>'+
+      '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-purple" style="flex:1" onclick="guardarEdicionGestion(\''+uid+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
+}
+async function guardarEdicionGestion(uid){
+  try{await dbGestion.collection("licencias").doc(uid).update({nombre:document.getElementById("ge-nom").value.trim(),email:document.getElementById("ge-ema").value.trim(),plan:document.getElementById("ge-plan").value,vencimiento:document.getElementById("ge-venc").value||null,estado:document.getElementById("ge-est").value});toast("✅ Usuario actualizado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
+}
+
+/* ════════════════════════════════════════
+   POLLERÍA — usa dbPolleria (app-polleria-f349b)
+   Colección: clientes/{negocioId}
+   Link: polleria.html?id={negocioId}
+════════════════════════════════════════ */
+async function cargarPolleriaClientes(){
+  try{var snap=await dbPolleria.collection("clientes").get();polleriaClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
+  catch(e){console.warn("Pollería clientes error:",e);}
+}
+function getPolleriaUrl(c){
+  var base=window.location.origin+window.location.pathname.replace("admin_emma.html","").replace("admin.html","");
+  return base+"polleria.html?id="+(c.negocioId||c.id);
+}
+function renderPolleria(){
+  var total=polleriaClientes.length;
+  var activos=polleriaClientes.filter(function(c){return c.activo&&!c.pendiente;}).length;
+  var suspendidos=polleriaClientes.filter(function(c){return!c.activo&&!c.pendiente;}).length;
+  var pendientes=polleriaClientes.filter(function(c){return c.pendiente;}).length;
+  var filtrados=polleriaClientes.filter(function(c){
+    if(!filtroPolleriaClientes)return true;
+    return(c.nombre||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0||
+           (c.email||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0||
+           (c.negocioId||c.id||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0;
+  });
+  var filas=filtrados.map(function(c){
+    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarPoll(\''+c.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none;margin-right:4px" onclick="verStatsPoll(\''+c.id+'\')">📊</button>'+
+      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkPoll(\''+c.id+'\')">🔗</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderPoll(\''+c.id+'\')">📅</button>'+
+      (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderPoll(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" onclick="suspenderPoll(\''+c.id+'\',true)">✅</button>');
+    return'<tr>'+
+      '<td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#f5a442;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td>'+
+      '<td>'+planBadge(c.plan)+'</td>'+
+      '<td>'+estadoBadgeActivo(c)+'</td>'+
+      '<td>'+vencLabel(c)+'</td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td>'+
+      '<td>'+acc+'</td>'+
+    '</tr>';
+  }).join("");
+  var cards=filtrados.map(function(c){
+    return'<div class="lic-card" style="border-color:rgba(245,164,66,0.2)">'+
+      '<div class="lic-card-top"><span class="lic-codigo" style="color:#f5a442">'+(c.negocioId||c.id)+'</span>'+estadoBadgeActivo(c)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">🐔 '+c.nombre+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Plan</span>'+planBadge(c.plan)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Vence</span>'+vencLabel(c)+'</div>'+
+      (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
+      '<div class="lic-card-actions">'+
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarPoll(\''+c.id+'\')">✏️ Editar</button>'+
+        '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none" onclick="verStatsPoll(\''+c.id+'\')">📊 Stats</button>'+
+        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" onclick="copiarLinkPoll(\''+c.id+'\')">🔗 Link</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderPoll(\''+c.id+'\')">📅 Extender</button>'+
+        (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderPoll(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" onclick="suspenderPoll(\''+c.id+'\',true)">✅ Activar</button>')+
+      '</div></div>';
+  }).join("");
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'+
+      '<span class="firebase-tag" style="border-color:rgba(245,164,66,0.35);color:#f5a442">🔥 app-polleria-f349b</span>'+
+    '</div>'+
+    '<div class="grid4" style="margin-bottom:14px">'+
+      '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div>'+
+      '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+suspendidos+'</div><div class="stat-label">Suspendidos</div></div>'+
+    '</div>'+
+    (pendientes>0?'<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a442">⚠️ Tenés <strong>'+pendientes+'</strong> pollería(s) pendiente(s) de activación</div>':'')+
+    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
+      '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email, ID..." oninput="filtroPolleriaClientes=this.value.toLowerCase();renderMain()" value="'+filtroPolleriaClientes+'"/></div>'+
+      '<button class="btn btn-sm btn-orange" onclick="abrirNuevoPoll()">+ Nueva pollería</button>'+
+    '</div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin pollerías todavía.</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin pollerías todavía.<br>Tocá <b>+ Nueva pollería</b> para agregar la primera.</div>')+'</div>'+
+    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' pollerías</p>';
+}
+function abrirNuevoPoll(){
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🐔 Nueva Pollería</h2>'+
+      '<label>Nombre del negocio</label><input id="p-nom" placeholder="Ej: Pollería El Gallo"/>'+
+      '<label>ID único (se genera solo)</label><input id="p-id" placeholder="polleria-el-gallo"/>'+
+      '<label>Email del dueño</label><input id="p-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
+      '<label>Teléfono</label><input id="p-tel" type="tel" placeholder="381 123-4567"/>'+
+      '<label>Plan</label><select id="p-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
+      '<label>Fecha de vencimiento</label><input id="p-venc" type="date"/>'+
+      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="crearClientePoll()">🐔 Crear pollería</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
+  setTimeout(function(){
+    var nomEl=document.getElementById("p-nom");var idEl=document.getElementById("p-id");
+    if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};
+    if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};
+  },100);
+}
+async function crearClientePoll(){
+  var nom=(document.getElementById("p-nom").value||"").trim();
+  var id=(document.getElementById("p-id").value||"").trim()||toSlug(nom);
+  var ema=(document.getElementById("p-ema").value||"").trim();
+  var tel=(document.getElementById("p-tel").value||"").trim();
+  var plan=document.getElementById("p-plan").value;
+  var venc=document.getElementById("p-venc").value||null;
+  if(!nom||!id){toast("Completá el nombre del negocio",false);return;}
+  try{
+    await dbPolleria.collection("clientes").doc(id).set({
+      nombre:nom,negocioId:id,email:ema,telefono:tel,
+      plan:plan,activo:true,pendiente:false,
+      vencimiento:venc,fechaAlta:new Date().toISOString()
+    });
+    toast("✅ Pollería "+nom+" creada");cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+function abrirEditarPoll(id){
+  var c=polleriaClientes.find(function(x){return x.id===id;});if(!c)return;
+  var url=getPolleriaUrl(c);
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar Pollería</h2>'+
+      '<p style="font-size:0.8rem;color:#f5a442;margin-bottom:14px;font-family:monospace">'+(c.negocioId||c.id)+'</p>'+
+      '<label>Nombre del negocio</label><input id="pe-nom" value="'+(c.nombre||"")+'"/>'+
+      '<label>Email</label><input id="pe-ema" type="email" value="'+(c.email||"")+'"/>'+
+      '<label>Teléfono</label><input id="pe-tel" type="tel" value="'+(c.telefono||"")+'"/>'+
+      '<label>Plan</label><select id="pe-plan"><option value="demo"'+(c.plan==="demo"?" selected":"")+'>Demo</option><option value="basic"'+(c.plan==="basic"?" selected":"")+'>Basic</option><option value="pro"'+(c.plan==="pro"?" selected":"")+'>Pro</option></select>'+
+      '<label>Fecha de vencimiento</label><input id="pe-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
+      '<label>Estado</label><select id="pe-activo"><option value="1"'+(c.activo?" selected":"")+'>✅ Activo</option><option value="0"'+(!c.activo?" selected":"")+'>🔴 Suspendido</option></select>'+
+      '<div style="font-size:0.8rem;color:#7a9ab8;margin-bottom:4px">Link de acceso:</div>'+
+      '<div class="link-box" style="border-color:rgba(245,164,66,0.3)"><span style="color:#f5a442">'+url+'</span><button class="btn-copy" onclick="navigator.clipboard.writeText(\''+url+'\');toast(\'✅ Link copiado\')">Copiar</button></div>'+
+      '<div style="display:flex;gap:10px;margin-top:12px">'+
+        '<button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(\''+id+'\')">Guardar</button>'+
+        '<button class="btn btn-danger btn-sm" onclick="eliminarPoll(\''+id+'\')">🗑️</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+}
+async function guardarEdicionPoll(id){
+  try{
+    await dbPolleria.collection("clientes").doc(id).update({
+      nombre:document.getElementById("pe-nom").value.trim(),
+      email:document.getElementById("pe-ema").value.trim(),
+      telefono:document.getElementById("pe-tel").value.trim(),
+      plan:document.getElementById("pe-plan").value,
+      vencimiento:document.getElementById("pe-venc").value||null,
+      activo:document.getElementById("pe-activo").value==="1"
+    });
+    toast("✅ Pollería actualizada");cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+async function eliminarPoll(id){
+  var c=polleriaClientes.find(function(x){return x.id===id;});
+  if(!confirm("¿Eliminar permanentemente a "+(c?c.nombre:id)+"? No se puede deshacer."))return;
+  try{await dbPolleria.collection("clientes").doc(id).delete();toast("✅ Pollería eliminada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
+}
+async function suspenderPoll(id,activo){
+  var c=polleriaClientes.find(function(x){return x.id===id;});
+  if(!confirm((activo?"¿Activar":"¿Suspender")+" a "+(c?c.nombre:id)+"?"))return;
+  try{await dbPolleria.collection("clientes").doc(id).update({activo:activo});toast(activo?"✅ Activada":"🔴 Suspendida");cargarTodo();}catch(e){toast(e.message,false);}
+}
+async function extenderPoll(id){
+  var c=polleriaClientes.find(function(x){return x.id===id;});
+  var dias=prompt("¿Cuántos días extender la suscripción de "+(c?c.nombre:id)+"?","30");
+  if(!dias)return;
+  var base=c&&c.vencimiento&&new Date(c.vencimiento)>new Date()?new Date(c.vencimiento):new Date();
+  base.setDate(base.getDate()+parseInt(dias));
+  try{await dbPolleria.collection("clientes").doc(id).update({vencimiento:base.toISOString().slice(0,10)});toast("✅ Vencimiento extendido "+dias+" días");cargarTodo();}catch(e){toast(e.message,false);}
+}
+function copiarLinkPoll(id){
+  var c=polleriaClientes.find(function(x){return x.id===id;});if(!c)return;
+  var url=getPolleriaUrl(c);
   navigator.clipboard.writeText(url).then(function(){toast("✅ Link copiado");}).catch(function(){prompt("Copiá este link:",url);});
 }
-
-/* ══════════════════════════════════════════════════════
-   POLLERÍA — gestión de usuarios
-══════════════════════════════════════════════════════ */
-async function cargarPolleriaUsuarios(){
-  try{
-    // Leemos la colección de usuarios registrados en la app pollería
-    var snap=await dbPolleria.collection("usuarios_admin").get();
-    polleriaUsuarios=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-  }catch(e){
-    // Si no existe la colección todavía, devolvemos vacío
-    polleriaUsuarios=[];
-  }
-}
-
-function estadoBadgeApp(activo){
-  return activo===false?'<span class="badge badge-red">Suspendido</span>':'<span class="badge badge-green">Activo</span>';
-}
-
-function renderPolleria(){
-  var total=polleriaUsuarios.length;
-  var activos=polleriaUsuarios.filter(function(u){return u.activo!==false;}).length;
-  var susp=polleriaUsuarios.filter(function(u){return u.activo===false;}).length;
-
-  var filtrados=polleriaUsuarios.filter(function(u){
-    if(!filtroPolleria)return true;
-    return(u.nombre||"").toLowerCase().indexOf(filtroPolleria)>=0||(u.email||"").toLowerCase().indexOf(filtroPolleria)>=0||(u.negocio||"").toLowerCase().indexOf(filtroPolleria)>=0;
-  });
-
-  var cards=filtrados.map(function(u){
-    return'<div class="app-cliente-card">'+
-      '<div class="app-cliente-top">'+
-        '<div><div class="app-cliente-nombre">'+(u.negocio||u.nombre||"Sin nombre")+'</div>'+
-          '<div class="app-cliente-sub">'+(u.email||"—")+(u.telefono?' · '+u.telefono:'')+'</div>'+
-        '</div>'+
-        estadoBadgeApp(u.activo)+
-      '</div>'+
-      (u.notas?'<div style="font-size:0.8rem;color:#7a9ab8;margin-bottom:6px">'+u.notas+'</div>':'')+
-      '<div class="app-cliente-actions">'+
-        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="editarAppCliente(\'polleria\',\''+u.id+'\')">✏️ Editar</button>'+
-        (u.activo!==false
-          ?'<button class="btn btn-sm btn-danger" onclick="toggleAppCliente(\'polleria\',\''+u.id+'\',false)">🔴 Suspender</button>'
-          :'<button class="btn btn-sm btn-success" onclick="toggleAppCliente(\'polleria\',\''+u.id+'\',true)">✅ Activar</button>'
-        )+
-        '<button class="btn btn-sm btn-danger" onclick="eliminarAppCliente(\'polleria\',\''+u.id+'\')">🗑️</button>'+
-      '</div>'+
-    '</div>';
-  }).join("");
-
-  // Info del proyecto
-  var infoProyecto='<div class="card" style="background:#0a1929;border-color:rgba(93,170,255,0.2);margin-bottom:16px">'+
-    '<div style="font-size:0.8rem;color:#5daaff;font-weight:700;margin-bottom:8px">🐔 App Pollería — Firebase</div>'+
-    '<div style="font-size:0.78rem;color:#7a9ab8;margin-bottom:4px">Proyecto: <code style="color:#5daaff">app-polleria-f349b</code></div>'+
-    '<div style="font-size:0.78rem;color:#7a9ab8;margin-bottom:8px">GitHub Pages: <code style="color:#5daaff">emmasolucionesdigitales-lang.github.io/polleria-gestion</code></div>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-      '<a href="https://console.firebase.google.com/project/app-polleria-f349b/authentication/users" target="_blank" class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;text-decoration:none">🔥 Ver usuarios Firebase</a>'+
-      '<a href="https://console.firebase.google.com/project/app-polleria-f349b/firestore" target="_blank" class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;text-decoration:none">🗄️ Ver base de datos</a>'+
-    '</div>'+
-  '</div>';
-
-  return'<div class="grid3" style="margin:14px 0">'+
-      '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+susp+'</div><div class="stat-label">Suspendidos</div></div>'+
-    '</div>'+
-    infoProyecto+
-    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
-      '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email..." oninput="filtroPolleria=this.value.toLowerCase();renderMain()" value="'+filtroPolleria+'"/></div>'+
-      '<button class="btn btn-sm btn-green" onclick="abrirNuevoAppCliente(\'polleria\',\'🐔\')">+ Nuevo cliente</button>'+
-    '</div>'+
-    '<div>'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0;line-height:2">Sin clientes todavía.<br>Tocá <b>+ Nuevo cliente</b> para agregar el primero.</div>')+'</div>'+
-    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes</p>';
-}
-
-/* ══════════════════════════════════════════════════════
-   REPOSTERÍA — gestión de usuarios
-══════════════════════════════════════════════════════ */
-async function cargarReposteriaUsuarios(){
-  try{
-    var snap=await dbReposteria.collection("usuarios_admin").get();
-    reposteriaUsuarios=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
-  }catch(e){
-    reposteriaUsuarios=[];
-  }
-}
-
-function renderReposteria(){
-  var total=reposteriaUsuarios.length;
-  var activos=reposteriaUsuarios.filter(function(u){return u.activo!==false;}).length;
-  var susp=reposteriaUsuarios.filter(function(u){return u.activo===false;}).length;
-
-  var filtrados=reposteriaUsuarios.filter(function(u){
-    if(!filtroReposteria)return true;
-    return(u.nombre||"").toLowerCase().indexOf(filtroReposteria)>=0||(u.email||"").toLowerCase().indexOf(filtroReposteria)>=0||(u.negocio||"").toLowerCase().indexOf(filtroReposteria)>=0;
-  });
-
-  var cards=filtrados.map(function(u){
-    return'<div class="app-cliente-card">'+
-      '<div class="app-cliente-top">'+
-        '<div><div class="app-cliente-nombre">'+(u.negocio||u.nombre||"Sin nombre")+'</div>'+
-          '<div class="app-cliente-sub">'+(u.email||"—")+(u.telefono?' · '+u.telefono:'')+'</div>'+
-        '</div>'+
-        estadoBadgeApp(u.activo)+
-      '</div>'+
-      (u.notas?'<div style="font-size:0.8rem;color:#7a9ab8;margin-bottom:6px">'+u.notas+'</div>':'')+
-      '<div class="app-cliente-actions">'+
-        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="editarAppCliente(\'reposteria\',\''+u.id+'\')">✏️ Editar</button>'+
-        (u.activo!==false
-          ?'<button class="btn btn-sm btn-danger" onclick="toggleAppCliente(\'reposteria\',\''+u.id+'\',false)">🔴 Suspender</button>'
-          :'<button class="btn btn-sm btn-success" onclick="toggleAppCliente(\'reposteria\',\''+u.id+'\',true)">✅ Activar</button>'
-        )+
-        '<button class="btn btn-sm btn-danger" onclick="eliminarAppCliente(\'reposteria\',\''+u.id+'\')">🗑️</button>'+
-      '</div>'+
-    '</div>';
-  }).join("");
-
-  var infoProyecto='<div class="card" style="background:#0a1929;border-color:rgba(93,170,255,0.2);margin-bottom:16px">'+
-    '<div style="font-size:0.8rem;color:#f5b07a;font-weight:700;margin-bottom:8px">🎂 App Repostería — Firebase</div>'+
-    '<div style="font-size:0.78rem;color:#7a9ab8;margin-bottom:4px">Proyecto: <code style="color:#f5b07a">app-reposteria-7e31e</code></div>'+
-    '<div style="font-size:0.78rem;color:#7a9ab8;margin-bottom:8px">GitHub Pages: <code style="color:#f5b07a">emmasolucionesdigitales-lang.github.io/dulce-gestion</code></div>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-      '<a href="https://console.firebase.google.com/project/app-reposteria-7e31e/authentication/users" target="_blank" class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none;text-decoration:none">🔥 Ver usuarios Firebase</a>'+
-      '<a href="https://console.firebase.google.com/project/app-reposteria-7e31e/firestore" target="_blank" class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;text-decoration:none">🗄️ Ver base de datos</a>'+
-    '</div>'+
-  '</div>';
-
-  return'<div class="grid3" style="margin:14px 0">'+
-      '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div>'+
-      '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+susp+'</div><div class="stat-label">Suspendidos</div></div>'+
-    '</div>'+
-    infoProyecto+
-    '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
-      '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email..." oninput="filtroReposteria=this.value.toLowerCase();renderMain()" value="'+filtroReposteria+'"/></div>'+
-      '<button class="btn btn-sm btn-orange" onclick="abrirNuevoAppCliente(\'reposteria\',\'🎂\')">+ Nuevo cliente</button>'+
-    '</div>'+
-    '<div>'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0;line-height:2">Sin clientes todavía.<br>Tocá <b>+ Nuevo cliente</b> para agregar el primero.</div>')+'</div>'+
-    '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes</p>';
-}
-
-/* ══════════════════════════════════════════════════════
-   HELPERS COMPARTIDOS — Pollería & Repostería
-══════════════════════════════════════════════════════ */
-function getDb(app){
-  if(app==="polleria")return dbPolleria;
-  if(app==="reposteria")return dbReposteria;
-  return null;
-}
-function getUsuarios(app){
-  if(app==="polleria")return polleriaUsuarios;
-  if(app==="reposteria")return reposteriaUsuarios;
-  return [];
-}
-
-function abrirNuevoAppCliente(app,emoji){
+async function verStatsPoll(id){
+  var c=polleriaClientes.find(function(x){return x.id===id;});if(!c)return;
+  var negId=c.negocioId||c.id;
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">'+emoji+' Nuevo cliente '+app+'</h2>'+
-      '<label>Nombre del negocio</label><input id="ac-neg" placeholder="Ej: La Especial"/>'+
-      '<label>Nombre del dueño</label><input id="ac-nom" placeholder="Ej: María García"/>'+
-      '<label>Email (el que usa para ingresar a la app)</label><input id="ac-ema" type="email" placeholder="dueno@gmail.com"/>'+
-      '<label>Teléfono</label><input id="ac-tel" type="tel" placeholder="381 123-4567"/>'+
-      '<label>Notas</label><input id="ac-not" placeholder="Ej: cliente de prueba, pago mayo..."/>'+
-      '<p style="font-size:0.75rem;color:#7a9ab8;margin:-8px 0 12px">⚠️ Acordate de crear el usuario en Firebase Authentication del proyecto <b>'+app+'</b> con ese email.</p>'+
-      '<div style="display:flex;gap:10px;margin-top:6px">'+
-        '<button class="btn btn-primary" style="flex:1" onclick="crearAppCliente(\''+app+'\')">Crear</button>'+
-        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
-      '</div></div></div>';
-}
-
-async function crearAppCliente(app){
-  var neg=(document.getElementById("ac-neg").value||"").trim();
-  var nom=(document.getElementById("ac-nom").value||"").trim();
-  var ema=(document.getElementById("ac-ema").value||"").trim();
-  var tel=(document.getElementById("ac-tel").value||"").trim();
-  var not=(document.getElementById("ac-not").value||"").trim();
-  if(!neg){toast("El nombre del negocio es obligatorio",false);return;}
-  var db=getDb(app);
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">📊 '+c.nombre+'</h2>'+
+      '<p style="font-size:0.8rem;color:#f5a442;margin-bottom:14px;font-family:monospace">'+negId+'</p>'+
+      '<div id="poll-stats" style="text-align:center;padding:20px;color:#7a9ab8">Cargando estadísticas...</div>'+
+      '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn" style="flex:1" onclick="cerrarModalBtn()">Cerrar</button></div></div></div>';
   try{
-    await db.collection("usuarios_admin").add({negocio:neg,nombre:nom,email:ema,telefono:tel,notas:not,activo:true,fechaAlta:new Date().toISOString(),app:app});
-    toast("✅ Cliente "+neg+" creado en "+app);cerrarModalBtn();cargarTodo();
-  }catch(e){toast(e.message,false);}
-}
-
-function editarAppCliente(app,id){
-  var u=getUsuarios(app).find(function(x){return x.id===id;});if(!u)return;
-  document.getElementById("modal-container").innerHTML=
-    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">✏️ Editar cliente '+app+'</h2>'+
-      '<label>Nombre del negocio</label><input id="ec-neg" value="'+(u.negocio||"")+'"/>'+
-      '<label>Nombre del dueño</label><input id="ec-nom" value="'+(u.nombre||"")+'"/>'+
-      '<label>Email</label><input id="ec-ema" type="email" value="'+(u.email||"")+'"/>'+
-      '<label>Teléfono</label><input id="ec-tel" type="tel" value="'+(u.telefono||"")+'"/>'+
-      '<label>Notas</label><input id="ec-not" value="'+(u.notas||"")+'"/>'+
-      '<label>Estado</label><select id="ec-act"><option value="1"'+(u.activo!==false?" selected":"")+'>✅ Activo</option><option value="0"'+(u.activo===false?" selected":"")+'>🔴 Suspendido</option></select>'+
-      '<div style="display:flex;gap:10px;margin-top:6px">'+
-        '<button class="btn btn-primary" style="flex:1" onclick="guardarAppCliente(\''+app+'\',\''+id+'\')">Guardar</button>'+
-        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
-      '</div></div></div>';
-}
-
-async function guardarAppCliente(app,id){
-  var db=getDb(app);
-  try{
-    await db.collection("usuarios_admin").doc(id).update({
-      negocio:document.getElementById("ec-neg").value.trim(),
-      nombre:document.getElementById("ec-nom").value.trim(),
-      email:document.getElementById("ec-ema").value.trim(),
-      telefono:document.getElementById("ec-tel").value.trim(),
-      notas:document.getElementById("ec-not").value.trim(),
-      activo:document.getElementById("ec-act").value==="1",
-    });
-    toast("✅ Actualizado");cerrarModalBtn();cargarTodo();
-  }catch(e){toast(e.message,false);}
-}
-
-async function toggleAppCliente(app,id,activo){
-  var u=getUsuarios(app).find(function(x){return x.id===id;});
-  if(!confirm((activo?"¿Activar":"¿Suspender")+" a "+(u?u.negocio||u.nombre:id)+"?"))return;
-  var db=getDb(app);
-  try{await db.collection("usuarios_admin").doc(id).update({activo:activo});toast(activo?"✅ Activado":"🔴 Suspendido");cargarTodo();}catch(e){toast(e.message,false);}
-}
-
-async function eliminarAppCliente(app,id){
-  var u=getUsuarios(app).find(function(x){return x.id===id;});
-  if(!confirm("¿Eliminar permanentemente a "+(u?u.negocio||u.nombre:id)+"?"))return;
-  var db=getDb(app);
-  try{await db.collection("usuarios_admin").doc(id).delete();toast("✅ Eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
+    var hoy=new Date().toISOString().slice(0,10);
+    var results=await Promise.all([
+      dbPolleria.collection("polleria").doc(negId).collection("pedidos").where("fecha","==",hoy).get(),
+      dbPolleria.collection("polleria").doc(negId).collection("productos").get(),
+      dbPolleria.collection("polleria").doc(negId).collection("clientes").get(),
+    ]);
+    var pedidosHoy=results[0].docs.map(function(d){return d.data();});
+    var totalVentasHoy=pedidosHoy.filter(function(p){return p.pagado&&p.estado!=="cancelado";}).reduce(function(s,p){return s+(p.total||0);},0);
+    var pedidosPendientes=pedidosHoy.filter(function(p){return p.estado==="pendiente";}).length;
+    var totalProductos=results[1].size;
+    var totalClientesApp=results[2].size;
+    document.getElementById("poll-stats").innerHTML=
+      '<div class="negocio-stats">'+
+        '<div class="ns"><div class="ns-val" style="color:#f5a442">$'+totalVentasHoy.toLocaleString("es-AR",{maximumFractionDigits:0})+'</div><div class="ns-label">Ventas hoy</div></div>'+
+        '<div class="ns"><div class="ns-val">'+pedidosHoy.length+'</div><div class="ns-label">Pedidos hoy</div></div>'+
+        '<div class="ns"><div class="ns-val" style="color:#f07070">'+pedidosPendientes+'</div><div class="ns-label">Pendientes</div></div>'+
+        '<div class="ns"><div class="ns-val">'+totalProductos+'</div><div class="ns-label">Productos</div></div>'+
+        '<div class="ns"><div class="ns-val">'+totalClientesApp+'</div><div class="ns-label">Clientes</div></div>'+
+        '<div class="ns"><div class="ns-val">'+planBadge(c.plan)+'</div><div class="ns-label">Plan</div></div>'+
+      '</div>'+
+      '<p style="font-size:0.75rem;color:#4a6a85;text-align:center">Datos en tiempo real · Hoy '+hoy+'</p>';
+  }catch(e){document.getElementById("poll-stats").innerHTML='<p style="color:#f07070;font-size:0.85rem">Error: '+e.message+'</p><p style="color:#4a6a85;font-size:0.75rem;margin-top:8px">Verificá las reglas de Firestore del proyecto app-polleria-f349b</p>';}
 }
 
 /* ── Helpers modales ── */
@@ -783,7 +863,7 @@ function cerrarModalBtn(){document.getElementById("modal-container").innerHTML="
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('/departamento-administrativo/sw.js')
-      .then(function(reg){console.log('SW:',reg.scope);})
+      .then(function(reg){console.log('SW registrado:',reg.scope);})
       .catch(function(err){console.log('SW error:',err);});
   });
 }
