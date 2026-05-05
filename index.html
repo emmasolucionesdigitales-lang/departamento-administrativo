@@ -27,13 +27,13 @@
     .ptab:hover{color:#e2eaf4;}
     .ptab.activo{color:#fff;border-bottom-color:#7b3fc9;}
     .ptab .ptab-badge{background:#7b3fc9;color:#fff;font-size:0.65rem;padding:2px 6px;border-radius:99px;}
-    .ptab-coming{opacity:.45;cursor:default;}
     .btn{padding:10px 16px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.13);cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.15s;background:#1a2b3c;color:#e2eaf4;min-height:40px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
     .btn:active{opacity:0.75;transform:scale(0.97);}
     .btn-primary{background:#185FA5;color:#fff;border:none;}
     .btn-primary:active{background:#1a6fc0;}
     .btn-purple{background:#7b3fc9;color:#fff;border:none;}
     .btn-orange{background:#c96a1a;color:#fff;border:none;}
+    .btn-pink{background:#c93082;color:#fff;border:none;}
     .btn-danger{background:#2e0a0a;color:#f07070;border:0.5px solid #f07070;}
     .btn-success{background:#0a2e1f;color:#4dd9a0;border:0.5px solid #4dd9a0;}
     .btn-sm{padding:8px 12px;font-size:0.8rem;min-height:36px;}
@@ -45,6 +45,7 @@
     .badge-gray{background:#1a2b3c;color:#7a9ab8;}
     .badge-purple{background:#2d1a4a;color:#c9a5f5;}
     .badge-orange{background:#2e1800;color:#f5a442;}
+    .badge-pink{background:#2e0a1a;color:#f5a0c8;}
     input,select{width:100%;padding:12px 14px;background:#1a2b3c;border:0.5px solid rgba(255,255,255,0.13);border-radius:10px;color:#e2eaf4;font-size:1rem;outline:none;margin-bottom:12px;min-height:46px;-webkit-appearance:none;}
     input:focus,select:focus{border-color:#185FA5;box-shadow:0 0 0 2px rgba(24,95,165,0.25);}
     label{font-size:0.8rem;color:#7a9ab8;margin-bottom:5px;display:block;}
@@ -80,21 +81,13 @@
     .modal-drag{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 18px;}
     .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;padding:40px 20px;}
     .login-box{width:100%;max-width:360px;display:flex;flex-direction:column;gap:0;}
-    .coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px;}
-    .coming-icon{font-size:64px;}
-    .coming-title{font-size:1.4rem;font-weight:700;color:#e2eaf4;}
-    .coming-sub{font-size:0.9rem;color:#7a9ab8;max-width:320px;line-height:1.6;}
-    .coming-badge{background:#2d1a4a;color:#c9a5f5;padding:6px 16px;border-radius:99px;font-size:0.8rem;font-weight:700;}
-    .venc-ok{color:#4dd9a0;font-weight:700;}
-    .venc-warn{color:#f5a442;font-weight:700;}
-    .venc-bad{color:#f07070;font-weight:700;}
+    .firebase-tag{display:inline-flex;align-items:center;gap:5px;background:#1a2b3c;border:0.5px solid rgba(255,200,0,0.3);border-radius:8px;padding:4px 10px;font-size:0.72rem;color:#f5c842;font-family:monospace;margin-left:8px;}
     #toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#185FA5;color:#fff;padding:12px 22px;border-radius:24px;font-size:0.9rem;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
     #btn-escala{position:fixed;bottom:20px;right:16px;z-index:300;background:#1a2b3c;border:1px solid rgba(255,255,255,0.18);border-radius:50px;padding:10px 16px;font-size:0.85rem;font-weight:700;color:#5daaff;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:none;}
     #btn-escala:active{transform:scale(0.95);}
     .search-wrap{position:relative;margin-bottom:14px;}
     .search-wrap input{padding-left:38px;margin-bottom:0;}
     .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7a9ab8;font-size:1rem;pointer-events:none;}
-    .firebase-tag{display:inline-flex;align-items:center;gap:5px;background:#1a2b3c;border:0.5px solid rgba(255,200,0,0.3);border-radius:8px;padding:4px 10px;font-size:0.72rem;color:#f5c842;font-family:monospace;margin-left:8px;}
     @media (max-width: 620px) {
       .desktop-only{display:none;}
       .mobile-only{display:block;}
@@ -199,16 +192,31 @@ firebase.initializeApp({
 },"polleria");
 const dbPolleria=firebase.app("polleria").firestore();
 
+/* ════════════════════════════════════════
+   FIREBASE — APP REPOSTERÍA  ← NUEVO
+════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:"AIzaSyD1CqN9t984CCgZsnxTYiv-DIexEVHj2t4",
+  authDomain:"app-reposteria-7e31e.firebaseapp.com",
+  projectId:"app-reposteria-7e31e",
+  storageBucket:"app-reposteria-7e31e.firebasestorage.app",
+  messagingSenderId:"767790519277",
+  appId:"1:767790519277:web:76e0e8194e5f10d0998de4"
+},"reposteria");
+const dbReposteria=firebase.app("reposteria").firestore();
+
 /* ── ESTADO GLOBAL ── */
 var productoActivo="reparto";
 var licencias=[];
 var kioscoClientes=[];
 var gestionUsuarios=[];
 var polleriaClientes=[];
+var reposteriaLicencias=[];          /* ← NUEVO */
 var filtroReparto="";
 var filtroKiosco="";
 var filtroGestion="";
 var filtroPolleriaClientes="";
+var filtroReposteria="";             /* ← NUEVO */
 
 /* ── TOAST ── */
 function toast(msg,ok){var t=document.getElementById("toast");t.textContent=msg;t.style.background=(ok===false)?"#c93030":"#185FA5";t.style.opacity="1";setTimeout(function(){t.style.opacity="0";},3000);}
@@ -230,8 +238,15 @@ function loginGoogle(){
 }
 function logout(){auth.signOut();document.getElementById("btn-escala").style.display="none";}
 
+/* cargarTodo ahora incluye repostería ← MODIFICADO */
 async function cargarTodo(){
-  await Promise.all([cargarLicencias(),cargarKioscoClientes(),cargarGestionUsuarios(),cargarPolleriaClientes()]);
+  await Promise.all([
+    cargarLicencias(),
+    cargarKioscoClientes(),
+    cargarGestionUsuarios(),
+    cargarPolleriaClientes(),
+    cargarReposteriaLicencias()   /* ← NUEVO */
+  ]);
   renderMain();
 }
 
@@ -259,26 +274,26 @@ function renderLogin(err){
 }
 
 /* ════════════════════════════════════════
-   RENDER PRINCIPAL
+   RENDER PRINCIPAL — MODIFICADO: agrega repostería real
 ════════════════════════════════════════ */
 function renderMain(){
   var totalRep=licencias.length;
   var totalKio=kioscoClientes.length;
   var totalPoll=polleriaClientes.length;
+  var totalRepos=reposteriaLicencias.length;  /* ← NUEVO */
 
   var tabs=[
-    {key:"reparto",  icon:"🚚", label:"Reparto",        count:totalRep},
-    {key:"kiosco",   icon:"🏪", label:"Kiosco",          count:totalKio},
-    {key:"gestion",  icon:"💰", label:"Emma Control",    count:gestionUsuarios.length},
-    {key:"polleria", icon:"🍗", label:"Pollería",         count:totalPoll},
-    {key:"reposteria",icon:"🎂",label:"Repostería",       count:0, coming:true},
+    {key:"reparto",    icon:"🚚", label:"Reparto",       count:totalRep},
+    {key:"kiosco",     icon:"🏪", label:"Kiosco",         count:totalKio},
+    {key:"gestion",    icon:"💰", label:"Emma Control",   count:gestionUsuarios.length},
+    {key:"polleria",   icon:"🍗", label:"Pollería",        count:totalPoll},
+    {key:"reposteria", icon:"🎂", label:"Repostería",      count:totalRepos},  /* ← sin coming:true */
   ];
 
   var tabsHtml=tabs.map(function(t){
-    var cls="ptab"+(productoActivo===t.key?" activo":"")+(t.coming?" ptab-coming":"");
-    var onclick=t.coming?"":"onclick=\"cambiarProducto('"+t.key+"')\"";
+    var cls="ptab"+(productoActivo===t.key?" activo":"");
     var badge=t.count>0?'<span class="ptab-badge">'+t.count+'</span>':"";
-    return '<div class="'+cls+'" '+onclick+'>'+t.icon+' '+t.label+badge+(t.coming?' <span style="font-size:0.65rem;color:#7a9ab8">(pronto)</span>':'')+' </div>';
+    return '<div class="'+cls+'" onclick="cambiarProducto(\''+t.key+'\')">'+t.icon+' '+t.label+badge+'</div>';
   }).join("");
 
   var bodyContent="";
@@ -286,7 +301,7 @@ function renderMain(){
   else if(productoActivo==="kiosco")  bodyContent=renderKiosco();
   else if(productoActivo==="gestion") bodyContent=renderGestion();
   else if(productoActivo==="polleria")bodyContent=renderPolleria();
-  else if(productoActivo==="reposteria")bodyContent=renderComingSoon("🎂","App Repostería","Gestión de pedidos personalizados, recetas y ventas para reposterías.","En desarrollo");
+  else if(productoActivo==="reposteria")bodyContent=renderReposteria();  /* ← NUEVO */
 
   document.getElementById("app").innerHTML=
     '<div class="header">'+
@@ -303,17 +318,6 @@ function renderMain(){
 }
 
 function cambiarProducto(p){productoActivo=p;renderMain();}
-
-/* ── COMING SOON ── */
-function renderComingSoon(icon,titulo,desc,badge){
-  return '<div class="coming-soon">'+
-    '<div class="coming-icon">'+icon+'</div>'+
-    '<div class="coming-title">'+titulo+'</div>'+
-    '<div class="coming-sub">'+desc+'</div>'+
-    '<div class="coming-badge">'+badge+'</div>'+
-    '<p style="font-size:0.8rem;color:#4a6a85;margin-top:8px">Contactá a Emma Soluciones Digitales para más info.</p>'+
-  '</div>';
-}
 
 /* ── HELPERS ── */
 function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
@@ -573,8 +577,7 @@ async function verStatsKio(id){
 }
 
 /* ════════════════════════════════════════
-   EMMA CONTROL (GESTIÓN DIARIA)
-   Sistema de códigos igual que Reparto
+   EMMA CONTROL
 ════════════════════════════════════════ */
 async function cargarGestionUsuarios(){
   try{
@@ -582,7 +585,6 @@ async function cargarGestionUsuarios(){
     gestionUsuarios=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
   }catch(e){console.warn("Gestión error:",e);}
 }
-
 function estadoBadgeGestion(estado){
   if(estado==="disponible")return'<span class="badge badge-blue">🔑 Disponible</span>';
   if(estado==="usado")return'<span class="badge badge-green">✅ Activo</span>';
@@ -591,20 +593,17 @@ function estadoBadgeGestion(estado){
   if(estado==="activo")return'<span class="badge badge-green">✅ Activo</span>';
   return'<span class="badge badge-gray">—</span>';
 }
-
 function renderGestion(){
   var total=gestionUsuarios.length;
   var disponibles=gestionUsuarios.filter(function(u){return u.estado==="disponible";}).length;
   var activos=gestionUsuarios.filter(function(u){return u.estado==="usado"||u.estado==="activo";}).length;
   var inactivos=gestionUsuarios.filter(function(u){return u.estado==="inactivo";}).length;
-
   var filtrados=gestionUsuarios.filter(function(u){
     if(!filtroGestion)return true;
     return(u.id||"").toLowerCase().indexOf(filtroGestion)>=0||
            (u.negocio||u.nombre||"").toLowerCase().indexOf(filtroGestion)>=0||
            (u.email||"").toLowerCase().indexOf(filtroGestion)>=0;
   });
-
   var filas=filtrados.map(function(u){
     var esActivo=u.estado==="usado"||u.estado==="activo";
     var acc=
@@ -623,7 +622,6 @@ function renderGestion(){
       '<td>'+acc+'</td>'+
     '</tr>';
   }).join("");
-
   var cards=filtrados.map(function(u){
     var esActivo=u.estado==="usado"||u.estado==="activo";
     return'<div class="lic-card">'+
@@ -641,7 +639,6 @@ function renderGestion(){
           :'<button class="btn btn-sm btn-success" onclick="cambiarEstadoGestion(\''+u.id+'\',\'usado\')">✅ Activar</button>')+
       '</div></div>';
   }).join("");
-
   return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'+
     '<span class="firebase-tag" style="border-color:rgba(100,255,150,0.3);color:#4dd9a0">🔥 sistema-de-gestion-diario</span>'+
   '</div>'+
@@ -663,7 +660,6 @@ function renderGestion(){
   '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin licencias.<br>Tocá <b>+ Nueva licencia</b> para crear la primera.</div>')+'</div>'+
   '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias Emma Control</p>';
 }
-
 function abrirNuevoGestion(){
   var anio=new Date().getFullYear();
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -690,7 +686,6 @@ function abrirNuevoGestion(){
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
 }
-
 async function crearLicenciaGestion(){
   var codigo=(document.getElementById("gnv-cod").value||"").trim().toUpperCase();
   var negocio=(document.getElementById("gnv-neg").value||"").trim();
@@ -710,7 +705,6 @@ async function crearLicenciaGestion(){
     cargarTodo();
   }catch(e){toast(e.message,false);}
 }
-
 function abrirEditarGestion(id){
   var u=gestionUsuarios.find(function(x){return x.id===id;});if(!u)return;
   var esActivo=u.estado==="usado"||u.estado==="activo";
@@ -746,7 +740,6 @@ function abrirEditarGestion(id){
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
 }
-
 async function guardarEdicionGestion(id){
   try{
     await dbGestion.collection("licencias").doc(id).update({
@@ -759,7 +752,6 @@ async function guardarEdicionGestion(id){
     toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
-
 async function cambiarEstadoGestion(id,estado){
   var u=gestionUsuarios.find(function(x){return x.id===id;});
   var nombre=u?u.negocio||u.nombre||id:id;
@@ -769,7 +761,6 @@ async function cambiarEstadoGestion(id,estado){
     toast(estado==="inactivo"?"🔴 Suspendida":"✅ Activada");cargarTodo();
   }catch(e){toast(e.message,false);}
 }
-
 async function extenderGestion(id){
   var u=gestionUsuarios.find(function(x){return x.id===id;});
   var nombre=u?u.negocio||u.nombre||id:id;
@@ -917,6 +908,182 @@ async function verStatsPoll(id){
       '</div>'+
       '<p style="font-size:0.75rem;color:#4a6a85;text-align:center">Datos en tiempo real · '+hoy+'</p>';
   }catch(e){document.getElementById("poll-stats").innerHTML='<p style="color:#f07070;font-size:0.85rem">Error: '+e.message+'</p>';}
+}
+
+/* ════════════════════════════════════════
+   REPOSTERÍA  ← TODO ESTO ES NUEVO
+════════════════════════════════════════ */
+async function cargarReposteriaLicencias(){
+  try{
+    var snap=await dbReposteria.collection("licencias").get();
+    reposteriaLicencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+  }catch(e){console.warn("Repostería licencias error:",e);}
+}
+
+function renderReposteria(){
+  var total=reposteriaLicencias.length;
+  var activos=reposteriaLicencias.filter(function(l){return l.estado==="activo"||l.estado==="usado";}).length;
+  var pendientes=reposteriaLicencias.filter(function(l){return l.estado==="pendiente";}).length;
+  var inact=reposteriaLicencias.filter(function(l){return l.estado==="inactivo";}).length;
+  var filtrados=reposteriaLicencias.filter(function(l){
+    if(!filtroReposteria)return true;
+    return(l.id||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.negocio||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.email||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.celular||"").indexOf(filtroReposteria)>=0;
+  });
+  var filas=filtrados.map(function(l){
+    var acc='<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none;margin-right:4px" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️</button>'+
+      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱</button>';
+    return'<tr>'+
+      '<td><code style="color:#f5a0c8;font-size:0.85rem">'+l.id+'</code></td>'+
+      '<td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td>'+
+      '<td>'+estadoBadgeRep(l.estado)+'</td>'+
+      '<td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td>'+
+      '<td>'+acc+'</td>'+
+    '</tr>';
+  }).join("");
+  var cards=filtrados.map(function(l){
+    var accionEstado=(l.estado==="inactivo"||l.estado==="pendiente")
+      ?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅ Activar</button>'
+      :'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
+    return'<div class="lic-card" style="border-color:rgba(245,160,200,0.2)">'+
+      '<div class="lic-card-top"><span class="lic-codigo" style="color:#f5a0c8">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+
+      (l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">🎂 '+l.negocio+'</span></div>':'')+
+      (l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+
+      (l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+
+      '<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div>'+
+      '<div class="lic-card-actions">'+
+        '<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️ Editar</button>'+
+        accionEstado+
+        '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱 Reset</button>'+
+      '</div></div>';
+  }).join("");
+
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'+
+    '<span class="firebase-tag" style="border-color:rgba(245,160,200,0.3);color:#f5a0c8">🔥 app-reposteria-7e31e</span>'+
+  '</div>'+
+  '<div class="grid4" style="margin-bottom:14px">'+
+    '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div>'+
+  '</div>'+
+  (pendientes>0?'<div style="background:#2e0a1a;border:0.5px solid #f5a0c8;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a0c8">⚠️ Tenés <strong>'+pendientes+'</strong> licencia(s) de repostería pendiente(s)</div>':'')+
+  '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
+    '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span>'+
+    '<input placeholder="Buscar código, negocio, email..." oninput="filtroReposteria=this.value.toLowerCase();renderMain()" value="'+filtroReposteria+'"/></div>'+
+    '<button class="btn btn-sm btn-pink" onclick="abrirNuevaReposteria()">+ Nueva</button>'+
+  '</div>'+
+  '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>'+
+    '<thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th></tr></thead>'+
+    '<tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin licencias todavía.</td></tr>')+'</tbody>'+
+  '</table></div></div>'+
+  '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin licencias todavía.</div>')+'</div>'+
+  '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias Repostería</p>';
+}
+
+function abrirNuevaReposteria(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='REPOS-'+rand;
+  var pin=Math.floor(1000+Math.random()*9000);
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🎂 Nueva licencia Repostería</h2>'+
+      '<label>Código de activación</label>'+
+      '<input id="mr-cod" value="'+codigo+'" style="font-family:monospace;font-weight:700;letter-spacing:0.1em;text-transform:uppercase"/>'+
+      '<label>PIN de acceso</label>'+
+      '<input id="mr-pin" type="number" value="'+pin+'"/>'+
+      '<label>Negocio / Cliente</label>'+
+      '<input id="mr-neg" placeholder="Ej: Dulce Gestión de María"/>'+
+      '<label>Email</label>'+
+      '<input id="mr-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
+      '<label>Celular</label>'+
+      '<input id="mr-cel" type="tel" placeholder="381 123-4567"/>'+
+      '<label>Notas (opcional)</label>'+
+      '<input id="mr-notas" placeholder="Ej: Plan mensual - vence 30/06"/>'+
+      '<div style="background:#2e0a1a;border:0.5px solid rgba(245,160,200,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#f5a0c8;line-height:1.6">'+
+        '📋 La clienta abre <b>Dulce Gestión</b>, va a ingresar, y usa este código + PIN para activar su cuenta.'+
+      '</div>'+
+      '<div style="display:flex;gap:10px">'+
+        '<button class="btn btn-pink" style="flex:1" onclick="crearLicenciaReposteria()">🎂 Crear licencia</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+}
+
+async function crearLicenciaReposteria(){
+  var codigo=(document.getElementById("mr-cod").value||"").trim().toUpperCase();
+  var pin=Number(document.getElementById("mr-pin").value);
+  var neg=(document.getElementById("mr-neg").value||"").trim();
+  var ema=(document.getElementById("mr-ema").value||"").trim();
+  var cel=(document.getElementById("mr-cel").value||"").trim();
+  var notas=(document.getElementById("mr-notas").value||"").trim();
+  if(!codigo||!pin){toast("Completá código y PIN",false);return;}
+  try{
+    await dbReposteria.collection("licencias").doc(codigo).set({
+      estado:"activo", pin:pin, negocio:neg,
+      email:ema, celular:cel, notas:notas,
+      deviceId:"", creadoEn:new Date().toISOString()
+    });
+    toast("✅ Licencia "+codigo+" creada — PIN: "+pin);
+    cerrarModalBtn();
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+
+function abrirEditarReposteria(id){
+  var l=reposteriaLicencias.find(function(x){return x.id===id;});if(!l)return;
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">✏️ Editar licencia</h2>'+
+      '<p style="font-size:0.8rem;color:#f5a0c8;margin-bottom:18px;font-family:monospace">'+l.id+'</p>'+
+      '<label>PIN</label><input id="er-pin" type="number" value="'+(l.pin||'')+'"/>'+
+      '<label>Negocio / Cliente</label><input id="er-neg" value="'+(l.negocio||'')+'"/>'+
+      '<label>Email</label><input id="er-ema" type="email" value="'+(l.email||'')+'"/>'+
+      '<label>Celular</label><input id="er-cel" type="tel" value="'+(l.celular||'')+'"/>'+
+      '<label>Notas</label><input id="er-not" value="'+(l.notas||'')+'"/>'+
+      '<div style="display:flex;gap:10px;margin-top:6px">'+
+        '<button class="btn btn-pink" style="flex:1" onclick="guardarEdicionReposteria(\''+id+'\')">Guardar</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+}
+
+async function guardarEdicionReposteria(id){
+  try{
+    await dbReposteria.collection("licencias").doc(id).update({
+      pin:Number(document.getElementById("er-pin").value),
+      negocio:document.getElementById("er-neg").value.trim(),
+      email:document.getElementById("er-ema").value.trim(),
+      celular:document.getElementById("er-cel").value.trim(),
+      notas:document.getElementById("er-not").value.trim()
+    });
+    toast("✅ Licencia actualizada");
+    cerrarModalBtn();
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+
+async function cambiarEstadoReposteria(id,estado){
+  var l=reposteriaLicencias.find(function(x){return x.id===id;});
+  var nombre=l?l.negocio||id:id;
+  if(!confirm((estado==="inactivo"?"¿Desactivar a ":"¿Activar a ")+nombre+"?"))return;
+  try{
+    await dbReposteria.collection("licencias").doc(id).update({estado:estado});
+    toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+
+async function resetDispositivoReposteria(id){
+  var l=reposteriaLicencias.find(function(x){return x.id===id;});
+  var nombre=l?l.negocio||id:id;
+  if(!confirm("¿Resetear dispositivo de "+nombre+"? Podrá activar desde un celular nuevo."))return;
+  try{
+    await dbReposteria.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
+    toast("✅ Dispositivo reseteado");
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 
 /* ── Helpers modales ── */
