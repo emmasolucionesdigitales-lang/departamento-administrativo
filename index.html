@@ -650,8 +650,9 @@ function renderReparto(){
   var filas=filtrados.map(function(l){
     var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarRep(\''+l.id+'\')">✏️</button>'+
       ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'reparto\',\''+l.id+'\')">💳</button>'+
       '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱</button>';
-    return'<tr><td><code style="color:#5daaff;font-size:0.85rem">'+l.id+'</code></td><td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td><td>'+estadoBadgeRep(l.estado)+'</td><td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td><td>'+acc+'</td></tr>';
+    return'<tr><td><code style="color:#5daaff;font-size:0.85rem">'+l.id+'</code></td><td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td><td>'+estadoBadgeRep(l.estado)+'</td><td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td><td>'+cobroBadge(l)+'</td><td>'+acc+'</td></tr>';
   }).join("");
   var cards=filtrados.map(function(l){
     var accionEstado=(l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
@@ -661,7 +662,7 @@ function renderReparto(){
     '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div></div>'+
     (pendientes>0?'<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a442">⚠️ Tenés <strong>'+pendientes+'</strong> licencia(s) pendiente(s) de activación</div>':'')+
     '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center"><div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar código, negocio, email..." oninput="filtroReparto=this.value.toLowerCase();renderMain()" value="'+filtroReparto+'"/></div><button class="btn btn-sm btn-primary" onclick="abrirNuevaRep()">+ Nueva</button></div>'+
-    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin resultados</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>Celular</th><th>Estado</th><th>PIN</th><th>Cobro</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="8" style="text-align:center;color:#4a6a85;padding:30px">Sin resultados</td></tr>')+'</tbody></table></div></div>'+
     '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin resultados</div>')+'</div>'+
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias</p>';
 }
@@ -740,9 +741,10 @@ function renderKiosco(){
     var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarKio(\''+c.id+'\')">✏️</button>'+
       '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;margin-right:4px" onclick="verStatsKio(\''+c.id+'\')">📊</button>'+
       '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkKio(\''+c.id+'\')">🔗</button>'+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳</button>'+
       '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderKio(\''+c.id+'\')">📅</button>'+
       (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>');
-    return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#5daaff;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td>'+acc+'</td></tr>';
+    return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#5daaff;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td>'+cobroBadge(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td>'+acc+'</td></tr>';
   }).join("");
   var cards=filtrados.map(function(c){
     return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+(c.negocioId||c.id)+'</span>'+estadoBadgeActivo(c)+'</div>'+
@@ -764,7 +766,7 @@ function renderKiosco(){
     '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+suspendidos+'</div><div class="stat-label">Suspendidos</div></div></div>'+
     (pendientes>0?'<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a442">⚠️ Tenés <strong>'+pendientes+'</strong> cliente(s) kiosco pendiente(s) de activación</div>':'')+
     '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center"><div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email, ID..." oninput="filtroKiosco=this.value.toLowerCase();renderMain()" value="'+filtroKiosco+'"/></div><button class="btn btn-sm btn-purple" onclick="abrirNuevoKio()">+ Nuevo cliente</button></div>'+
-    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin clientes todavía.</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Cobro</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin clientes todavía.</td></tr>')+'</tbody></table></div></div>'+
     '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin clientes todavía.</div>')+'</div>'+
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes kiosco</p>';
 }
@@ -898,6 +900,7 @@ function renderGestion(){
     var acc=
       '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarGestion(\''+u.id+'\')">✏️</button>'+
       '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderGestion(\''+u.id+'\')">📅</button>'+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳</button>'+
       (esActivo
         ?'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴</button>'
         :'<button class="btn btn-sm btn-success" onclick="cambiarEstadoGestion(\''+u.id+'\',\'usado\')">✅</button>');
@@ -908,6 +911,7 @@ function renderGestion(){
       '<td>'+planBadge(u.plan||"demo")+'</td>'+
       '<td>'+estadoBadgeGestion(u.estado)+'</td>'+
       '<td>'+vencLabel(u)+'</td>'+
+      '<td>'+cobroBadge(u)+'</td>'+
       '<td>'+acc+'</td>'+
     '</tr>';
   }).join("");
@@ -945,8 +949,8 @@ function renderGestion(){
     '<button class="btn btn-sm btn-purple" onclick="abrirNuevoGestion()">+ Nueva licencia</button>'+
   '</div>'+
   '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>'+
-    '<thead><tr><th>Código</th><th>Negocio / Cliente</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Acciones</th></tr></thead>'+
-    '<tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin licencias. Tocá + Nueva licencia para crear la primera.</td></tr>')+'</tbody>'+
+    '<thead><tr><th>Código</th><th>Negocio / Cliente</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Cobro</th><th>Acciones</th></tr></thead>'+
+    '<tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin licencias. Tocá + Nueva licencia para crear la primera.</td></tr>')+'</tbody>'+
   '</table></div></div>'+
   '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin licencias.<br>Tocá <b>+ Nueva licencia</b> para crear la primera.</div>')+'</div>'+
   '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias Emma Control</p>';
@@ -1084,9 +1088,10 @@ function renderPolleria(){
     var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarPoll(\''+c.id+'\')">✏️</button>'+
       '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none;margin-right:4px" onclick="verStatsPoll(\''+c.id+'\')">📊</button>'+
       '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkPoll(\''+c.id+'\')">🔗</button>'+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳</button>'+
       '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderPoll(\''+c.id+'\')">📅</button>'+
       (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderPoll(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" onclick="suspenderPoll(\''+c.id+'\',true)">✅</button>');
-    return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#f5a442;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td>'+acc+'</td></tr>';
+    return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#f5a442;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td>'+cobroBadge(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td>'+acc+'</td></tr>';
   }).join("");
   var cards=filtrados.map(function(c){
     return'<div class="lic-card" style="border-color:rgba(245,164,66,0.2)"><div class="lic-card-top"><span class="lic-codigo" style="color:#f5a442">'+(c.negocioId||c.id)+'</span>'+estadoBadgeActivo(c)+'</div>'+
@@ -1108,7 +1113,7 @@ function renderPolleria(){
     '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+suspendidos+'</div><div class="stat-label">Suspendidos</div></div></div>'+
     (pendientes>0?'<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#f5a442">⚠️ Tenés <strong>'+pendientes+'</strong> pollería(s) pendiente(s)</div>':'')+
     '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center"><div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span><input placeholder="Buscar negocio, email, ID..." oninput="filtroPolleriaClientes=this.value.toLowerCase();renderMain()" value="'+filtroPolleriaClientes+'"/></div><button class="btn btn-sm btn-orange" onclick="abrirNuevoPoll()">+ Nueva pollería</button></div>'+
-    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="6" style="text-align:center;color:#4a6a85;padding:30px">Sin pollerías todavía.</td></tr>')+'</tbody></table></div></div>'+
+    '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>Negocio</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Cobro</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin pollerías todavía.</td></tr>')+'</tbody></table></div></div>'+
     '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin pollerías todavía.</div>')+'</div>'+
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' pollerías</p>';
 }
