@@ -205,13 +205,28 @@ firebase.initializeApp({
 },"reposteria");
 const dbReposteria=firebase.app("reposteria").firestore();
 
+/* ════════════════════════════════════════
+   FIREBASE — REPARTO MULTI
+════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:"AIzaSyDLkcgpubzhXsx3sgmxw8hRZCQvuSJAZwA",
+  authDomain:"sistema-de-reparto-2026.firebaseapp.com",
+  projectId:"sistema-de-reparto-2026",
+  storageBucket:"sistema-de-reparto-2026.firebasestorage.app",
+  messagingSenderId:"1043524483419",
+  appId:"1:1043524483419:web:65dffc27eb8bfda5f9027e"
+},"repartomulti");
+const dbRepartoMulti=firebase.app("repartomulti").firestore();
+
 /* ── ESTADO GLOBAL ── */
 var productoActivo="reparto";
 var licencias=[];
 var kioscoClientes=[];
 var gestionUsuarios=[];
 var polleriaClientes=[];
-var reposteriaLicencias=[];          /* ← NUEVO */
+var reposteriaLicencias=[];
+var repartoMultiNegocios=[];
+var filtroRepartoMulti="";
 var filtroReparto="";
 var filtroKiosco="";
 var filtroGestion="";
@@ -245,7 +260,8 @@ async function cargarTodo(){
     cargarKioscoClientes(),
     cargarGestionUsuarios(),
     cargarPolleriaClientes(),
-    cargarReposteriaLicencias()   /* ← NUEVO */
+    cargarReposteriaLicencias(),
+    cargarRepartoMulti()
   ]);
   renderMain();
 }
@@ -283,11 +299,12 @@ function renderMain(){
   var totalRepos=reposteriaLicencias.length;  /* ← NUEVO */
 
   var tabs=[
-    {key:"reparto",    icon:"🚚", label:"Reparto",       count:totalRep},
-    {key:"kiosco",     icon:"🏪", label:"Kiosco",         count:totalKio},
-    {key:"gestion",    icon:"💰", label:"Emma Control",   count:gestionUsuarios.length},
-    {key:"polleria",   icon:"🍗", label:"Pollería",        count:totalPoll},
-    {key:"reposteria", icon:"🎂", label:"Repostería",      count:totalRepos},  /* ← sin coming:true */
+    {key:"reparto",       icon:"🚚", label:"Reparto",       count:totalRep},
+    {key:"repartomulti",  icon:"🚛", label:"Reparto Multi",  count:repartoMultiNegocios.length},
+    {key:"kiosco",        icon:"🏪", label:"Kiosco",         count:totalKio},
+    {key:"gestion",       icon:"💰", label:"Emma Control",   count:gestionUsuarios.length},
+    {key:"polleria",      icon:"🍗", label:"Pollería",        count:totalPoll},
+    {key:"reposteria",    icon:"🎂", label:"Repostería",      count:totalRepos},
   ];
 
   var tabsHtml=tabs.map(function(t){
@@ -297,11 +314,12 @@ function renderMain(){
   }).join("");
 
   var bodyContent="";
-  if(productoActivo==="reparto")      bodyContent=renderReparto();
-  else if(productoActivo==="kiosco")  bodyContent=renderKiosco();
-  else if(productoActivo==="gestion") bodyContent=renderGestion();
-  else if(productoActivo==="polleria")bodyContent=renderPolleria();
-  else if(productoActivo==="reposteria")bodyContent=renderReposteria();  /* ← NUEVO */
+  if(productoActivo==="reparto")           bodyContent=renderReparto();
+  else if(productoActivo==="repartomulti") bodyContent=renderRepartoMulti();
+  else if(productoActivo==="kiosco")       bodyContent=renderKiosco();
+  else if(productoActivo==="gestion")      bodyContent=renderGestion();
+  else if(productoActivo==="polleria")     bodyContent=renderPolleria();
+  else if(productoActivo==="reposteria")   bodyContent=renderReposteria();
 
   document.getElementById("app").innerHTML=
     '<div class="header">'+
@@ -1082,6 +1100,143 @@ async function resetDispositivoReposteria(id){
   try{
     await dbReposteria.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
     toast("✅ Dispositivo reseteado");
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+
+/* ════════════════════════════════════════
+   REPARTO MULTI
+════════════════════════════════════════ */
+async function cargarRepartoMulti(){
+  try{
+    var snapNeg=await dbRepartoMulti.collection("negocios").get();
+    var snapUsers=await dbRepartoMulti.collection("users").get();
+    var users=snapUsers.docs.map(function(d){return Object.assign({uid:d.id},d.data());});
+    repartoMultiNegocios=snapNeg.docs.map(function(d){
+      var neg=Object.assign({id:d.id},d.data());
+      var dueno=users.find(function(u){return u.uid===neg.ownerId&&u.rol==="dueño";});
+      var repartidores=users.filter(function(u){return u.negocioId===neg.id&&u.rol==="repartidor";});
+      neg.ownerEmail=dueno?dueno.email||"—":"—";
+      neg.ownerNombre=dueno?dueno.nombre||"—":"—";
+      neg.cantRepartidores=repartidores.length;
+      neg.repartidores=repartidores;
+      return neg;
+    });
+  }catch(e){console.warn("Reparto Multi error:",e);}
+}
+
+function renderRepartoMulti(){
+  var total=repartoMultiNegocios.length;
+  var filtrados=repartoMultiNegocios.filter(function(n){
+    if(!filtroRepartoMulti)return true;
+    return(n.nombre||"").toLowerCase().indexOf(filtroRepartoMulti)>=0||
+           (n.ownerEmail||"").toLowerCase().indexOf(filtroRepartoMulti)>=0||
+           (n.ownerNombre||"").toLowerCase().indexOf(filtroRepartoMulti)>=0||
+           (n.id||"").toLowerCase().indexOf(filtroRepartoMulti)>=0;
+  });
+
+  var filas=filtrados.map(function(n){
+    var fechaAlta=n.creadoEn?new Date(n.creadoEn).toLocaleDateString("es-AR"):"—";
+    var acc=
+      '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;margin-right:4px" onclick="verRepartidores(\''+n.id+'\')">👥 '+n.cantRepartidores+'</button>'+
+      '<button class="btn btn-sm btn-danger" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️</button>';
+    return'<tr>'+
+      '<td><div style="font-weight:600;color:#e2eaf4">'+escHtml(n.nombre)+'</div>'+
+          '<code style="color:#5dffee;font-size:0.72rem">'+n.id+'</code></td>'+
+      '<td><div style="font-size:0.85rem">'+escHtml(n.ownerNombre)+'</div>'+
+          '<div style="font-size:0.75rem;color:#7a9ab8">'+escHtml(n.ownerEmail)+'</div></td>'+
+      '<td style="text-align:center"><span style="color:#5daaff;font-weight:700">'+n.cantRepartidores+'</span></td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+fechaAlta+'</td>'+
+      '<td>'+acc+'</td>'+
+    '</tr>';
+  }).join("");
+
+  var cards=filtrados.map(function(n){
+    var fechaAlta=n.creadoEn?new Date(n.creadoEn).toLocaleDateString("es-AR"):"—";
+    return'<div class="lic-card" style="border-color:rgba(93,255,238,0.18)">'+
+      '<div class="lic-card-top">'+
+        '<span class="lic-codigo" style="color:#5dffee">'+escHtml(n.nombre)+'</span>'+
+        '<span class="badge" style="background:#0a2e3f;color:#5dffee">'+n.cantRepartidores+' rep.</span>'+
+      '</div>'+
+      '<div class="lic-card-fila"><span class="lbl">ID</span><code style="color:#5dffee;font-size:0.75rem">'+n.id+'</code></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Dueño</span><span class="val">'+escHtml(n.ownerNombre)+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+escHtml(n.ownerEmail)+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Alta</span><span class="val">'+fechaAlta+'</span></div>'+
+      '<div class="lic-card-actions">'+
+        '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="verRepartidores(\''+n.id+'\')">👥 Ver repartidores</button>'+
+        '<button class="btn btn-sm btn-danger" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️ Eliminar</button>'+
+      '</div>'+
+    '</div>';
+  }).join("");
+
+  return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'+
+    '<span class="firebase-tag" style="border-color:rgba(93,255,238,0.3);color:#5dffee">🔥 sistema-de-reparto-2026</span>'+
+  '</div>'+
+  '<div class="grid3" style="margin-bottom:14px">'+
+    '<div class="stat-card"><div class="stat-num" style="color:#5dffee">'+total+'</div><div class="stat-label">Negocios</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:#5daaff">'+repartoMultiNegocios.reduce(function(s,n){return s+n.cantRepartidores;},0)+'</div><div class="stat-label">Repartidores</div></div>'+
+    '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+licencias.filter(function(l){return l.estado==="usado";}).length+'</div><div class="stat-label">Lic. activas</div></div>'+
+  '</div>'+
+  '<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">'+
+    '<div class="search-wrap" style="flex:1;margin:0"><span class="search-icon">🔍</span>'+
+    '<input placeholder="Buscar negocio, dueño, email..." oninput="filtroRepartoMulti=this.value.toLowerCase();renderMain()" value="'+filtroRepartoMulti+'"/></div>'+
+  '</div>'+
+  '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>'+
+    '<thead><tr><th>Negocio</th><th>Dueño</th><th style="text-align:center">Repartidores</th><th>Alta</th><th>Acciones</th></tr></thead>'+
+    '<tbody>'+(filas||'<tr><td colspan="5" style="text-align:center;color:#4a6a85;padding:30px">No hay negocios registrados en Reparto Multi.</td></tr>')+'</tbody>'+
+  '</table></div></div>'+
+  '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">No hay negocios registrados.</div>')+'</div>'+
+  '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' negocios · Reparto Multi</p>';
+}
+
+function escHtml(s){return(s||"").replace(/'/g,"&#39;").replace(/"/g,"&quot;");}
+
+function verRepartidores(negocioId){
+  var neg=repartoMultiNegocios.find(function(n){return n.id===negocioId;});
+  if(!neg)return;
+  var lista=(neg.repartidores||[]);
+  var filas=lista.length===0
+    ?'<p style="color:#7a9ab8;font-size:0.85rem;text-align:center;padding:16px">No tiene repartidores aún.</p>'
+    :lista.map(function(r){
+        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.06)">'+
+          '<div>'+
+            '<div style="font-weight:600;font-size:0.9rem">'+escHtml(r.nombre||"Sin nombre")+'</div>'+
+            '<div style="font-size:0.75rem;color:#7a9ab8">'+escHtml(r.email||"—")+'</div>'+
+            (r.sectores&&r.sectores.length?'<div style="font-size:0.72rem;color:#5dffee;margin-top:2px">Sectores: '+r.sectores.join(", ")+'</div>':'')+
+          '</div>'+
+          '<button class="btn btn-sm btn-danger" onclick="eliminarRepartidorMulti(\''+r.uid+'\',\''+escHtml(r.nombre)+'\')">🗑️</button>'+
+        '</div>';
+      }).join("");
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.05rem;font-weight:700;margin-bottom:4px">👥 Repartidores</h2>'+
+      '<p style="font-size:0.8rem;color:#5dffee;margin-bottom:16px;font-family:monospace">'+escHtml(neg.nombre)+'</p>'+
+      filas+
+      '<div style="margin-top:16px"><button class="btn" style="width:100%" onclick="cerrarModalBtn()">Cerrar</button></div>'+
+    '</div></div>';
+}
+
+async function eliminarRepartidorMulti(uid, nombre){
+  if(!confirm("¿Eliminar al repartidor "+nombre+"? Perderá el acceso al sistema."))return;
+  try{
+    await dbRepartoMulti.collection("users").doc(uid).delete();
+    toast("✅ Repartidor eliminado");
+    cerrarModalBtn();
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+
+async function eliminarNegocioMulti(negocioId, nombre){
+  if(!confirm("¿Eliminar el negocio \""+nombre+"\"?\nSe eliminará el negocio y sus repartidores asociados. Esta acción no se puede deshacer."))return;
+  try{
+    var neg=repartoMultiNegocios.find(function(n){return n.id===negocioId;});
+    var promesas=[];
+    if(neg&&neg.repartidores){
+      neg.repartidores.forEach(function(r){ promesas.push(dbRepartoMulti.collection("users").doc(r.uid).delete()); });
+    }
+    promesas.push(dbRepartoMulti.collection("negocios").doc(negocioId).delete());
+    await Promise.all(promesas);
+    toast("✅ Negocio eliminado");
     cargarTodo();
   }catch(e){toast(e.message,false);}
 }
