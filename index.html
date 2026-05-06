@@ -105,6 +105,14 @@
       .modal{border-radius:18px;border-bottom:0.5px solid rgba(255,255,255,0.12);}
       .modal-drag{display:none;}
     }
+    /* ── COBROS ── */
+    .cobro-badge{padding:3px 9px;border-radius:99px;font-size:0.65rem;font-weight:700;display:inline-block;white-space:nowrap;}
+    .cobro-ok{background:#0a2e1f;color:#4dd9a0;border:0.5px solid #4dd9a0;}
+    .cobro-pend{background:#1a2e00;color:#c8e01a;border:0.5px solid #c8e01a;}
+    .cobro-recargo{background:#2e1800;color:#f5a442;border:0.5px solid #f5a442;}
+    .cobro-vencido{background:#2e0a0a;color:#f07070;border:0.5px solid #f07070;}
+    .cobro-sin{background:#1a2b3c;color:#4a6a85;border:0.5px solid #4a6a85;}
+    .seccion-cobro{background:#111c2e;border:0.5px solid rgba(123,63,201,0.3);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
   </style>
 </head>
 <body>
@@ -233,6 +241,13 @@ var filtroGestion="";
 var filtroPolleriaClientes="";
 var filtroReposteria="";             /* ← NUEVO */
 
+/* ── COBROS ── */
+var MP_ACCESS_TOKEN=localStorage.getItem("mpAccessToken")||"";
+var MI_ALIAS_MP=localStorage.getItem("miAliasMp")||"";
+var RECARGO_PCT=15;
+var DIA_RECARGO=5;
+var DIA_SUSPENSION=15;
+
 /* ── TOAST ── */
 function toast(msg,ok){var t=document.getElementById("toast");t.textContent=msg;t.style.background=(ok===false)?"#c93030":"#185FA5";t.style.opacity="1";setTimeout(function(){t.style.opacity="0";},3000);}
 
@@ -263,6 +278,7 @@ async function cargarTodo(){
     cargarReposteriaLicencias(),
     cargarRepartoMulti()
   ]);
+  await chequearSuspensionesAutomaticas();
   renderMain();
 }
 
@@ -327,12 +343,13 @@ function renderMain(){
         '<div><h1>Panel Admin</h1><span>Emma Soluciones Digitales</span></div>'+
       '</div>'+
       '<div class="header-actions">'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirConfigMP()" title="Configurar MercadoPago">💳</button>'+
         '<button class="btn btn-sm btn-icon" onclick="cargarTodo()" title="Actualizar">↻</button>'+
         '<button class="btn btn-sm" onclick="logout()">Salir</button>'+
       '</div>'+
     '</div>'+
     '<div class="product-tabs">'+tabsHtml+'</div>'+
-    '<div class="screen">'+bodyContent+'</div>';
+    '<div class="screen">'+resumenCobrosMes()+bodyContent+'</div>';
 }
 
 function cambiarProducto(p){productoActivo=p;renderMain();}
@@ -341,6 +358,252 @@ function cambiarProducto(p){productoActivo=p;renderMain();}
 function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function diasRestantes(f){if(!f)return null;return Math.ceil((new Date(f)-new Date())/(1000*60*60*24));}
 function formatFecha(f){if(!f)return"—";return new Date(f).toLocaleDateString("es-AR");}
+
+/* ════════════════════════════════════════
+   SISTEMA DE COBROS
+════════════════════════════════════════ */
+function calcularEstadoCobro(c){
+  var precio=Number(c.precioMensual||0);
+  if(!precio)return{estado:"sin_precio",monto:0,montoFinal:0};
+  var hoy=new Date();
+  var dia=hoy.getDate();
+  var mes=hoy.getFullYear()+"-"+String(hoy.getMonth()+1).padStart(2,"0");
+  var pagado=(c.ultimoPago||"").startsWith(mes);
+  var recargo=Math.round(precio*(1+RECARGO_PCT/100));
+  if(pagado)return{estado:"al_dia",monto:precio,montoFinal:precio};
+  if(dia<=DIA_RECARGO)return{estado:"pendiente",monto:precio,montoFinal:precio,diasRestantes:DIA_RECARGO-dia+1};
+  if(dia<=DIA_SUSPENSION)return{estado:"con_recargo",monto:precio,montoFinal:recargo,diasRestantes:DIA_SUSPENSION-dia};
+  return{estado:"suspender",monto:precio,montoFinal:recargo,diasVencido:dia-DIA_SUSPENSION};
+}
+function cobroBadge(c){
+  if(!c.precioMensual)return'<span class="cobro-badge cobro-sin">Sin precio</span>';
+  var ec=calcularEstadoCobro(c);
+  if(ec.estado==="al_dia")return'<span class="cobro-badge cobro-ok">💚 Cobrado</span>';
+  if(ec.estado==="pendiente")return'<span class="cobro-badge cobro-pend">💛 $'+ec.montoFinal.toLocaleString("es-AR")+'</span>';
+  if(ec.estado==="con_recargo")return'<span class="cobro-badge cobro-recargo">🟠 $'+ec.montoFinal.toLocaleString("es-AR")+' +15%</span>';
+  return'<span class="cobro-badge cobro-vencido">🔴 SUSPENDER</span>';
+}
+function camposCobro(c){
+  return'<div style="margin:16px 0 8px;border-top:0.5px solid rgba(255,255,255,0.1);padding-top:14px">'+
+    '<p style="font-size:0.75rem;color:#9d65e0;font-weight:700;margin-bottom:12px;letter-spacing:0.05em">💳 DATOS DE COBRO</p>'+
+    '<label>Inicio del contrato</label>'+
+    '<input id="cobro-fecha" type="date" value="'+(c&&c.fechaContrato||"")+'"/>'+
+    '<label>Precio mensual ($)</label>'+
+    '<input id="cobro-precio" type="number" placeholder="Ej: 8000" value="'+(c&&c.precioMensual||"")+'"/>'+
+    '<label>Alias MP del cliente (referencia)</label>'+
+    '<input id="cobro-alias" placeholder="Ej: distribuidora.elsol" value="'+(c&&c.aliasMp||"")+'"/>'+
+  '</div>';
+}
+function getCobroData(){
+  return{
+    fechaContrato:(document.getElementById("cobro-fecha")||{value:""}).value||null,
+    precioMensual:Number((document.getElementById("cobro-precio")||{value:0}).value)||0,
+    aliasMp:((document.getElementById("cobro-alias")||{value:""}).value||"").trim()
+  };
+}
+function getClienteByTipo(tipo,id){
+  if(tipo==="reparto")return licencias.find(function(x){return x.id===id;});
+  if(tipo==="kiosco")return kioscoClientes.find(function(x){return x.id===id;});
+  if(tipo==="gestion")return gestionUsuarios.find(function(x){return x.id===id;});
+  if(tipo==="polleria")return polleriaClientes.find(function(x){return x.id===id;});
+  if(tipo==="reposteria")return reposteriaLicencias.find(function(x){return x.id===id;});
+  if(tipo==="repartomulti")return repartoMultiNegocios.find(function(x){return x.id===id;});
+  return null;
+}
+function getDbByTipo(tipo){
+  if(tipo==="reparto")return{db:dbReparto,col:"licencias"};
+  if(tipo==="kiosco")return{db:dbKiosco,col:"clientes"};
+  if(tipo==="gestion")return{db:dbGestion,col:"licencias"};
+  if(tipo==="polleria")return{db:dbPolleria,col:"clientes"};
+  if(tipo==="reposteria")return{db:dbReposteria,col:"licencias"};
+  if(tipo==="repartomulti")return{db:dbRepartoMulti,col:"negocios"};
+  return null;
+}
+function abrirCobrar(tipo,id){
+  var c=getClienteByTipo(tipo,id);if(!c)return;
+  var ec=calcularEstadoCobro(c);
+  var nombre=c.nombre||c.negocio||id;
+  var hist=(c.historialPagos||[]).slice(-5).reverse();
+  var histHtml=hist.length===0
+    ?'<p style="color:#4a6a85;font-size:0.8rem;text-align:center;padding:10px 0">Sin pagos registrados</p>'
+    :hist.map(function(p){
+        return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.06);font-size:0.8rem">'+
+          '<span style="color:#7a9ab8">'+formatFecha(p.fecha)+'</span>'+
+          '<span style="color:#4dd9a0;font-weight:700">$'+Number(p.monto).toLocaleString("es-AR")+'</span>'+
+          '<span style="background:#1a2b3c;color:#7a9ab8;padding:2px 7px;border-radius:8px;font-size:0.7rem">'+(p.via||"Manual")+'</span>'+
+        '</div>';
+      }).join("");
+  var montoFinal=ec.montoFinal||0;
+  var estadoBox="";
+  if(ec.estado==="al_dia")estadoBox='<div style="background:#0a2e1f;border:0.5px solid #4dd9a0;border-radius:10px;padding:12px;margin-bottom:14px;text-align:center;color:#4dd9a0;font-weight:600">💚 Pago registrado este mes</div>';
+  else if(ec.estado==="pendiente")estadoBox='<div style="background:#1a2e00;border:0.5px solid #c8e01a;border-radius:10px;padding:12px;margin-bottom:14px;color:#c8e01a"><b>💛 Pendiente de cobro</b><br><small style="opacity:0.8">Sin recargo hasta el día '+DIA_RECARGO+' &nbsp;·&nbsp; Monto: <b>$'+montoFinal.toLocaleString("es-AR")+'</b></small></div>';
+  else if(ec.estado==="con_recargo")estadoBox='<div style="background:#2e1800;border:0.5px solid #f5a442;border-radius:10px;padding:12px;margin-bottom:14px;color:#f5a442"><b>🟠 Con recargo del '+RECARGO_PCT+'%</b><br><small style="opacity:0.8">Base: $'+ec.monto.toLocaleString("es-AR")+' → Con recargo: <b>$'+montoFinal.toLocaleString("es-AR")+'</b></small></div>';
+  else estadoBox='<div style="background:#2e0a0a;border:0.5px solid #f07070;border-radius:10px;padding:12px;margin-bottom:14px;color:#f07070"><b>🔴 VENCIDO — Suspender acceso</b><br><small style="opacity:0.8">Pasó el día '+DIA_SUSPENSION+' sin pago &nbsp;·&nbsp; Monto: <b>$'+montoFinal.toLocaleString("es-AR")+'</b></small></div>';
+  var mpBox=MI_ALIAS_MP
+    ?'<div style="background:#1a2b3c;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:0.8rem">💸 Tu alias MP: <b style="color:#5daaff">'+MI_ALIAS_MP+'</b> &nbsp;·&nbsp; Monto: <b style="color:#4dd9a0">$'+montoFinal.toLocaleString("es-AR")+'</b></div>'
+    :'<div style="background:#2e1a00;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:0.78rem;color:#f5a442">⚙️ Configurá tu alias de MP para mostrárselo a los clientes</div>';
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">💳 Cobrar</h2>'+
+      '<p style="font-size:0.85rem;color:#7a9ab8;margin-bottom:14px">'+escHtmlBasico(nombre)+'</p>'+
+      estadoBox+
+      mpBox+
+      '<label>Monto a registrar ($)</label>'+
+      '<input id="cobro-monto" type="number" value="'+montoFinal+'"/>'+
+      '<div style="display:flex;gap:8px;margin-bottom:16px">'+
+        '<button class="btn btn-success" style="flex:1" onclick="marcarPagado(\''+tipo+'\',\''+id+'\')">✅ Marcar pagado</button>'+
+        '<button class="btn" style="background:#1e3a5f;color:#5daaff;border:none;flex:1" onclick="verificarPagoMP(\''+tipo+'\',\''+id+'\')">🔍 Verificar MP</button>'+
+      '</div>'+
+      (ec.estado==="suspender"?'<button class="btn btn-danger" style="width:100%;margin-bottom:12px" onclick="suspenderPorPago(\''+tipo+'\',\''+id+'\')">🔴 Suspender acceso ahora</button>':'')+
+      '<div style="border-top:0.5px solid rgba(255,255,255,0.08);padding-top:12px">'+
+        '<p style="font-size:0.75rem;color:#7a9ab8;margin-bottom:8px">📋 Últimos pagos registrados</p>'+
+        histHtml+
+      '</div>'+
+      '<button class="btn" style="width:100%;margin-top:12px" onclick="cerrarModalBtn()">Cerrar</button>'+
+    '</div></div>';
+}
+function escHtmlBasico(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/'/g,"&#39;").replace(/"/g,"&quot;");}
+async function marcarPagado(tipo,id){
+  var monto=Number((document.getElementById("cobro-monto")||{value:0}).value)||0;
+  if(!monto){toast("Ingresá un monto",false);return;}
+  var ref=getDbByTipo(tipo);var c=getClienteByTipo(tipo,id);if(!ref||!c)return;
+  var hist=(c.historialPagos||[]);
+  var hoy=new Date().toISOString().slice(0,10);
+  hist.push({fecha:hoy,monto:monto,via:"Manual"});
+  var upd={ultimoPago:hoy,historialPagos:hist};
+  if(tipo==="reparto"||tipo==="reposteria"){if(c.estado==="inactivo")upd.estado="activo";}
+  else if(tipo==="kiosco"||tipo==="polleria"){if(!c.activo)upd.activo=true;}
+  else if(tipo==="gestion"){if(c.estado==="inactivo")upd.estado="usado";}
+  try{
+    await ref.db.collection(ref.col).doc(id).update(upd);
+    toast("✅ Pago $"+monto.toLocaleString("es-AR")+" registrado");
+    cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+async function verificarPagoMP(tipo,id){
+  if(!MP_ACCESS_TOKEN){toast("⚙️ Configurá tu Access Token de MP",false);setTimeout(abrirConfigMP,600);return;}
+  var hoy=new Date();
+  var ini=new Date(hoy.getFullYear(),hoy.getMonth(),1).toISOString();
+  var fin=new Date(hoy.getFullYear(),hoy.getMonth()+1,0,23,59,59).toISOString();
+  toast("🔍 Consultando MercadoPago...");
+  try{
+    var resp=await fetch(
+      "https://api.mercadopago.com/v1/payments/search?external_reference="+encodeURIComponent(id)+"&status=approved&sort=date_created&criteria=desc&range=date_created&begin_date="+encodeURIComponent(ini)+"&end_date="+encodeURIComponent(fin),
+      {headers:{"Authorization":"Bearer "+MP_ACCESS_TOKEN}}
+    );
+    if(!resp.ok){toast("Error MP: "+resp.status+" — verificá tu token",false);return;}
+    var data=await resp.json();
+    if(data.results&&data.results.length>0){
+      var pago=data.results[0];
+      var monto=pago.transaction_amount||0;
+      var fechaPago=(pago.date_approved||new Date().toISOString()).slice(0,10);
+      var ref=getDbByTipo(tipo);var c=getClienteByTipo(tipo,id);
+      var hist=(c&&c.historialPagos)||[];
+      hist.push({fecha:fechaPago,monto:monto,via:"MercadoPago",mpId:pago.id});
+      var upd={ultimoPago:fechaPago,historialPagos:hist};
+      if(tipo==="reparto"||tipo==="reposteria"){if(c&&c.estado==="inactivo")upd.estado="activo";}
+      else if(tipo==="kiosco"||tipo==="polleria"){if(c&&!c.activo)upd.activo=true;}
+      else if(tipo==="gestion"){if(c&&c.estado==="inactivo")upd.estado="usado";}
+      await ref.db.collection(ref.col).doc(id).update(upd);
+      toast("✅ Pago verificado en MP: $"+monto.toLocaleString("es-AR"));
+      cerrarModalBtn();cargarTodo();
+    }else{
+      toast("❌ No se encontró pago aprobado este mes en MP",false);
+    }
+  }catch(e){
+    var msg=e.message||"";
+    if(msg.indexOf("fetch")>=0||msg.indexOf("CORS")>=0)toast("⚠️ Error de red MP — marcá manualmente",false);
+    else toast("Error MP: "+msg,false);
+  }
+}
+async function suspenderPorPago(tipo,id){
+  var c=getClienteByTipo(tipo,id);
+  var nombre=c?c.nombre||c.negocio||id:id;
+  if(!confirm("¿Suspender acceso a "+nombre+" por falta de pago?"))return;
+  var ref=getDbByTipo(tipo);if(!ref)return;
+  var upd={};
+  if(tipo==="reparto"||tipo==="reposteria")upd.estado="inactivo";
+  else if(tipo==="kiosco"||tipo==="polleria")upd.activo=false;
+  else if(tipo==="gestion")upd.estado="inactivo";
+  try{
+    await ref.db.collection(ref.col).doc(id).update(upd);
+    toast("🔴 "+nombre+" suspendido");cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+async function chequearSuspensionesAutomaticas(){
+  var hoy=new Date();var dia=hoy.getDate();
+  if(dia<=DIA_SUSPENSION)return;
+  var mes=hoy.getFullYear()+"-"+String(hoy.getMonth()+1).padStart(2,"0");
+  function necesita(c){return c.precioMensual&&!(c.ultimoPago||"").startsWith(mes);}
+  var promesas=[];var susp=0;
+  licencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){promesas.push(dbReparto.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
+  kioscoClientes.forEach(function(c){if(necesita(c)&&c.activo){promesas.push(dbKiosco.collection("clientes").doc(c.id).update({activo:false}));c.activo=false;susp++;}});
+  gestionUsuarios.forEach(function(u){if(necesita(u)&&u.estado!=="inactivo"&&u.estado!=="disponible"){promesas.push(dbGestion.collection("licencias").doc(u.id).update({estado:"inactivo"}));u.estado="inactivo";susp++;}});
+  polleriaClientes.forEach(function(c){if(necesita(c)&&c.activo){promesas.push(dbPolleria.collection("clientes").doc(c.id).update({activo:false}));c.activo=false;susp++;}});
+  reposteriaLicencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){promesas.push(dbReposteria.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
+  if(promesas.length){
+    try{await Promise.all(promesas);if(susp>0)toast("🔴 "+susp+" cliente(s) suspendidos automáticamente por falta de pago",false);}
+    catch(e){console.warn("Suspensión auto error:",e);}
+  }
+}
+function abrirConfigMP(){
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:4px">⚙️ Configuración MercadoPago</h2>'+
+      '<p style="font-size:0.78rem;color:#7a9ab8;margin-bottom:14px;line-height:1.5">Se guarda en este dispositivo, no en la nube.</p>'+
+      '<label>Mi alias de MercadoPago (el tuyo, para cobrar)</label>'+
+      '<input id="cfg-alias" placeholder="Ej: emmasoluciones" value="'+MI_ALIAS_MP+'"/>'+
+      '<label>Access Token de producción (para verificar pagos)</label>'+
+      '<input id="cfg-token" type="password" placeholder="APP_USR-..." value="'+MP_ACCESS_TOKEN+'"/>'+
+      '<div style="background:#1a2b3c;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.78rem;color:#7a9ab8;line-height:1.6">'+
+        '📍 <b style="color:#e2eaf4">¿Dónde está el Access Token?</b><br>'+
+        'mercadopago.com.ar → Tu perfil → Tu negocio → Credenciales → <b style="color:#5daaff">Credenciales de producción</b>'+
+      '</div>'+
+      '<div style="background:#1a2b3c;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.78rem;color:#7a9ab8;line-height:1.6">'+
+        '📋 <b style="color:#e2eaf4">¿Cómo diferencia los pagos?</b><br>'+
+        'Cuando verificás, busca en MP pagos con la referencia del cliente (su código de licencia). El cliente tiene que poner ese código como concepto al transferir.'+
+      '</div>'+
+      '<div style="display:flex;gap:10px">'+
+        '<button class="btn btn-purple" style="flex:1" onclick="guardarConfigMP()">Guardar</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+}
+function guardarConfigMP(){
+  MI_ALIAS_MP=((document.getElementById("cfg-alias")||{value:""}).value||"").trim();
+  MP_ACCESS_TOKEN=((document.getElementById("cfg-token")||{value:""}).value||"").trim();
+  localStorage.setItem("miAliasMp",MI_ALIAS_MP);
+  localStorage.setItem("mpAccessToken",MP_ACCESS_TOKEN);
+  toast("✅ Configuración MP guardada");
+  cerrarModalBtn();
+}
+function resumenCobrosMes(){
+  var todos=[];
+  function ag(arr,tipo){arr.forEach(function(c){if(c.precioMensual)todos.push({tipo:tipo,c:c,ec:calcularEstadoCobro(c)});});}
+  ag(licencias,"reparto");ag(kioscoClientes,"kiosco");ag(gestionUsuarios,"gestion");ag(polleriaClientes,"polleria");ag(reposteriaLicencias,"reposteria");
+  if(!todos.length)return'<div class="seccion-cobro" style="text-align:center;padding:12px 16px"><p style="color:#4a6a85;font-size:0.82rem">💳 Configurá precios en los clientes para ver el resumen de cobros</p><button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-top:8px" onclick="abrirConfigMP()">⚙️ Configurar MercadoPago</button></div>';
+  var alDia=todos.filter(function(t){return t.ec.estado==="al_dia";});
+  var pend=todos.filter(function(t){return t.ec.estado==="pendiente";});
+  var rec=todos.filter(function(t){return t.ec.estado==="con_recargo";});
+  var susp=todos.filter(function(t){return t.ec.estado==="suspender";});
+  var totalCobrado=alDia.reduce(function(s,t){return s+t.ec.montoFinal;},0);
+  var totalPend=[].concat(pend,rec,susp).reduce(function(s,t){return s+t.ec.montoFinal;},0);
+  return'<div class="seccion-cobro">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
+      '<span style="font-size:0.85rem;font-weight:700;color:#e2eaf4">💳 Cobros del mes</span>'+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;padding:4px 10px;font-size:0.72rem" onclick="abrirConfigMP()">⚙️ Config MP</button>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">'+
+      '<div style="background:#0a2e1f;border-radius:8px;padding:8px;text-align:center"><div style="font-size:1.1rem;font-weight:700;color:#4dd9a0">'+alDia.length+'</div><div style="font-size:0.62rem;color:#4dd9a0">Al día</div></div>'+
+      '<div style="background:#1a2e00;border-radius:8px;padding:8px;text-align:center"><div style="font-size:1.1rem;font-weight:700;color:#c8e01a">'+pend.length+'</div><div style="font-size:0.62rem;color:#c8e01a">Pendiente</div></div>'+
+      '<div style="background:#2e1800;border-radius:8px;padding:8px;text-align:center"><div style="font-size:1.1rem;font-weight:700;color:#f5a442">'+rec.length+'</div><div style="font-size:0.62rem;color:#f5a442">+Recargo</div></div>'+
+      '<div style="background:#2e0a0a;border-radius:8px;padding:8px;text-align:center"><div style="font-size:1.1rem;font-weight:700;color:#f07070">'+susp.length+'</div><div style="font-size:0.62rem;color:#f07070">Suspender</div></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:8px 4px 2px">'+
+      '<span style="color:#7a9ab8">Cobrado: <b style="color:#4dd9a0">$'+totalCobrado.toLocaleString("es-AR")+'</b></span>'+
+      '<span style="color:#7a9ab8">Por cobrar: <b style="color:#f5a442">$'+totalPend.toLocaleString("es-AR")+'</b></span>'+
+    '</div>'+
+  '</div>';
+}
 
 function estadoBadgeActivo(c){
   if(c.pendiente)return'<span class="badge badge-orange">⏳ Pendiente</span>';
@@ -392,7 +655,7 @@ function renderReparto(){
   }).join("");
   var cards=filtrados.map(function(l){
     var accionEstado=(l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
-    return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+(l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>':'')+(l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+(l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+'<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div><div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarRep(\''+l.id+'\')">✏️ Editar</button>'+accionEstado+'<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button></div></div>';
+    return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+(l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>':'')+(l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+(l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+'<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div><div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(l)+'</div><div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarRep(\''+l.id+'\')">✏️ Editar</button>'+accionEstado+'<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'reparto\',\''+l.id+'\')">💳 Cobrar</button><button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button></div></div>';
   }).join("");
   return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span class="firebase-tag">🔥 app-reparto-65035</span></div>'+
     '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div></div>'+
@@ -414,6 +677,7 @@ function abrirNuevaRep(){
       '<label>Email</label><input id="m-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
       '<label>Celular</label><input id="m-cel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Plan mensual - vence 30/06"/>'+
+      camposCobro(null)+
       '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function crearLicenciaRep(){
@@ -424,7 +688,8 @@ async function crearLicenciaRep(){
   var cel=document.getElementById("m-cel").value.trim();
   var notas=document.getElementById("m-notas").value.trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
-  try{await dbReparto.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()});toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();}
+  var cobro=getCobroData();
+  try{await dbReparto.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()},cobro));toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 function abrirEditarRep(id){
@@ -438,10 +703,12 @@ function abrirEditarRep(id){
       '<label>Email</label><input id="e-ema" type="email" value="'+(l.email||'')+'"/>'+
       '<label>Celular</label><input id="e-cel" type="tel" value="'+(l.celular||'')+'"/>'+
       '<label>Notas</label><input id="e-not" value="'+(l.notas||'')+'"/>'+
+      camposCobro(l)+
       '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="guardarEdicionRep(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function guardarEdicionRep(id){
-  try{await dbReparto.collection("licencias").doc(id).update({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()});toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();}
+  var cobro=getCobroData();
+  try{await dbReparto.collection("licencias").doc(id).update(Object.assign({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()},cobro));toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 async function cambiarEstadoRep(id,estado){
@@ -482,11 +749,13 @@ function renderKiosco(){
       '<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+c.nombre+'</span></div>'+
       '<div class="lic-card-fila"><span class="lbl">Plan</span>'+planBadge(c.plan)+'</div>'+
       '<div class="lic-card-fila"><span class="lbl">Vence</span>'+vencLabel(c)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(c)+'</div>'+
       (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarKio(\''+c.id+'\')">✏️ Editar</button>'+
         '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none" onclick="verStatsKio(\''+c.id+'\')">📊 Stats</button>'+
         '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" onclick="copiarLinkKio(\''+c.id+'\')">🔗 Link</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳 Cobrar</button>'+
         '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderKio(\''+c.id+'\')">📅 Extender</button>'+
         (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅ Activar</button>')+
       '</div></div>';
@@ -537,10 +806,12 @@ function abrirEditarKio(id){
       '<label>Estado</label><select id="ke-activo"><option value="1"'+(c.activo?" selected":"")+'>✅ Activo</option><option value="0"'+(!c.activo?" selected":"")+'>🔴 Suspendido</option></select>'+
       '<div style="font-size:0.8rem;color:#7a9ab8;margin-bottom:4px">Link:</div>'+
       '<div class="link-box"><span>'+getKioscoUrl(c)+'</span><button class="btn-copy" onclick="navigator.clipboard.writeText(\''+getKioscoUrl(c)+'\');toast(\'✅ Link copiado\')">Copiar</button></div>'+
+      camposCobro(c)+
       '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-purple" style="flex:1" onclick="guardarEdicionKio(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarKio(\''+id+'\')">🗑️</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function guardarEdicionKio(id){
-  try{await dbKiosco.collection("clientes").doc(id).update({nombre:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),telefono:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,activo:document.getElementById("ke-activo").value==="1"});toast("✅ Cliente actualizado");cerrarModalBtn();cargarTodo();}
+  var cobro=getCobroData();
+  try{await dbKiosco.collection("clientes").doc(id).update(Object.assign({nombre:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),telefono:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,activo:document.getElementById("ke-activo").value==="1"},cobro));toast("✅ Cliente actualizado");cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 async function eliminarKio(id){
@@ -649,9 +920,11 @@ function renderGestion(){
       (u.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+u.email+'</span></div>':'')+
       '<div class="lic-card-fila"><span class="lbl">Plan</span>'+planBadge(u.plan||"demo")+'</div>'+
       '<div class="lic-card-fila"><span class="lbl">Vence</span>'+vencLabel(u)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(u)+'</div>'+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarGestion(\''+u.id+'\')">✏️ Editar</button>'+
         '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderGestion(\''+u.id+'\')">📅 Extender</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳 Cobrar</button>'+
         (esActivo
           ?'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴 Suspender</button>'
           :'<button class="btn btn-sm btn-success" onclick="cambiarEstadoGestion(\''+u.id+'\',\'usado\')">✅ Activar</button>')+
@@ -753,20 +1026,22 @@ function abrirEditarGestion(id){
       '</select>'+
       '<label>Notas</label>'+
       '<input id="ge-not" value="'+(u.notas||"")+'"/>'+
+      camposCobro(u)+
       '<div style="display:flex;gap:10px;margin-top:12px">'+
         '<button class="btn btn-purple" style="flex:1" onclick="guardarEdicionGestion(\''+id+'\')">Guardar</button>'+
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
 }
 async function guardarEdicionGestion(id){
+  var cobro=getCobroData();
   try{
-    await dbGestion.collection("licencias").doc(id).update({
+    await dbGestion.collection("licencias").doc(id).update(Object.assign({
       negocio:document.getElementById("ge-neg").value.trim(),
       plan:document.getElementById("ge-plan").value,
       vencimiento:document.getElementById("ge-venc").value||null,
       estado:document.getElementById("ge-est").value,
       notas:document.getElementById("ge-not").value.trim()
-    });
+    },cobro));
     toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
@@ -818,11 +1093,13 @@ function renderPolleria(){
       '<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">🐔 '+c.nombre+'</span></div>'+
       '<div class="lic-card-fila"><span class="lbl">Plan</span>'+planBadge(c.plan)+'</div>'+
       '<div class="lic-card-fila"><span class="lbl">Vence</span>'+vencLabel(c)+'</div>'+
+      '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(c)+'</div>'+
       (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarPoll(\''+c.id+'\')">✏️ Editar</button>'+
         '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none" onclick="verStatsPoll(\''+c.id+'\')">📊 Stats</button>'+
         '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" onclick="copiarLinkPoll(\''+c.id+'\')">🔗 Link</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳 Cobrar</button>'+
         '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderPoll(\''+c.id+'\')">📅 Extender</button>'+
         (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderPoll(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" onclick="suspenderPoll(\''+c.id+'\',true)">✅ Activar</button>')+
       '</div></div>';
@@ -873,10 +1150,12 @@ function abrirEditarPoll(id){
       '<label>Vencimiento</label><input id="pe-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
       '<label>Estado</label><select id="pe-activo"><option value="1"'+(c.activo?" selected":"")+'>✅ Activo</option><option value="0"'+(!c.activo?" selected":"")+'>🔴 Suspendido</option></select>'+
       '<div class="link-box" style="border-color:rgba(245,164,66,0.3)"><span style="color:#f5a442">'+url+'</span><button class="btn-copy" onclick="navigator.clipboard.writeText(\''+url+'\');toast(\'✅ Link copiado\')">Copiar</button></div>'+
+      camposCobro(c)+
       '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarPoll(\''+id+'\')">🗑️</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function guardarEdicionPoll(id){
-  try{await dbPolleria.collection("clientes").doc(id).update({nombre:document.getElementById("pe-nom").value.trim(),email:document.getElementById("pe-ema").value.trim(),telefono:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,activo:document.getElementById("pe-activo").value==="1"});toast("✅ Pollería actualizada");cerrarModalBtn();cargarTodo();}
+  var cobro=getCobroData();
+  try{await dbPolleria.collection("clientes").doc(id).update(Object.assign({nombre:document.getElementById("pe-nom").value.trim(),email:document.getElementById("pe-ema").value.trim(),telefono:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,activo:document.getElementById("pe-activo").value==="1"},cobro));toast("✅ Pollería actualizada");cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 async function eliminarPoll(id){
@@ -971,9 +1250,11 @@ function renderReposteria(){
       (l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+
       (l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+
       '<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(l)+'</div>'+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️ Editar</button>'+
         accionEstado+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'reposteria\',\''+l.id+'\')">💳 Cobrar</button>'+
         '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱 Reset</button>'+
       '</div></div>';
   }).join("");
@@ -1021,6 +1302,7 @@ function abrirNuevaReposteria(){
       '<input id="mr-cel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Notas (opcional)</label>'+
       '<input id="mr-notas" placeholder="Ej: Plan mensual - vence 30/06"/>'+
+      camposCobro(null)+
       '<div style="background:#2e0a1a;border:0.5px solid rgba(245,160,200,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#f5a0c8;line-height:1.6">'+
         '📋 La clienta abre <b>Dulce Gestión</b>, va a ingresar, y usa este código + PIN para activar su cuenta.'+
       '</div>'+
@@ -1038,12 +1320,13 @@ async function crearLicenciaReposteria(){
   var cel=(document.getElementById("mr-cel").value||"").trim();
   var notas=(document.getElementById("mr-notas").value||"").trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
+  var cobro=getCobroData();
   try{
-    await dbReposteria.collection("licencias").doc(codigo).set({
+    await dbReposteria.collection("licencias").doc(codigo).set(Object.assign({
       estado:"activo", pin:pin, negocio:neg,
       email:ema, celular:cel, notas:notas,
       deviceId:"", creadoEn:new Date().toISOString()
-    });
+    },cobro));
     toast("✅ Licencia "+codigo+" creada — PIN: "+pin);
     cerrarModalBtn();
     cargarTodo();
@@ -1061,6 +1344,7 @@ function abrirEditarReposteria(id){
       '<label>Email</label><input id="er-ema" type="email" value="'+(l.email||'')+'"/>'+
       '<label>Celular</label><input id="er-cel" type="tel" value="'+(l.celular||'')+'"/>'+
       '<label>Notas</label><input id="er-not" value="'+(l.notas||'')+'"/>'+
+      camposCobro(l)+
       '<div style="display:flex;gap:10px;margin-top:6px">'+
         '<button class="btn btn-pink" style="flex:1" onclick="guardarEdicionReposteria(\''+id+'\')">Guardar</button>'+
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
@@ -1068,14 +1352,15 @@ function abrirEditarReposteria(id){
 }
 
 async function guardarEdicionReposteria(id){
+  var cobro=getCobroData();
   try{
-    await dbReposteria.collection("licencias").doc(id).update({
+    await dbReposteria.collection("licencias").doc(id).update(Object.assign({
       pin:Number(document.getElementById("er-pin").value),
       negocio:document.getElementById("er-neg").value.trim(),
       email:document.getElementById("er-ema").value.trim(),
       celular:document.getElementById("er-cel").value.trim(),
       notas:document.getElementById("er-not").value.trim()
-    });
+    },cobro));
     toast("✅ Licencia actualizada");
     cerrarModalBtn();
     cargarTodo();
@@ -1162,8 +1447,10 @@ function renderRepartoMulti(){
       '<div class="lic-card-fila"><span class="lbl">Dueño</span><span class="val">'+escHtml(n.ownerNombre)+'</span></div>'+
       '<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+escHtml(n.ownerEmail)+'</span></div>'+
       '<div class="lic-card-fila"><span class="lbl">Alta</span><span class="val">'+fechaAlta+'</span></div>'+
+      '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(n)+'</div>'+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="verRepartidores(\''+n.id+'\')">👥 Ver repartidores</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳 Cobrar</button>'+
         '<button class="btn btn-sm btn-danger" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️ Eliminar</button>'+
       '</div>'+
     '</div>';
