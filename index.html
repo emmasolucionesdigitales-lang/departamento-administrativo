@@ -147,6 +147,7 @@ firebase.initializeApp({
   appId:"1:761424199819:web:513eeaf0e54f4e1401d48e"
 },"admin");
 const auth=firebase.app("admin").auth();
+const dbControl=firebase.app("admin").firestore(); // ← Central de licencias (app-control-de-apps)
 
 /* ════════════════════════════════════════
    FIREBASE — APP REPARTO
@@ -536,11 +537,11 @@ async function chequearSuspensionesAutomaticas(){
   var mes=hoy.getFullYear()+"-"+String(hoy.getMonth()+1).padStart(2,"0");
   function necesita(c){return c.precioMensual&&!(c.ultimoPago||"").startsWith(mes);}
   var promesas=[];var susp=0;
-  licencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){promesas.push(dbReparto.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
+  licencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){promesas.push(dbControl.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
   kioscoClientes.forEach(function(c){if(necesita(c)&&c.activo){promesas.push(dbKiosco.collection("clientes").doc(c.id).update({activo:false}));c.activo=false;susp++;}});
-  gestionUsuarios.forEach(function(u){if(necesita(u)&&u.estado!=="inactivo"&&u.estado!=="disponible"){promesas.push(dbGestion.collection("licencias").doc(u.id).update({estado:"inactivo"}));u.estado="inactivo";susp++;}});
+  gestionUsuarios.forEach(function(u){if(necesita(u)&&u.estado!=="inactivo"&&u.estado!=="disponible"){promesas.push(dbControl.collection("licencias").doc(u.id).update({estado:"inactivo"}));u.estado="inactivo";susp++;}});
   polleriaClientes.forEach(function(c){if(necesita(c)&&c.activo){promesas.push(dbPolleria.collection("clientes").doc(c.id).update({activo:false}));c.activo=false;susp++;}});
-  reposteriaLicencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){promesas.push(dbReposteria.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
+  reposteriaLicencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){promesas.push(dbControl.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
   if(promesas.length){
     try{await Promise.all(promesas);if(susp>0)toast("🔴 "+susp+" cliente(s) suspendidos automáticamente por falta de pago",false);}
     catch(e){console.warn("Suspensión auto error:",e);}
@@ -629,8 +630,8 @@ function vencLabel(c){
    REPARTO
 ════════════════════════════════════════ */
 async function cargarLicencias(){
-  try{var snap=await dbReparto.collection("licencias").get();licencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}
-  catch(e){console.warn("Licencias Reparto error:",e);}
+  try{var snap=await dbControl.collection("licencias").get();licencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).filter(function(l){return !l.app||l.app==="reparto";});}
+  catch(e){console.warn("Reparto licencias error:",e);}
 }
 function estadoBadgeRep(estado){
   if(estado==="pendiente")return'<span class="badge badge-orange">⏳ Pendiente</span>';
@@ -691,7 +692,7 @@ async function crearLicenciaRep(){
   var notas=document.getElementById("m-notas").value.trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
   var cobro=getCobroData();
-  try{await dbReparto.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()},cobro));toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();}
+  try{await dbControl.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,app:"reparto",plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()},cobro));toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 function abrirEditarRep(id){
@@ -710,17 +711,17 @@ function abrirEditarRep(id){
 }
 async function guardarEdicionRep(id){
   var cobro=getCobroData();
-  try{await dbReparto.collection("licencias").doc(id).update(Object.assign({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()},cobro));toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();}
+  try{await dbControl.collection("licencias").doc(id).update(Object.assign({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()},cobro));toast("✅ Licencia actualizada");cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 async function cambiarEstadoRep(id,estado){
   if(!confirm(estado==="inactivo"?"¿Desactivar? El cliente perderá el acceso.":"¿Activar esta licencia?"))return;
-  try{await dbReparto.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");cargarTodo();}
+  try{await dbControl.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 async function resetDispositivo(id){
   if(!confirm("¿Resetear dispositivo? El cliente podrá activar desde un celular nuevo."))return;
-  try{await dbReparto.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}
+  try{await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 
@@ -809,7 +810,7 @@ async function crearClienteKio(){
   if(!nom||!id||!codigo||!pin){toast("Completá nombre, código y PIN",false);return;}
   try{
     await dbKiosco.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()});
-    await dbReparto.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,app:"kiosco",negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
+    await dbControl.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,app:"kiosco",negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
     toast("✅ Kiosco "+nom+" — Código: "+codigo+" — PIN: "+pin);
     cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -892,8 +893,8 @@ async function verStatsKio(id){
 ════════════════════════════════════════ */
 async function cargarGestionUsuarios(){
   try{
-    var snap=await dbGestion.collection("licencias").get();
-    gestionUsuarios=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    var snap=await dbControl.collection("licencias").get();
+    gestionUsuarios=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).filter(function(l){return l.app==="emma-control";});
   }catch(e){console.warn("Gestión error:",e);}
 }
 function estadoBadgeGestion(estado){
@@ -1012,8 +1013,8 @@ async function crearLicenciaGestion(){
   var notas=(document.getElementById("gnv-notas").value||"").trim();
   if(!codigo){toast("El código no puede estar vacío",false);return;}
   try{
-    await dbGestion.collection("licencias").doc(codigo).set({
-      negocio:negocio, plan:plan, estado:"disponible",
+    await dbControl.collection("licencias").doc(codigo).set({
+      app:"emma-control", negocio:negocio, plan:plan, estado:"disponible",
       uid:"", email:"", nombre:"",
       vencimiento:venc, notas:notas,
       fechaAlta:new Date().toISOString()
@@ -1062,7 +1063,7 @@ function abrirEditarGestion(id){
 async function guardarEdicionGestion(id){
   var cobro=getCobroData();
   try{
-    await dbGestion.collection("licencias").doc(id).update(Object.assign({
+    await dbControl.collection("licencias").doc(id).update(Object.assign({
       negocio:document.getElementById("ge-neg").value.trim(),
       plan:document.getElementById("ge-plan").value,
       vencimiento:document.getElementById("ge-venc").value||null,
@@ -1077,7 +1078,7 @@ async function cambiarEstadoGestion(id,estado){
   var nombre=u?u.negocio||u.nombre||id:id;
   if(!confirm((estado==="inactivo"?"¿Suspender a ":"¿Activar a ")+nombre+"?"))return;
   try{
-    await dbGestion.collection("licencias").doc(id).update({estado:estado});
+    await dbControl.collection("licencias").doc(id).update({estado:estado});
     toast(estado==="inactivo"?"🔴 Suspendida":"✅ Activada");cargarTodo();
   }catch(e){toast(e.message,false);}
 }
@@ -1088,7 +1089,7 @@ async function extenderGestion(id){
   var base=u&&u.vencimiento&&new Date(u.vencimiento)>new Date()?new Date(u.vencimiento):new Date();
   base.setDate(base.getDate()+parseInt(dias));
   try{
-    await dbGestion.collection("licencias").doc(id).update({vencimiento:base.toISOString().slice(0,10)});
+    await dbControl.collection("licencias").doc(id).update({vencimiento:base.toISOString().slice(0,10)});
     toast("✅ Extendido "+dias+" días");cargarTodo();
   }catch(e){toast(e.message,false);}
 }
@@ -1178,7 +1179,7 @@ async function crearClientePoll(){
   if(!nom||!id||!codigo||!pin){toast("Completá el nombre, código y PIN",false);return;}
   try{
     await dbPolleria.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,vencimiento:venc,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()});
-    await dbPolleria.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
+    await dbControl.collection("licencias").doc(codigo).set({app:"polleria",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
     toast("✅ Pollería "+nom+" — Código: "+codigo+" — PIN: "+pin);
     cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1259,8 +1260,8 @@ async function verStatsPoll(id){
 ════════════════════════════════════════ */
 async function cargarReposteriaLicencias(){
   try{
-    var snap=await dbReposteria.collection("licencias").get();
-    reposteriaLicencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    var snap=await dbControl.collection("licencias").get();
+    reposteriaLicencias=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).filter(function(l){return l.app==="reposteria";});
   }catch(e){console.warn("Repostería licencias error:",e);}
 }
 
@@ -1371,8 +1372,8 @@ async function crearLicenciaReposteria(){
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
   var cobro=getCobroData();
   try{
-    await dbReposteria.collection("licencias").doc(codigo).set(Object.assign({
-      estado:"activo", pin:pin, negocio:neg,
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({
+      app:"reposteria", estado:"activo", pin:pin, negocio:neg,
       email:ema, celular:cel, notas:notas,
       deviceId:"", creadoEn:new Date().toISOString()
     },cobro));
@@ -1403,7 +1404,7 @@ function abrirEditarReposteria(id){
 async function guardarEdicionReposteria(id){
   var cobro=getCobroData();
   try{
-    await dbReposteria.collection("licencias").doc(id).update(Object.assign({
+    await dbControl.collection("licencias").doc(id).update(Object.assign({
       pin:Number(document.getElementById("er-pin").value),
       negocio:document.getElementById("er-neg").value.trim(),
       email:document.getElementById("er-ema").value.trim(),
@@ -1421,7 +1422,7 @@ async function cambiarEstadoReposteria(id,estado){
   var nombre=l?l.negocio||id:id;
   if(!confirm((estado==="inactivo"?"¿Desactivar a ":"¿Activar a ")+nombre+"?"))return;
   try{
-    await dbReposteria.collection("licencias").doc(id).update({estado:estado});
+    await dbControl.collection("licencias").doc(id).update({estado:estado});
     toast(estado==="inactivo"?"🔴 Desactivada":"✅ Activada");
     cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1432,7 +1433,7 @@ async function resetDispositivoReposteria(id){
   var nombre=l?l.negocio||id:id;
   if(!confirm("¿Resetear dispositivo de "+nombre+"? Podrá activar desde un celular nuevo."))return;
   try{
-    await dbReposteria.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
+    await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
     toast("✅ Dispositivo reseteado");
     cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1608,7 +1609,7 @@ function cerrarModalBtn(){document.getElementById("modal-container").innerHTML="
 async function eliminarLicenciaRep(id, nombre){
   if(!confirm("¿Eliminar la licencia de \""+nombre+"\"?\nEsta acción no se puede deshacer."))return;
   try{
-    await dbReparto.collection("licencias").doc(id).delete();
+    await dbControl.collection("licencias").doc(id).delete();
     toast("✅ Licencia eliminada");
     cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1626,7 +1627,7 @@ async function eliminarKioscoCliente(id, nombre){
 async function eliminarLicenciaGestion(id, nombre){
   if(!confirm("¿Eliminar la licencia de \""+nombre+"\"?\nEsta acción no se puede deshacer."))return;
   try{
-    await dbGestion.collection("licencias").doc(id).delete();
+    await dbControl.collection("licencias").doc(id).delete();
     toast("✅ Licencia eliminada");
     cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1635,7 +1636,7 @@ async function eliminarLicenciaGestion(id, nombre){
 async function eliminarLicenciaReposteria(id, nombre){
   if(!confirm("¿Eliminar la licencia de \""+nombre+"\"?\nEsta acción no se puede deshacer."))return;
   try{
-    await dbReposteria.collection("licencias").doc(id).delete();
+    await dbControl.collection("licencias").doc(id).delete();
     toast("✅ Licencia eliminada");
     cargarTodo();
   }catch(e){toast(e.message,false);}
