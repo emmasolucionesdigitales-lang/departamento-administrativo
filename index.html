@@ -648,16 +648,16 @@ function renderReparto(){
     return(l.id||"").toLowerCase().indexOf(filtroReparto)>=0||(l.negocio||"").toLowerCase().indexOf(filtroReparto)>=0||(l.email||"").toLowerCase().indexOf(filtroReparto)>=0||(l.celular||"").indexOf(filtroReparto)>=0;
   });
   var filas=filtrados.map(function(l){
-    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarRep(\''+l.id+'\')">✏️</button>'+
-      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴</button>')+
-      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'reparto\',\''+l.id+'\')">💳</button>'+
-      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942;margin-right:4px" onclick="resetDispositivo(\''+l.id+'\')">📱</button>'+
-      '<button class="btn btn-sm btn-danger" onclick="eliminarLicenciaRep(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️</button>';
+    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarRep(\''+l.id+'\')">✏️</button>'+
+      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" title="Cambiar estado" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" title="Cambiar estado" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'reparto\',\''+l.id+'\')">💳</button>'+
+      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942;margin-right:4px" title="Reset dispositivo" onclick="resetDispositivo(\''+l.id+'\')">📱</button>'+
+      '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarLicenciaRep(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️</button>';
     return'<tr><td><code style="color:#5daaff;font-size:0.85rem">'+l.id+'</code></td><td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.email||"—")+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(l.celular||"—")+'</td><td>'+estadoBadgeRep(l.estado)+'</td><td><code style="color:#f5b942">'+(l.pin||"—")+'</code></td><td>'+cobroBadge(l)+'</td><td>'+acc+'</td></tr>';
   }).join("");
   var cards=filtrados.map(function(l){
-    var accionEstado=(l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
-    return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+(l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>':'')+(l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+(l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+'<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div><div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(l)+'</div><div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarRep(\''+l.id+'\')">✏️ Editar</button>'+accionEstado+'<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'reparto\',\''+l.id+'\')">💳 Cobrar</button><button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button><button class="btn btn-sm btn-danger" onclick="eliminarLicenciaRep(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️ Eliminar</button></div></div>';
+    var accionEstado=(l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" title="Cambiar estado" onclick="cambiarEstadoRep(\''+l.id+'\',\'activo\')">✅ Activar</button>':'<button class="btn btn-sm btn-danger" title="Cambiar estado" onclick="cambiarEstadoRep(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
+    return'<div class="lic-card"><div class="lic-card-top"><span class="lic-codigo">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+(l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">'+l.negocio+'</span></div>':'')+(l.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+l.email+'</span></div>':'')+(l.celular?'<div class="lic-card-fila"><span class="lbl">Celular</span><span class="val">'+l.celular+'</span></div>':'')+'<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div><div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(l)+'</div><div class="lic-card-actions"><button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" title="Editar" onclick="abrirEditarRep(\''+l.id+'\')">✏️ Editar</button>'+accionEstado+'<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'reparto\',\''+l.id+'\')">💳 Cobrar</button><button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" title="Reset dispositivo" onclick="resetDispositivo(\''+l.id+'\')">📱 Reset</button><button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarLicenciaRep(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️ Eliminar</button></div></div>';
   }).join("");
   return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span class="firebase-tag">🔥 app-reparto-65035</span></div>'+
     '<div class="grid4" style="margin-bottom:14px"><div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div><div class="stat-card"><div class="stat-num" style="color:#f5a442">'+pendientes+'</div><div class="stat-label">Pendientes</div></div><div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activas</div></div><div class="stat-card"><div class="stat-num" style="color:#f07070">'+inact+'</div><div class="stat-label">Inactivas</div></div></div>'+
@@ -739,13 +739,13 @@ function renderKiosco(){
   var pendientes=kioscoClientes.filter(function(c){return c.pendiente;}).length;
   var filtrados=kioscoClientes.filter(function(c){if(!filtroKiosco)return true;return(c.nombre||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.email||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.negocioId||c.id||"").toLowerCase().indexOf(filtroKiosco)>=0;});
   var filas=filtrados.map(function(c){
-    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarKio(\''+c.id+'\')">✏️</button>'+
-      '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;margin-right:4px" onclick="verStatsKio(\''+c.id+'\')">📊</button>'+
-      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkKio(\''+c.id+'\')">🔗</button>'+
-      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳</button>'+
-      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderKio(\''+c.id+'\')">📅</button>'+
-      (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>')+
-      '<button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="eliminarKioscoCliente(\''+c.id+'\',\''+escHtml(c.nombre||c.id)+'\')">🗑️</button>';
+    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarKio(\''+c.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;margin-right:4px" title="Ver estadísticas" onclick="verStatsKio(\''+c.id+'\')">📊</button>'+
+      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" title="Copiar link" onclick="copiarLinkKio(\''+c.id+'\')">🔗</button>'+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" title="Extender vencimiento" onclick="extenderKio(\''+c.id+'\')">📅</button>'+
+      (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>')+
+      '<button class="btn btn-sm btn-danger" style="margin-left:4px" title="Eliminar" onclick="eliminarKioscoCliente(\''+c.id+'\',\''+escHtml(c.nombre||c.id)+'\')">🗑️</button>';
     return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#5daaff;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td>'+cobroBadge(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td>'+acc+'</td></tr>';
   }).join("");
   var cards=filtrados.map(function(c){
@@ -756,13 +756,13 @@ function renderKiosco(){
       '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(c)+'</div>'+
       (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
       '<div class="lic-card-actions">'+
-        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarKio(\''+c.id+'\')">✏️ Editar</button>'+
-        '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none" onclick="verStatsKio(\''+c.id+'\')">📊 Stats</button>'+
-        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" onclick="copiarLinkKio(\''+c.id+'\')">🔗 Link</button>'+
-        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳 Cobrar</button>'+
-        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderKio(\''+c.id+'\')">📅 Extender</button>'+
-        (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderKio(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" onclick="suspenderKio(\''+c.id+'\',true)">✅ Activar</button>')+
-        '<button class="btn btn-sm btn-danger" onclick="eliminarKioscoCliente(\''+c.id+'\',\''+escHtml(c.nombre||c.id)+'\')">🗑️ Eliminar</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" title="Editar" onclick="abrirEditarKio(\''+c.id+'\')">✏️ Editar</button>'+
+        '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none" title="Ver estadísticas" onclick="verStatsKio(\''+c.id+'\')">📊 Stats</button>'+
+        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" title="Copiar link" onclick="copiarLinkKio(\''+c.id+'\')">🔗 Link</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳 Cobrar</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" title="Extender vencimiento" onclick="extenderKio(\''+c.id+'\')">📅 Extender</button>'+
+        (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderKio(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderKio(\''+c.id+'\',true)">✅ Activar</button>')+
+        '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarKioscoCliente(\''+c.id+'\',\''+escHtml(c.nombre||c.id)+'\')">🗑️ Eliminar</button>'+
       '</div></div>';
   }).join("");
   return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span class="firebase-tag" style="border-color:rgba(100,200,255,0.3);color:#5daaff">🔥 app-kiosco-c9482</span></div>'+
@@ -774,28 +774,45 @@ function renderKiosco(){
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' clientes kiosco</p>';
 }
 function abrirNuevoKio(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='KIO-'+rand;
+  var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🏪 Nuevo cliente Kiosco</h2>'+
+      '<label>Código de activación</label>'+
+      '<input id="k-cod" value="'+codigo+'" style="font-family:monospace;font-weight:700;letter-spacing:0.1em;text-transform:uppercase"/>'+
+      '<label>PIN de acceso</label>'+
+      '<input id="k-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label><input id="k-nom" placeholder="Ej: Kiosco El Sol"/>'+
       '<label>ID único (se genera solo)</label><input id="k-id" placeholder="kiosco-el-sol"/>'+
       '<label>Email</label><input id="k-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
       '<label>Teléfono</label><input id="k-tel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Plan</label><select id="k-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Fecha de vencimiento</label><input id="k-venc" type="date"/>'+
+      '<div style="background:#0a1e2e;border:0.5px solid rgba(93,170,255,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#5daaff;line-height:1.6">'+
+        '📋 El cliente abre <b>Mi Kiosco</b> e ingresa este código + PIN para activar.'+
+      '</div>'+
       '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
   setTimeout(function(){var nomEl=document.getElementById("k-nom");var idEl=document.getElementById("k-id");if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};},100);
 }
 async function crearClienteKio(){
+  var codigo=(document.getElementById("k-cod").value||"").trim().toUpperCase();
+  var pin=Number(document.getElementById("k-pin").value);
   var nom=(document.getElementById("k-nom").value||"").trim();
   var id=(document.getElementById("k-id").value||"").trim()||toSlug(nom);
   var ema=(document.getElementById("k-ema").value||"").trim();
   var tel=(document.getElementById("k-tel").value||"").trim();
   var plan=document.getElementById("k-plan").value;
   var venc=document.getElementById("k-venc").value||null;
-  if(!nom||!id){toast("Completá nombre del negocio",false);return;}
-  try{await dbKiosco.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,fechaAlta:new Date().toISOString()});toast("✅ Cliente "+nom+" creado");cerrarModalBtn();cargarTodo();}
-  catch(e){toast(e.message,false);}
+  if(!nom||!id||!codigo||!pin){toast("Completá nombre, código y PIN",false);return;}
+  try{
+    await dbKiosco.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()});
+    await dbReparto.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,app:"kiosco",negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
+    toast("✅ Kiosco "+nom+" — Código: "+codigo+" — PIN: "+pin);
+    cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 function abrirEditarKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
@@ -901,13 +918,13 @@ function renderGestion(){
   var filas=filtrados.map(function(u){
     var esActivo=u.estado==="usado"||u.estado==="activo";
     var acc=
-      '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarGestion(\''+u.id+'\')">✏️</button>'+
-      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderGestion(\''+u.id+'\')">📅</button>'+
-      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarGestion(\''+u.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" title="Extender vencimiento" onclick="extenderGestion(\''+u.id+'\')">📅</button>'+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳</button>'+
       (esActivo
-        ?'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴</button>'
-        :'<button class="btn btn-sm btn-success" onclick="cambiarEstadoGestion(\''+u.id+'\',\'usado\')">✅</button>')+
-      '<button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="eliminarLicenciaGestion(\''+u.id+'\',\''+escHtml(u.negocio||u.nombre||u.id)+'\')">🗑️</button>';
+        ?'<button class="btn btn-sm btn-danger" title="Cambiar estado" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴</button>'
+        :'<button class="btn btn-sm btn-success" title="Cambiar estado" onclick="cambiarEstadoGestion(\''+u.id+'\',\'usado\')">✅</button>')+
+      '<button class="btn btn-sm btn-danger" style="margin-left:4px" title="Eliminar" onclick="eliminarLicenciaGestion(\''+u.id+'\',\''+escHtml(u.negocio||u.nombre||u.id)+'\')">🗑️</button>';
     return'<tr>'+
       '<td><code style="color:#c9a5f5;font-size:0.85rem;font-weight:700">'+u.id+'</code></td>'+
       '<td><div style="font-weight:600">'+(u.negocio||u.nombre||'<span style="color:#4a6a85">Sin activar</span>')+'</div>'+
@@ -930,13 +947,13 @@ function renderGestion(){
       '<div class="lic-card-fila"><span class="lbl">Vence</span>'+vencLabel(u)+'</div>'+
       '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(u)+'</div>'+
       '<div class="lic-card-actions">'+
-        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarGestion(\''+u.id+'\')">✏️ Editar</button>'+
-        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderGestion(\''+u.id+'\')">📅 Extender</button>'+
-        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳 Cobrar</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" title="Editar" onclick="abrirEditarGestion(\''+u.id+'\')">✏️ Editar</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" title="Extender vencimiento" onclick="extenderGestion(\''+u.id+'\')">📅 Extender</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳 Cobrar</button>'+
         (esActivo
-          ?'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴 Suspender</button>'
-          :'<button class="btn btn-sm btn-success" onclick="cambiarEstadoGestion(\''+u.id+'\',\'usado\')">✅ Activar</button>')+
-        '<button class="btn btn-sm btn-danger" onclick="eliminarLicenciaGestion(\''+u.id+'\',\''+escHtml(u.negocio||u.nombre||u.id)+'\')">🗑️ Eliminar</button>'+
+          ?'<button class="btn btn-sm btn-danger" title="Cambiar estado" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴 Suspender</button>'
+          :'<button class="btn btn-sm btn-success" title="Cambiar estado" onclick="cambiarEstadoGestion(\''+u.id+'\',\'usado\')">✅ Activar</button>')+
+        '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarLicenciaGestion(\''+u.id+'\',\''+escHtml(u.negocio||u.nombre||u.id)+'\')">🗑️ Eliminar</button>'+
       '</div></div>';
   }).join("");
   return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'+
@@ -1090,13 +1107,13 @@ function renderPolleria(){
   var pendientes=polleriaClientes.filter(function(c){return c.pendiente;}).length;
   var filtrados=polleriaClientes.filter(function(c){if(!filtroPolleriaClientes)return true;return(c.nombre||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0||(c.email||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0||(c.negocioId||c.id||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0;});
   var filas=filtrados.map(function(c){
-    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" onclick="abrirEditarPoll(\''+c.id+'\')">✏️</button>'+
-      '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none;margin-right:4px" onclick="verStatsPoll(\''+c.id+'\')">📊</button>'+
-      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" onclick="copiarLinkPoll(\''+c.id+'\')">🔗</button>'+
-      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳</button>'+
-      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" onclick="extenderPoll(\''+c.id+'\')">📅</button>'+
-      (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderPoll(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" onclick="suspenderPoll(\''+c.id+'\',true)">✅</button>')+
-      '<button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="eliminarPoll(\''+c.id+'\')">🗑️</button>';
+    var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarPoll(\''+c.id+'\')">✏️</button>'+
+      '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none;margin-right:4px" title="Ver estadísticas" onclick="verStatsPoll(\''+c.id+'\')">📊</button>'+
+      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" title="Copiar link" onclick="copiarLinkPoll(\''+c.id+'\')">🔗</button>'+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳</button>'+
+      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" title="Extender vencimiento" onclick="extenderPoll(\''+c.id+'\')">📅</button>'+
+      (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',true)">✅</button>')+
+      '<button class="btn btn-sm btn-danger" style="margin-left:4px" title="Eliminar" onclick="eliminarPoll(\''+c.id+'\')">🗑️</button>';
     return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#f5a442;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td>'+cobroBadge(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td>'+acc+'</td></tr>';
   }).join("");
   var cards=filtrados.map(function(c){
@@ -1107,13 +1124,13 @@ function renderPolleria(){
       '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(c)+'</div>'+
       (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
       '<div class="lic-card-actions">'+
-        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarPoll(\''+c.id+'\')">✏️ Editar</button>'+
-        '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none" onclick="verStatsPoll(\''+c.id+'\')">📊 Stats</button>'+
-        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" onclick="copiarLinkPoll(\''+c.id+'\')">🔗 Link</button>'+
-        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳 Cobrar</button>'+
-        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" onclick="extenderPoll(\''+c.id+'\')">📅 Extender</button>'+
-        (c.activo?'<button class="btn btn-sm btn-danger" onclick="suspenderPoll(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" onclick="suspenderPoll(\''+c.id+'\',true)">✅ Activar</button>')+
-        '<button class="btn btn-sm btn-danger" onclick="eliminarPoll(\''+c.id+'\')">🗑️ Eliminar</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" title="Editar" onclick="abrirEditarPoll(\''+c.id+'\')">✏️ Editar</button>'+
+        '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none" title="Ver estadísticas" onclick="verStatsPoll(\''+c.id+'\')">📊 Stats</button>'+
+        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" title="Copiar link" onclick="copiarLinkPoll(\''+c.id+'\')">🔗 Link</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳 Cobrar</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" title="Extender vencimiento" onclick="extenderPoll(\''+c.id+'\')">📅 Extender</button>'+
+        (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',true)">✅ Activar</button>')+
+        '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarPoll(\''+c.id+'\')">🗑️ Eliminar</button>'+
       '</div></div>';
   }).join("");
   return'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px"><span class="firebase-tag" style="border-color:rgba(245,164,66,0.35);color:#f5a442">🔥 app-polleria-f349b</span></div>'+
@@ -1125,28 +1142,45 @@ function renderPolleria(){
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' pollerías</p>';
 }
 function abrirNuevoPoll(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='POLL-'+rand;
+  var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🐔 Nueva Pollería</h2>'+
+      '<label>Código de activación</label>'+
+      '<input id="p-cod" value="'+codigo+'" style="font-family:monospace;font-weight:700;letter-spacing:0.1em;text-transform:uppercase"/>'+
+      '<label>PIN de acceso</label>'+
+      '<input id="p-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label><input id="p-nom" placeholder="Ej: Pollería El Gallo"/>'+
       '<label>ID único</label><input id="p-id" placeholder="polleria-el-gallo"/>'+
       '<label>Email</label><input id="p-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
       '<label>Teléfono</label><input id="p-tel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Plan</label><select id="p-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Fecha de vencimiento</label><input id="p-venc" type="date"/>'+
+      '<div style="background:#2e1800;border:0.5px solid rgba(245,164,66,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#f5a442;line-height:1.6">'+
+        '📋 El cliente abre <b>Emma Pollería</b> e ingresa este código + PIN para activar.'+
+      '</div>'+
       '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="crearClientePoll()">🐔 Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
   setTimeout(function(){var nomEl=document.getElementById("p-nom");var idEl=document.getElementById("p-id");if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};},100);
 }
 async function crearClientePoll(){
+  var codigo=(document.getElementById("p-cod").value||"").trim().toUpperCase();
+  var pin=Number(document.getElementById("p-pin").value);
   var nom=(document.getElementById("p-nom").value||"").trim();
   var id=(document.getElementById("p-id").value||"").trim()||toSlug(nom);
   var ema=(document.getElementById("p-ema").value||"").trim();
   var tel=(document.getElementById("p-tel").value||"").trim();
   var plan=document.getElementById("p-plan").value;
   var venc=document.getElementById("p-venc").value||null;
-  if(!nom||!id){toast("Completá el nombre",false);return;}
-  try{await dbPolleria.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,vencimiento:venc,fechaAlta:new Date().toISOString()});toast("✅ Pollería "+nom+" creada");cerrarModalBtn();cargarTodo();}
-  catch(e){toast(e.message,false);}
+  if(!nom||!id||!codigo||!pin){toast("Completá el nombre, código y PIN",false);return;}
+  try{
+    await dbPolleria.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,vencimiento:venc,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()});
+    await dbPolleria.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
+    toast("✅ Pollería "+nom+" — Código: "+codigo+" — PIN: "+pin);
+    cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 function abrirEditarPoll(id){
   var c=polleriaClientes.find(function(x){return x.id===id;});if(!c)return;
@@ -1163,7 +1197,7 @@ function abrirEditarPoll(id){
       '<label>Estado</label><select id="pe-activo"><option value="1"'+(c.activo?" selected":"")+'>✅ Activo</option><option value="0"'+(!c.activo?" selected":"")+'>🔴 Suspendido</option></select>'+
       '<div class="link-box" style="border-color:rgba(245,164,66,0.3)"><span style="color:#f5a442">'+url+'</span><button class="btn-copy" onclick="navigator.clipboard.writeText(\''+url+'\');toast(\'✅ Link copiado\')">Copiar</button></div>'+
       camposCobro(c)+
-      '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarPoll(\''+id+'\')">🗑️</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
+      '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminarPoll(\''+id+'\')">🗑️</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
 async function guardarEdicionPoll(id){
   var cobro=getCobroData();
@@ -1239,10 +1273,10 @@ function renderReposteria(){
     return(l.id||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.negocio||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.email||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.celular||"").indexOf(filtroReposteria)>=0;
   });
   var filas=filtrados.map(function(l){
-    var acc='<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none;margin-right:4px" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️</button>'+
-      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴</button>')+
-      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942;margin-right:4px" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱</button>'+
-      '<button class="btn btn-sm btn-danger" onclick="eliminarLicenciaReposteria(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️</button>';
+    var acc='<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none;margin-right:4px" title="Editar" title="Editar" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️</button>'+
+      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" title="Cambiar estado" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" title="Cambiar estado" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942;margin-right:4px" title="Reset dispositivo" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱</button>'+
+      '<button class="btn btn-sm btn-danger" title="Eliminar" title="Eliminar" onclick="eliminarLicenciaReposteria(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️</button>';
     return'<tr>'+
       '<td><code style="color:#f5a0c8;font-size:0.85rem">'+l.id+'</code></td>'+
       '<td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td>'+
@@ -1255,8 +1289,8 @@ function renderReposteria(){
   }).join("");
   var cards=filtrados.map(function(l){
     var accionEstado=(l.estado==="inactivo"||l.estado==="pendiente")
-      ?'<button class="btn btn-sm btn-success" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅ Activar</button>'
-      :'<button class="btn btn-sm btn-danger" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
+      ?'<button class="btn btn-sm btn-success" title="Cambiar estado" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅ Activar</button>'
+      :'<button class="btn btn-sm btn-danger" title="Cambiar estado" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴 Desactivar</button>';
     return'<div class="lic-card" style="border-color:rgba(245,160,200,0.2)">'+
       '<div class="lic-card-top"><span class="lic-codigo" style="color:#f5a0c8">'+l.id+'</span>'+estadoBadgeRep(l.estado)+'</div>'+
       (l.negocio?'<div class="lic-card-fila"><span class="lbl">Negocio</span><span class="val" style="font-weight:600">🎂 '+l.negocio+'</span></div>':'')+
@@ -1265,11 +1299,11 @@ function renderReposteria(){
       '<div class="lic-card-fila"><span class="lbl">PIN</span><span style="color:#f5b942;font-family:monospace;font-weight:700">'+(l.pin||"—")+'</span></div>'+
       '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(l)+'</div>'+
       '<div class="lic-card-actions">'+
-        '<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️ Editar</button>'+
+        '<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none" title="Editar" title="Editar" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️ Editar</button>'+
         accionEstado+
-        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'reposteria\',\''+l.id+'\')">💳 Cobrar</button>'+
-        '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱 Reset</button>'+
-        '<button class="btn btn-sm btn-danger" onclick="eliminarLicenciaReposteria(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️ Eliminar</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'reposteria\',\''+l.id+'\')">💳 Cobrar</button>'+
+        '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" title="Reset dispositivo" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱 Reset</button>'+
+        '<button class="btn btn-sm btn-danger" title="Eliminar" title="Eliminar" onclick="eliminarLicenciaReposteria(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️ Eliminar</button>'+
       '</div></div>';
   }).join("");
 
@@ -1464,7 +1498,7 @@ function renderRepartoMulti(){
       '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(n)+'</div>'+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="verRepartidores(\''+n.id+'\')">👥 Ver repartidores</button>'+
-        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳 Cobrar</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳 Cobrar</button>'+
         '<button class="btn btn-sm btn-danger" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️ Eliminar</button>'+
       '</div>'+
     '</div>';
