@@ -933,6 +933,7 @@ function renderGestion(){
       '<td>'+estadoBadgeGestion(u.estado)+'</td>'+
       '<td>'+vencLabel(u)+'</td>'+
       '<td>'+cobroBadge(u)+'</td>'+
+      '<td><code style="color:#f5b942;font-weight:700">'+(u.pin||"—")+'</code></td>'+
       '<td>'+acc+'</td>'+
     '</tr>';
   }).join("");
@@ -971,8 +972,8 @@ function renderGestion(){
     '<button class="btn btn-sm btn-purple" onclick="abrirNuevoGestion()">+ Nueva licencia</button>'+
   '</div>'+
   '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>'+
-    '<thead><tr><th>Código</th><th>Negocio / Cliente</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Cobro</th><th>Acciones</th></tr></thead>'+
-    '<tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">Sin licencias. Tocá + Nueva licencia para crear la primera.</td></tr>')+'</tbody>'+
+    '<thead><tr><th>Código</th><th>Negocio / Cliente</th><th>Plan</th><th>Estado</th><th>Vencimiento</th><th>Cobro</th><th>PIN</th><th>Acciones</th></tr></thead>'+
+    '<tbody>'+(filas||'<tr><td colspan="8" style="text-align:center;color:#4a6a85;padding:30px">Sin licencias. Tocá + Nueva licencia para crear la primera.</td></tr>')+'</tbody>'+
   '</table></div></div>'+
   '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">Sin licencias.<br>Tocá <b>+ Nueva licencia</b> para crear la primera.</div>')+'</div>'+
   '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias Emma Control</p>';
@@ -1534,13 +1535,22 @@ function verRepartidores(negocioId){
   var filas=lista.length===0
     ?'<p style="color:#7a9ab8;font-size:0.85rem;text-align:center;padding:16px">No tiene repartidores aún.</p>'
     :lista.map(function(r){
+        var bloqueado=r.bloqueado===true;
         return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.06)">'+
           '<div>'+
-            '<div style="font-weight:600;font-size:0.9rem">'+escHtml(r.nombre||"Sin nombre")+'</div>'+
+            '<div style="display:flex;align-items:center;gap:6px">'+
+              '<span style="font-weight:600;font-size:0.9rem">'+escHtml(r.nombre||"Sin nombre")+'</span>'+
+              (bloqueado?'<span style="background:#2e0a0a;color:#f07070;font-size:0.7rem;padding:2px 6px;border-radius:4px;font-weight:600">BLOQUEADO</span>':'<span style="background:#0a2e1f;color:#4dd9a0;font-size:0.7rem;padding:2px 6px;border-radius:4px">Activo</span>')+
+            '</div>'+
             '<div style="font-size:0.75rem;color:#7a9ab8">'+escHtml(r.email||"—")+'</div>'+
             (r.sectores&&r.sectores.length?'<div style="font-size:0.72rem;color:#5dffee;margin-top:2px">Sectores: '+r.sectores.join(", ")+'</div>':'')+
           '</div>'+
-          '<button class="btn btn-sm btn-danger" onclick="eliminarRepartidorMulti(\''+r.uid+'\',\''+escHtml(r.nombre)+'\')">🗑️</button>'+
+          '<div style="display:flex;gap:6px">'+
+            (bloqueado
+              ?'<button class="btn btn-sm btn-success" title="Desbloquear" onclick="toggleBloqueoRepartidor(\''+r.uid+'\',false,\''+escHtml(r.nombre)+'\',\''+negocioId+'\')">✅</button>'
+              :'<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:0.5px solid #f5a442" title="Bloquear acceso" onclick="toggleBloqueoRepartidor(\''+r.uid+'\',true,\''+escHtml(r.nombre)+'\',\''+negocioId+'\')">🔒</button>')+
+            '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarRepartidorMulti(\''+r.uid+'\',\''+escHtml(r.nombre)+'\')">🗑️</button>'+
+          '</div>'+
         '</div>';
       }).join("");
   document.getElementById("modal-container").innerHTML=
@@ -1550,6 +1560,17 @@ function verRepartidores(negocioId){
       filas+
       '<div style="margin-top:16px"><button class="btn" style="width:100%" onclick="cerrarModalBtn()">Cerrar</button></div>'+
     '</div></div>';
+}
+
+async function toggleBloqueoRepartidor(uid, bloquear, nombre, negocioId){
+  var msg=bloquear?"¿Bloquear a "+nombre+"? Perderá el acceso inmediatamente.":"¿Desbloquear a "+nombre+"?";
+  if(!confirm(msg))return;
+  try{
+    await dbRepartoMulti.collection("users").doc(uid).update({bloqueado:bloquear});
+    toast(bloquear?"🔒 "+nombre+" bloqueado":"✅ "+nombre+" desbloqueado");
+    cerrarModalBtn();
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 
 async function eliminarRepartidorMulti(uid, nombre){
