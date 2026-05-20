@@ -1482,6 +1482,8 @@ function renderRepartoMulti(){
           '<div style="font-size:0.75rem;color:#7a9ab8">'+escHtml(n.ownerEmail)+'</div></td>'+
       '<td style="text-align:center"><span style="color:#5daaff;font-weight:700">'+n.cantRepartidores+'</span></td>'+
       '<td style="color:#7a9ab8;font-size:0.8rem">'+fechaAlta+'</td>'+
+      '<td><code style="color:#5dffee;font-weight:700;font-size:0.85rem">'+(n.codigoActivacion||"—")+'</code></td>'+
+      '<td><code style="color:#f5b942;font-weight:700">'+(n.pin||"—")+'</code></td>'+
       '<td>'+acc+'</td>'+
     '</tr>';
   }).join("");
@@ -1520,8 +1522,8 @@ function renderRepartoMulti(){
     '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="abrirNuevoRepartoMulti()">+ Nuevo</button>'+
   '</div>'+
   '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>'+
-    '<thead><tr><th>Negocio</th><th>Dueño</th><th style="text-align:center">Repartidores</th><th>Alta</th><th>Acciones</th></tr></thead>'+
-    '<tbody>'+(filas||'<tr><td colspan="5" style="text-align:center;color:#4a6a85;padding:30px">No hay negocios registrados en Reparto Multi.</td></tr>')+'</tbody>'+
+    '<thead><tr><th>Negocio</th><th>Dueño</th><th style="text-align:center">Repartidores</th><th>Alta</th><th>Código</th><th>PIN</th><th>Acciones</th></tr></thead>'+
+    '<tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">No hay negocios registrados en Reparto Multi.</td></tr>')+'</tbody>'+
   '</table></div></div>'+
   '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">No hay negocios registrados.</div>')+'</div>'+
   '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' negocios · Reparto Multi</p>';
@@ -1646,9 +1648,17 @@ async function eliminarLicenciaReposteria(id, nombre){
    REPARTO MULTI — NUEVO NEGOCIO
 ════════════════════════════════════════ */
 function abrirNuevoRepartoMulti(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='RM-'+rand;
+  var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🚚 Nuevo negocio Reparto Multi</h2>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🚛 Nuevo negocio Reparto Multi</h2>'+
+      '<label>Código de activación</label>'+
+      '<input id="rm-cod" value="'+codigo+'" style="font-family:monospace;font-weight:700;letter-spacing:0.1em;text-transform:uppercase"/>'+
+      '<label>PIN de acceso</label>'+
+      '<input id="rm-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label>'+
       '<input id="rm-nom" placeholder="Ej: Distribuidora La Catalina"/>'+
       '<label>Email del dueño (opcional)</label>'+
@@ -1656,28 +1666,32 @@ function abrirNuevoRepartoMulti(){
       '<label>Notas (opcional)</label>'+
       '<input id="rm-notas" placeholder="Ej: Cliente nuevo - plan mensual"/>'+
       '<div style="background:#0a2e3f;border:0.5px solid rgba(93,255,238,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#5dffee;line-height:1.6">'+
-        '📋 Se crea el negocio en Firestore. El dueño se vincula automáticamente cuando registra su cuenta en la app.'+
+        '📋 El dueño abre <b>Reparto Multi</b> e ingresa este código + PIN para activar.'+
       '</div>'+
       '<div style="display:flex;gap:10px">'+
-        '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;flex:1;font-size:1rem;padding:12px" onclick="crearNuevoRepartoMulti()">🚚 Crear negocio</button>'+
+        '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;flex:1;font-size:1rem;padding:12px" onclick="crearNuevoRepartoMulti()">🚛 Crear negocio</button>'+
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
 }
 
 async function crearNuevoRepartoMulti(){
+  var codigo=(document.getElementById("rm-cod").value||"").trim().toUpperCase();
+  var pin=Number(document.getElementById("rm-pin").value);
   var nom=(document.getElementById("rm-nom").value||"").trim();
   var ema=(document.getElementById("rm-ema").value||"").trim();
   var notas=(document.getElementById("rm-notas").value||"").trim();
-  if(!nom){toast("El nombre del negocio es obligatorio",false);return;}
+  if(!nom||!codigo||!pin){toast("Completá nombre, código y PIN",false);return;}
   try{
     var ref=await dbRepartoMulti.collection("negocios").add({
-      nombre:nom,
-      ownerEmail:ema||"",
-      ownerId:"",
-      notas:notas,
-      creadoEn:new Date().toISOString()
+      nombre:nom, ownerEmail:ema||"", ownerId:"",
+      notas:notas, creadoEn:new Date().toISOString()
     });
-    toast("✅ Negocio \""+nom+"\" creado");
+    await dbControl.collection("licencias").doc(codigo).set({
+      app:"reparto-multi", estado:"activo", pin:pin,
+      negocioId:ref.id, negocio:nom, email:ema,
+      deviceId:"", creadoEn:new Date().toISOString()
+    });
+    toast("✅ "+nom+" creado — Código: "+codigo+" — PIN: "+pin);
     cerrarModalBtn();
     cargarTodo();
   }catch(e){toast(e.message,false);}
