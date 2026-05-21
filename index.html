@@ -1481,9 +1481,12 @@ function renderRepartoMulti(){
       '<td><div style="font-size:0.85rem">'+escHtml(n.ownerNombre)+'</div>'+
           '<div style="font-size:0.75rem;color:#7a9ab8">'+escHtml(n.ownerEmail)+'</div></td>'+
       '<td style="text-align:center"><span style="color:#5daaff;font-weight:700">'+n.cantRepartidores+'</span></td>'+
-      '<td style="color:#7a9ab8;font-size:0.8rem">'+fechaAlta+'</td>'+
-      '<td><code style="color:#5dffee;font-weight:700;font-size:0.85rem">'+(n.codigoActivacion||"—")+'</code></td>'+
+      '<td><code style="color:#5dffee;font-weight:700;font-size:0.9rem">'+(n.codigoActivacion||"—")+'</code></td>'+
+      '<td><div style="font-weight:600">'+escHtml(n.nombre||"—")+'</div><code style="color:#5dffee;font-size:0.7rem">'+n.id+'</code></td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(n.ownerEmail||"—")+'</td>'+
       '<td><code style="color:#f5b942;font-weight:700">'+(n.pin||"—")+'</code></td>'+
+      '<td style="text-align:center"><span style="font-weight:600;color:var(--color-text-primary)">'+n.cantRepartidores+'</span></td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+fechaAlta+'</td>'+
       '<td>'+acc+'</td>'+
     '</tr>';
   }).join("");
@@ -1522,7 +1525,7 @@ function renderRepartoMulti(){
     '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="abrirNuevoRepartoMulti()">+ Nuevo</button>'+
   '</div>'+
   '<div class="desktop-only card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>'+
-    '<thead><tr><th>Negocio</th><th>Dueño</th><th style="text-align:center">Repartidores</th><th>Alta</th><th>Código</th><th>PIN</th><th>Acciones</th></tr></thead>'+
+    '<thead><tr><th>Código</th><th>Negocio</th><th>Email</th><th>PIN</th><th style="text-align:center">Repartidores</th><th>Alta</th><th>Acciones</th></tr></thead>'+
     '<tbody>'+(filas||'<tr><td colspan="7" style="text-align:center;color:#4a6a85;padding:30px">No hay negocios registrados en Reparto Multi.</td></tr>')+'</tbody>'+
   '</table></div></div>'+
   '<div class="mobile-only">'+(cards||'<div style="text-align:center;color:#4a6a85;padding:40px 0">No hay negocios registrados.</div>')+'</div>'+
@@ -1684,7 +1687,8 @@ async function crearNuevoRepartoMulti(){
   try{
     var ref=await dbRepartoMulti.collection("negocios").add({
       nombre:nom, ownerEmail:ema||"", ownerId:"",
-      notas:notas, creadoEn:new Date().toISOString()
+      notas:notas, codigoActivacion:codigo, pin:pin,
+      creadoEn:new Date().toISOString()
     });
     await dbControl.collection("licencias").doc(codigo).set({
       app:"reparto-multi", estado:"activo", pin:pin,
