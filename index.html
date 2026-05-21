@@ -984,11 +984,14 @@ function abrirNuevoGestion(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
   var codigo='EC'+anio+'-'+rand;
+  var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">💰 Nueva licencia Emma Control</h2>'+
       '<label>Código de activación</label>'+
       '<input id="gnv-cod" value="'+codigo+'" style="font-family:monospace;font-size:1.1rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase"/>'+
+      '<label>PIN de acceso</label>'+
+      '<input id="gnv-pin" type="number" value="'+pin+'"/>'+ 
       '<label>Negocio / Cliente</label>'+
       '<input id="gnv-neg" placeholder="Ej: Distribuidora El Sol"/>'+
       '<label>Plan</label>'+
@@ -1007,19 +1010,20 @@ function abrirNuevoGestion(){
 }
 async function crearLicenciaGestion(){
   var codigo=(document.getElementById("gnv-cod").value||"").trim().toUpperCase();
+  var pin=Number(document.getElementById("gnv-pin").value);
   var negocio=(document.getElementById("gnv-neg").value||"").trim();
   var plan=document.getElementById("gnv-plan").value;
   var venc=document.getElementById("gnv-venc").value||null;
   var notas=(document.getElementById("gnv-notas").value||"").trim();
-  if(!codigo){toast("El código no puede estar vacío",false);return;}
+  if(!codigo||!pin){toast("El código y PIN son obligatorios",false);return;}
   try{
     await dbControl.collection("licencias").doc(codigo).set({
-      app:"emma-control", negocio:negocio, plan:plan, estado:"disponible",
-      uid:"", email:"", nombre:"",
+      app:"emma-control", negocio:negocio, plan:plan, estado:"activo",
+      pin:pin, email:"", deviceId:"",
       vencimiento:venc, notas:notas,
       fechaAlta:new Date().toISOString()
     });
-    toast("✅ Licencia "+codigo+" creada");
+    toast("✅ Licencia "+codigo+" — PIN: "+pin);
     cerrarModalBtn();
     cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1036,6 +1040,8 @@ function abrirEditarGestion(id){
         '👤 Activado por: <b style="color:#e2eaf4">'+(u.nombre||"")+'</b>'+(u.email?' · '+u.email:'')+
         '</div>'
         :'<div style="background:#2d1a4a;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.82rem;color:#c9a5f5">🔑 Sin activar todavía</div>')+
+      '<label>PIN de acceso</label>'+
+      '<input id="gnv-pin" type="number" value="'+pin+'"/>'+ 
       '<label>Negocio / Cliente</label>'+
       '<input id="ge-neg" value="'+(u.negocio||"")+'"/>'+
       '<label>Plan</label>'+
@@ -1344,6 +1350,8 @@ function abrirNuevaReposteria(){
       '<input id="mr-cod" value="'+codigo+'" style="font-family:monospace;font-weight:700;letter-spacing:0.1em;text-transform:uppercase"/>'+
       '<label>PIN de acceso</label>'+
       '<input id="mr-pin" type="number" value="'+pin+'"/>'+
+      '<label>PIN de acceso</label>'+
+      '<input id="gnv-pin" type="number" value="'+pin+'"/>'+ 
       '<label>Negocio / Cliente</label>'+
       '<input id="mr-neg" placeholder="Ej: Dulce Gestión de María"/>'+
       '<label>Email</label>'+
