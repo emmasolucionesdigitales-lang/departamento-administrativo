@@ -1472,20 +1472,21 @@ function renderRepartoMulti(){
 
   var filas=filtrados.map(function(n){
     var fechaAlta=n.creadoEn?new Date(n.creadoEn).toLocaleDateString("es-AR"):"—";
+    var bloqueado=n.bloqueado===true;
     var acc=
-      '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;margin-right:4px" onclick="verRepartidores(\''+n.id+'\')">👥 '+n.cantRepartidores+'</button>'+
-      '<button class="btn btn-sm btn-danger" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️</button>';
+      '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarMulti(\''+n.id+'\')">✏️</button>'+
+      (bloqueado
+        ?'<button class="btn btn-sm btn-success" title="Activar negocio" onclick="bloquearNegocioMulti(\''+n.id+'\',false,\''+escHtml(n.nombre)+'\')">✅</button>'
+        :'<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:0.5px solid #f5a442;margin-right:4px" title="Bloquear negocio" onclick="bloquearNegocioMulti(\''+n.id+'\',true,\''+escHtml(n.nombre)+'\')">🔒</button>')+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳</button>'+
+      '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;margin-right:4px" title="Ver y gestionar repartidores" onclick="verRepartidores(\''+n.id+'\')">👥 '+n.cantRepartidores+'</button>'+
+      '<button class="btn btn-sm btn-danger" title="Eliminar negocio" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️</button>';
     return'<tr>'+
-      '<td><div style="font-weight:600;color:#e2eaf4">'+escHtml(n.nombre)+'</div>'+
-          '<code style="color:#5dffee;font-size:0.72rem">'+n.id+'</code></td>'+
-      '<td><div style="font-size:0.85rem">'+escHtml(n.ownerNombre)+'</div>'+
-          '<div style="font-size:0.75rem;color:#7a9ab8">'+escHtml(n.ownerEmail)+'</div></td>'+
-      '<td style="text-align:center"><span style="color:#5daaff;font-weight:700">'+n.cantRepartidores+'</span></td>'+
-      '<td><code style="color:#5dffee;font-weight:700;font-size:0.9rem">'+(n.codigoActivacion||"—")+'</code></td>'+
-      '<td><div style="font-weight:600">'+escHtml(n.nombre||"—")+'</div><code style="color:#5dffee;font-size:0.7rem">'+n.id+'</code></td>'+
-      '<td style="color:#7a9ab8;font-size:0.8rem">'+(n.ownerEmail||"—")+'</td>'+
-      '<td><code style="color:#f5b942;font-weight:700">'+(n.pin||"—")+'</code></td>'+
-      '<td style="text-align:center"><span style="font-weight:600;color:var(--color-text-primary)">'+n.cantRepartidores+'</span></td>'+
+      '<td><code style="color:#5dffee;font-weight:700;font-size:0.9rem">'+(n.codigoActivacion||'—')+'</code></td>'+
+      '<td><div style="font-weight:600">'+escHtml(n.nombre)+'</div><code style="color:#5dffee;font-size:0.7rem">'+n.id+'</code></td>'+
+      '<td style="color:#7a9ab8;font-size:0.8rem">'+(n.ownerEmail||'—')+'</td>'+
+      '<td><code style="color:#f5b942;font-weight:700">'+(n.pin||'—')+'</code></td>'+
+      '<td style="text-align:center"><span style="font-weight:600;color:#5daaff">'+n.cantRepartidores+'</span></td>'+
       '<td style="color:#7a9ab8;font-size:0.8rem">'+fechaAlta+'</td>'+
       '<td>'+acc+'</td>'+
     '</tr>';
@@ -1504,8 +1505,10 @@ function renderRepartoMulti(){
       '<div class="lic-card-fila"><span class="lbl">Alta</span><span class="val">'+fechaAlta+'</span></div>'+
       '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(n)+'</div>'+
       '<div class="lic-card-actions">'+
-        '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="verRepartidores(\''+n.id+'\')">👥 Ver repartidores</button>'+
-        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳 Cobrar</button>'+
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" onclick="abrirEditarMulti(\''+n.id+'\')">✏️ Editar</button>'+
+        (n.bloqueado?'<button class="btn btn-sm btn-success" onclick="bloquearNegocioMulti(\''+n.id+'\',false,\''+escHtml(n.nombre)+'\')">✅ Activar</button>':'<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:0.5px solid #f5a442" onclick="bloquearNegocioMulti(\''+n.id+'\',true,\''+escHtml(n.nombre)+'\')">🔒 Bloquear</button>')+
+        '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="verRepartidores(\''+n.id+'\')">👥 Repartidores</button>'+
+        '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳 Cobrar</button>'+
         '<button class="btn btn-sm btn-danger" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️ Eliminar</button>'+
       '</div>'+
     '</div>';
@@ -1585,6 +1588,45 @@ async function eliminarRepartidorMulti(uid, nombre){
     await dbRepartoMulti.collection("users").doc(uid).delete();
     toast("✅ Repartidor eliminado");
     cerrarModalBtn();
+    cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+
+function abrirEditarMulti(id){
+  var n=repartoMultiNegocios.find(function(x){return x.id===id;});
+  if(!n)return;
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">✏️ Editar negocio</h2>'+
+      '<label>Nombre del negocio</label><input id="em-nom" value="'+escHtml(n.nombre||'')+'"/>'+
+      '<label>Email del dueño</label><input id="em-ema" type="email" value="'+escHtml(n.ownerEmail||'')+'"/>'+
+      '<label>Notas</label><input id="em-notas" value="'+escHtml(n.notas||'')+'"/>'+
+      '<label>Código de activación</label><input id="em-cod" value="'+escHtml(n.codigoActivacion||'')+'"/>'+
+      '<label>PIN</label><input id="em-pin" type="number" value="'+(n.pin||'')+'"/>'+
+      '<div style="display:flex;gap:10px;margin-top:6px">'+
+        '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:0.5px solid #5daaff;flex:1;padding:10px" onclick="guardarEdicionMulti(\''+id+'\')">💾 Guardar</button>'+
+        '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
+      '</div></div></div>';
+}
+
+async function guardarEdicionMulti(id){
+  var nom=(document.getElementById("em-nom").value||"").trim();
+  var ema=(document.getElementById("em-ema").value||"").trim();
+  var notas=(document.getElementById("em-notas").value||"").trim();
+  var cod=(document.getElementById("em-cod").value||"").trim().toUpperCase();
+  var pin=Number(document.getElementById("em-pin").value);
+  if(!nom){toast("El nombre es obligatorio",false);return;}
+  try{
+    await dbRepartoMulti.collection("negocios").doc(id).update({nombre:nom,ownerEmail:ema,notas:notas,codigoActivacion:cod,pin:pin});
+    toast("✅ Negocio actualizado");cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
+
+async function bloquearNegocioMulti(id,bloquear,nombre){
+  if(!confirm(bloquear?"¿Bloquear "+nombre+"? El dueño no podrá entrar a la app.":"¿Desbloquear "+nombre+"?"))return;
+  try{
+    await dbRepartoMulti.collection("negocios").doc(id).update({bloqueado:bloquear});
+    toast(bloquear?"🔒 "+nombre+" bloqueado":"✅ "+nombre+" desbloqueado");
     cargarTodo();
   }catch(e){toast(e.message,false);}
 }
