@@ -384,22 +384,71 @@ function cobroBadge(c){
   if(ec.estado==="con_recargo")return'<span class="cobro-badge cobro-recargo">🟠 $'+ec.montoFinal.toLocaleString("es-AR")+' +15%</span>';
   return'<span class="cobro-badge cobro-vencido">🔴 SUSPENDER</span>';
 }
+// ── Brevo — envío automático de código al cliente ──────────────────
+const BREVO_KEY="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";
+async function enviarCodigoBrevo(app,negocio,email,codigo,pin){
+  if(!email||!/\S+@\S+\.\S+/.test(email))return;
+  const nombres={reparto:"Sistema de Reparto","reparto-multi":"Reparto Multi",kiosco:"Mi Kiosco","emma-control":"Emma Control",polleria:"Gestión Pollería",reposteria:"Dulce Gestión"};
+  const appNombre=nombres[app]||app;
+  try{
+    await fetch("https://api.brevo.com/v3/smtp/email",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","api-key":BREVO_KEY},
+      body:JSON.stringify({
+        sender:{name:"Emma Soluciones Digitales",email:"carabajalponce1980@gmail.com"},
+        to:[{email:email,name:negocio||email}],
+        subject:"🔑 Tu código de activación — "+appNombre,
+        htmlContent:"<div style='font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px'>"+
+          "<h2 style='color:#185FA5'>¡Bienvenido a "+appNombre+"!</h2>"+
+          "<p>Hola <b>"+negocio+"</b>, tu licencia fue creada correctamente.</p>"+
+          "<div style='background:#f0f4f8;border-radius:12px;padding:20px;text-align:center;margin:20px 0'>"+
+            "<p style='margin:0 0 8px;font-size:13px;color:#666'>Código de activación</p>"+
+            "<div style='font-size:28px;font-weight:700;font-family:monospace;letter-spacing:4px;color:#185FA5'>"+codigo+"</div>"+
+            "<p style='margin:16px 0 4px;font-size:13px;color:#666'>PIN de acceso</p>"+
+            "<div style='font-size:32px;font-weight:700;color:#333'>"+pin+"</div>"+
+          "</div>"+
+          "<p style='font-size:13px;color:#666'>Guardá estos datos. Los necesitarás para activar y acceder a la app.</p>"+
+          "<hr style='border:none;border-top:1px solid #eee;margin:20px 0'>"+
+          "<p style='font-size:12px;color:#999'>Emma Soluciones Digitales · 3813399962</p>"+
+        "</div>"
+      })
+    });
+  }catch(e){console.warn("Brevo error:",e);}
+}
+function validarEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);}
+function validarCelular(cel){return cel&&cel.replace(/\D/g,'').length>=8;}
+
 function camposCobro(c){
+  var mp=c&&c.medioPago||'transferencia';
   return'<div style="margin:16px 0 8px;border-top:0.5px solid rgba(255,255,255,0.1);padding-top:14px">'+
     '<p style="font-size:0.75rem;color:#9d65e0;font-weight:700;margin-bottom:12px;letter-spacing:0.05em">💳 DATOS DE COBRO</p>'+
     '<label>Inicio del contrato</label>'+
-    '<input id="cobro-fecha" type="date" value="'+(c&&c.fechaContrato||"")+'"/>'+
+    '<input id="cobro-fecha" type="date" value="'+(c&&c.fechaContrato||'')+'"/>'+
     '<label>Precio mensual ($)</label>'+
-    '<input id="cobro-precio" type="number" placeholder="Ej: 8000" value="'+(c&&c.precioMensual||"")+'"/>'+
-    '<label>Alias MP del cliente (referencia)</label>'+
-    '<input id="cobro-alias" placeholder="Ej: distribuidora.elsol" value="'+(c&&c.aliasMp||"")+'"/>'+
+    '<input id="cobro-precio" type="number" placeholder="Ej: 8000" value="'+(c&&c.precioMensual||'')+'"/>'+
+    '<label>Medio de pago</label>'+
+    '<select id="cobro-medio" onchange="toggleAliasMP(this.value)" style="width:100%;padding:8px 10px;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;background:#1a2b3c;color:#e2eaf4;font-size:14px;margin-bottom:10px">'+
+      '<option value="efectivo"'+(mp==='efectivo'?' selected':'')+'>💵 Efectivo</option>'+
+      '<option value="transferencia"'+(mp==='transferencia'?' selected':'')+'>📲 Transferencia bancaria</option>'+
+      '<option value="mercadopago"'+(mp==='mercadopago'?' selected':'')+'>💙 MercadoPago</option>'+
+      '<option value="otro"'+(mp==='otro'?' selected':'')+'>🔄 Otro</option>'+
+    '</select>'+
+    '<div id="campo-alias" style="display:'+(mp==='mercadopago'||mp==='transferencia'?'block':'none')+'">'+
+      '<label>Alias / CBU del cliente</label>'+
+      '<input id="cobro-alias" placeholder="Ej: distribuidora.elsol o CBU" value="'+(c&&c.aliasMp||'')+'"/>'+
+    '</div>'+
   '</div>';
+}
+function toggleAliasMP(val){
+  var el=document.getElementById('campo-alias');
+  if(el)el.style.display=(val==='mercadopago'||val==='transferencia')?'block':'none';
 }
 function getCobroData(){
   return{
-    fechaContrato:(document.getElementById("cobro-fecha")||{value:""}).value||null,
-    precioMensual:Number((document.getElementById("cobro-precio")||{value:0}).value)||0,
-    aliasMp:((document.getElementById("cobro-alias")||{value:""}).value||"").trim()
+    fechaContrato:(document.getElementById('cobro-fecha')||{value:''}).value||null,
+    precioMensual:Number((document.getElementById('cobro-precio')||{value:0}).value)||0,
+    medioPago:(document.getElementById('cobro-medio')||{value:'transferencia'}).value||'transferencia',
+    aliasMp:((document.getElementById('cobro-alias')||{value:''}).value||'').trim()
   };
 }
 function getClienteByTipo(tipo,id){
@@ -691,9 +740,15 @@ async function crearLicenciaRep(){
   var cel=document.getElementById("m-cel").value.trim();
   var notas=document.getElementById("m-notas").value.trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
+  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
-  try{await dbControl.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,app:"reparto",plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()},cobro));toast("✅ Licencia "+codigo+" creada — PIN: "+pin);cerrarModalBtn();cargarTodo();}
-  catch(e){toast(e.message,false);}
+  try{
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,app:"reparto",plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()},cobro));
+    if(ema)await enviarCodigoBrevo("reparto",neg,ema,codigo,pin);
+    toast("✅ Licencia "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
+    cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 function abrirEditarRep(id){
   var l=licencias.find(function(x){return x.id===id;});if(!l)return;
@@ -781,21 +836,19 @@ function abrirNuevoKio(){
   var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🏪 Nuevo cliente Kiosco</h2>'+
-      '<label>Código de activación</label>'+
-      '<input id="k-cod" value="'+codigo+'" style="font-family:monospace;font-weight:700;letter-spacing:0.1em;text-transform:uppercase"/>'+
-      '<label>PIN de acceso</label>'+
-      '<input id="k-pin" type="number" value="'+pin+'"/>'+
+      '<h2 style="font-size:1.1rem;font-weight:700;margin-bottom:18px">🏪 Nueva licencia Kiosco</h2>'+
+      '<label>Código de activación</label><input id="k-cod" value="'+codigo+'" style="font-family:monospace;font-weight:700;letter-spacing:0.1em;text-transform:uppercase"/>'+
+      '<label>PIN de acceso</label><input id="k-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label><input id="k-nom" placeholder="Ej: Kiosco El Sol"/>'+
       '<label>ID único (se genera solo)</label><input id="k-id" placeholder="kiosco-el-sol"/>'+
-      '<label>Email</label><input id="k-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
-      '<label>Teléfono</label><input id="k-tel" type="tel" placeholder="381 123-4567"/>'+
+      '<label>Email ✉️</label><input id="k-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
+      '<label>Celular 📱</label><input id="k-tel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Plan</label><select id="k-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
-      '<label>Fecha de vencimiento</label><input id="k-venc" type="date"/>'+
-      '<div style="background:#0a1e2e;border:0.5px solid rgba(93,170,255,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#5daaff;line-height:1.6">'+
-        '📋 El cliente abre <b>Mi Kiosco</b> e ingresa este código + PIN para activar.'+
+      camposCobro(null)+
+      '<div style="background:#0a1e2e;border:0.5px solid rgba(93,170,255,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#5daaff">'+
+        '📧 Al crear, se enviará el código al email del cliente automáticamente.'+
       '</div>'+
-      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
+      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
   setTimeout(function(){var nomEl=document.getElementById("k-nom");var idEl=document.getElementById("k-id");if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};},100);
 }
 async function crearClienteKio(){
@@ -806,12 +859,15 @@ async function crearClienteKio(){
   var ema=(document.getElementById("k-ema").value||"").trim();
   var tel=(document.getElementById("k-tel").value||"").trim();
   var plan=document.getElementById("k-plan").value;
-  var venc=document.getElementById("k-venc").value||null;
   if(!nom||!id||!codigo||!pin){toast("Completá nombre, código y PIN",false);return;}
+  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(tel&&!validarCelular(tel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  var cobro=getCobroData();
   try{
-    await dbKiosco.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()});
-    await dbControl.collection("licencias").doc(codigo).set({estado:"activo",pin:pin,app:"kiosco",negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
-    toast("✅ Kiosco "+nom+" — Código: "+codigo+" — PIN: "+pin);
+    await dbKiosco.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()},cobro));
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({app:"kiosco",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()},cobro));
+    if(ema)await enviarCodigoBrevo("kiosco",nom,ema,codigo,pin);
+    toast("✅ "+nom+" — Código: "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
@@ -994,17 +1050,22 @@ function abrirNuevoGestion(){
       '<input id="gnv-pin" type="number" value="'+pin+'"/>'+ 
       '<label>Negocio / Cliente</label>'+
       '<input id="gnv-neg" placeholder="Ej: Distribuidora El Sol"/>'+
+      '<label>Email ✉️</label>'+
+      '<input id="gnv-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
+      '<label>Celular 📱</label>'+
+      '<input id="gnv-cel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Plan</label>'+
       '<select id="gnv-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Fecha de vencimiento</label>'+
       '<input id="gnv-venc" type="date"/>'+
       '<label>Notas (opcional)</label>'+
-      '<input id="gnv-notas" placeholder="Ej: Pago mensual $5000"/>'+
-      '<div style="background:#2d1a4a;border:0.5px solid rgba(201,165,245,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#c9a5f5;line-height:1.6">'+
-        '📋 <b>Cómo funciona:</b> El cliente abre Emma Control → "Activar cuenta" → ingresa este código → crea su usuario. Sin intervención tuya.'+
+      '<input id="gnv-notas" placeholder="Ej: Plan mensual"/>'+
+      camposCobro(null)+
+      '<div style="background:#2d1a4a;border:0.5px solid rgba(201,165,245,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#c9a5f5">'+
+        '📧 Al crear, se enviará el código al email del cliente automáticamente.'+
       '</div>'+
       '<div style="display:flex;gap:10px">'+
-        '<button class="btn btn-purple" style="flex:1" onclick="crearLicenciaGestion()">Crear licencia</button>'+
+        '<button class="btn btn-purple" style="flex:1" onclick="crearLicenciaGestion()">Crear y enviar</button>'+
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
 }
@@ -1012,18 +1073,22 @@ async function crearLicenciaGestion(){
   var codigo=(document.getElementById("gnv-cod").value||"").trim().toUpperCase();
   var pin=Number(document.getElementById("gnv-pin").value);
   var negocio=(document.getElementById("gnv-neg").value||"").trim();
+  var ema=(document.getElementById("gnv-ema")||{value:""}).value.trim();
+  var cel=(document.getElementById("gnv-cel")||{value:""}).value.trim();
   var plan=document.getElementById("gnv-plan").value;
-  var venc=document.getElementById("gnv-venc").value||null;
   var notas=(document.getElementById("gnv-notas").value||"").trim();
   if(!codigo||!pin){toast("El código y PIN son obligatorios",false);return;}
+  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  var cobro=getCobroData();
   try{
-    await dbControl.collection("licencias").doc(codigo).set({
-      app:"emma-control", negocio:negocio, plan:plan, estado:"activo",
-      pin:pin, email:"", deviceId:"",
-      vencimiento:venc, notas:notas,
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({
+      app:"emma-control",negocio:negocio,plan:plan,estado:"activo",
+      pin:pin,email:ema,celular:cel,deviceId:"",notas:notas,
       fechaAlta:new Date().toISOString()
-    });
-    toast("✅ Licencia "+codigo+" — PIN: "+pin);
+    },cobro));
+    if(ema)await enviarCodigoBrevo("emma-control",negocio,ema,codigo,pin);
+    toast("✅ Licencia "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();
     cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1166,11 +1231,11 @@ function abrirNuevoPoll(){
       '<label>Email</label><input id="p-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
       '<label>Teléfono</label><input id="p-tel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Plan</label><select id="p-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
-      '<label>Fecha de vencimiento</label><input id="p-venc" type="date"/>'+
-      '<div style="background:#2e1800;border:0.5px solid rgba(245,164,66,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#f5a442;line-height:1.6">'+
-        '📋 El cliente abre <b>Emma Pollería</b> e ingresa este código + PIN para activar.'+
+      camposCobro(null)+
+      '<div style="background:#2e1800;border:0.5px solid rgba(245,164,66,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#f5a442">'+
+        '📧 Al crear, se enviará el código al email del cliente automáticamente.'+
       '</div>'+
-      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="crearClientePoll()">🐔 Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
+      '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="crearClientePoll()">🐔 Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
   setTimeout(function(){var nomEl=document.getElementById("p-nom");var idEl=document.getElementById("p-id");if(nomEl&&idEl)nomEl.oninput=function(){if(!idEl._touched)idEl.value=toSlug(this.value);};if(idEl)idEl.oninput=function(){this._touched=true;this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,"-");};},100);
 }
 async function crearClientePoll(){
@@ -1181,12 +1246,15 @@ async function crearClientePoll(){
   var ema=(document.getElementById("p-ema").value||"").trim();
   var tel=(document.getElementById("p-tel").value||"").trim();
   var plan=document.getElementById("p-plan").value;
-  var venc=document.getElementById("p-venc").value||null;
   if(!nom||!id||!codigo||!pin){toast("Completá el nombre, código y PIN",false);return;}
+  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(tel&&!validarCelular(tel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  var cobro=getCobroData();
   try{
-    await dbPolleria.collection("clientes").doc(id).set({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,vencimiento:venc,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()});
-    await dbControl.collection("licencias").doc(codigo).set({app:"polleria",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()});
-    toast("✅ Pollería "+nom+" — Código: "+codigo+" — PIN: "+pin);
+    await dbPolleria.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()},cobro));
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({app:"polleria",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",creadoEn:new Date().toISOString()},cobro));
+    if(ema)await enviarCodigoBrevo("polleria",nom,ema,codigo,pin);
+    toast("✅ "+nom+" — Código: "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }
@@ -1378,14 +1446,17 @@ async function crearLicenciaReposteria(){
   var cel=(document.getElementById("mr-cel").value||"").trim();
   var notas=(document.getElementById("mr-notas").value||"").trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
+  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
   try{
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({
-      app:"reposteria", estado:"activo", pin:pin, negocio:neg,
-      email:ema, celular:cel, notas:notas,
-      deviceId:"", creadoEn:new Date().toISOString()
+      app:"reposteria",estado:"activo",pin:pin,negocio:neg,
+      email:ema,celular:cel,notas:notas,
+      deviceId:"",creadoEn:new Date().toISOString()
     },cobro));
-    toast("✅ Licencia "+codigo+" creada — PIN: "+pin);
+    if(ema)await enviarCodigoBrevo("reposteria",neg,ema,codigo,pin);
+    toast("✅ Licencia "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();
     cargarTodo();
   }catch(e){toast(e.message,false);}
@@ -1714,15 +1785,18 @@ function abrirNuevoRepartoMulti(){
       '<input id="rm-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label>'+
       '<input id="rm-nom" placeholder="Ej: Distribuidora La Catalina"/>'+
-      '<label>Email del dueño (opcional)</label>'+
+      '<label>Email del dueño ✉️</label>'+
       '<input id="rm-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
+      '<label>Celular 📱</label>'+
+      '<input id="rm-cel" type="tel" placeholder="381 123-4567"/>'+
       '<label>Notas (opcional)</label>'+
-      '<input id="rm-notas" placeholder="Ej: Cliente nuevo - plan mensual"/>'+
-      '<div style="background:#0a2e3f;border:0.5px solid rgba(93,255,238,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#5dffee;line-height:1.6">'+
-        '📋 El dueño abre <b>Reparto Multi</b> e ingresa este código + PIN para activar.'+
+      '<input id="rm-notas" placeholder="Ej: Plan mensual"/>'+
+      camposCobro(null)+
+      '<div style="background:#0a2e3f;border:0.5px solid rgba(93,255,238,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#5dffee">'+
+        '📧 Al crear, se enviará el código al email del dueño automáticamente.'+
       '</div>'+
       '<div style="display:flex;gap:10px">'+
-        '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;flex:1;font-size:1rem;padding:12px" onclick="crearNuevoRepartoMulti()">🚛 Crear negocio</button>'+
+        '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;flex:1;font-size:1rem;padding:12px" onclick="crearNuevoRepartoMulti()">🚛 Crear y enviar</button>'+
         '<button class="btn" onclick="cerrarModalBtn()">Cancelar</button>'+
       '</div></div></div>';
 }
@@ -1732,20 +1806,25 @@ async function crearNuevoRepartoMulti(){
   var pin=Number(document.getElementById("rm-pin").value);
   var nom=(document.getElementById("rm-nom").value||"").trim();
   var ema=(document.getElementById("rm-ema").value||"").trim();
+  var cel=(document.getElementById("rm-cel").value||"").trim();
   var notas=(document.getElementById("rm-notas").value||"").trim();
   if(!nom||!codigo||!pin){toast("Completá nombre, código y PIN",false);return;}
+  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  var cobro=getCobroData();
   try{
     var ref=await dbRepartoMulti.collection("negocios").add({
-      nombre:nom, ownerEmail:ema||"", ownerId:"",
-      notas:notas, codigoActivacion:codigo, pin:pin,
+      nombre:nom,ownerEmail:ema||"",ownerId:"",
+      notas:notas,codigoActivacion:codigo,pin:pin,
       creadoEn:new Date().toISOString()
     });
-    await dbControl.collection("licencias").doc(codigo).set({
-      app:"reparto-multi", estado:"activo", pin:pin,
-      negocioId:ref.id, negocio:nom, email:ema,
-      deviceId:"", creadoEn:new Date().toISOString()
-    });
-    toast("✅ "+nom+" creado — Código: "+codigo+" — PIN: "+pin);
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({
+      app:"reparto-multi",estado:"activo",pin:pin,
+      negocioId:ref.id,negocio:nom,email:ema,celular:cel,
+      deviceId:"",creadoEn:new Date().toISOString()
+    },cobro));
+    if(ema)await enviarCodigoBrevo("reparto-multi",nom,ema,codigo,pin);
+    toast("✅ "+nom+" — Código: "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();
     cargarTodo();
   }catch(e){toast(e.message,false);}
