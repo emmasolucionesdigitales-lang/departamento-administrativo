@@ -247,7 +247,7 @@ var MP_ACCESS_TOKEN=localStorage.getItem("mpAccessToken")||"";
 var MI_ALIAS_MP=localStorage.getItem("miAliasMp")||"";
 var RECARGO_PCT=15;
 var DIA_RECARGO=5;
-var DIA_SUSPENSION=15;
+var DIA_SUSPENSION=10;
 
 /* ── TOAST ── */
 function toast(msg,ok){var t=document.getElementById("toast");t.textContent=msg;t.style.background=(ok===false)?"#c93030":"#185FA5";t.style.opacity="1";setTimeout(function(){t.style.opacity="0";},3000);}
@@ -740,8 +740,10 @@ async function crearLicenciaRep(){
   var cel=document.getElementById("m-cel").value.trim();
   var notas=document.getElementById("m-notas").value.trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
-  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
-  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  if(!ema){toast("El email del cliente es obligatorio ✉️",false);return;}
+  if(!cel){toast("El celular del cliente es obligatorio 📱",false);return;}
+  if(!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
   try{
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,app:"reparto",plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",creadoEn:new Date().toISOString()},cobro));
@@ -796,10 +798,7 @@ function renderKiosco(){
   var filtrados=kioscoClientes.filter(function(c){if(!filtroKiosco)return true;return(c.nombre||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.email||"").toLowerCase().indexOf(filtroKiosco)>=0||(c.negocioId||c.id||"").toLowerCase().indexOf(filtroKiosco)>=0;});
   var filas=filtrados.map(function(c){
     var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarKio(\''+c.id+'\')">✏️</button>'+
-      '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none;margin-right:4px" title="Ver estadísticas" onclick="verStatsKio(\''+c.id+'\')">📊</button>'+
-      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" title="Copiar link" onclick="copiarLinkKio(\''+c.id+'\')">🔗</button>'+
       '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳</button>'+
-      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" title="Extender vencimiento" onclick="extenderKio(\''+c.id+'\')">📅</button>'+
       (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderKio(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderKio(\''+c.id+'\',true)">✅</button>')+
       '<button class="btn btn-sm btn-danger" style="margin-left:4px" title="Eliminar" onclick="eliminarKioscoCliente(\''+c.id+'\',\''+escHtml(c.nombre||c.id)+'\')">🗑️</button>';
     return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#5daaff;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td>'+cobroBadge(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td><code style="color:#5daaff;font-weight:700;font-size:0.85rem">'+(c.codigoActivacion||"—")+'</code></td><td><code style="color:#f5b942;font-weight:700">'+(c.pin||"—")+'</code></td><td>'+acc+'</td></tr>';
@@ -813,10 +812,7 @@ function renderKiosco(){
       (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" title="Editar" onclick="abrirEditarKio(\''+c.id+'\')">✏️ Editar</button>'+
-        '<button class="btn btn-sm" style="background:#0a2e1f;color:#4dd9a0;border:none" title="Ver estadísticas" onclick="verStatsKio(\''+c.id+'\')">📊 Stats</button>'+
-        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" title="Copiar link" onclick="copiarLinkKio(\''+c.id+'\')">🔗 Link</button>'+
         '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'kiosco\',\''+c.id+'\')">💳 Cobrar</button>'+
-        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" title="Extender vencimiento" onclick="extenderKio(\''+c.id+'\')">📅 Extender</button>'+
         (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderKio(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderKio(\''+c.id+'\',true)">✅ Activar</button>')+
         '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarKioscoCliente(\''+c.id+'\',\''+escHtml(c.nombre||c.id)+'\')">🗑️ Eliminar</button>'+
       '</div></div>';
@@ -860,8 +856,10 @@ async function crearClienteKio(){
   var tel=(document.getElementById("k-tel").value||"").trim();
   var plan=document.getElementById("k-plan").value;
   if(!nom||!id||!codigo||!pin){toast("Completá nombre, código y PIN",false);return;}
-  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
-  if(tel&&!validarCelular(tel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  if(!ema){toast("El email del cliente es obligatorio ✉️",false);return;}
+  if(!tel){toast("El celular del cliente es obligatorio 📱",false);return;}
+  if(!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(!validarCelular(tel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
   try{
     await dbKiosco.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()},cobro));
@@ -976,7 +974,6 @@ function renderGestion(){
     var esActivo=u.estado==="usado"||u.estado==="activo";
     var acc=
       '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarGestion(\''+u.id+'\')">✏️</button>'+
-      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" title="Extender vencimiento" onclick="extenderGestion(\''+u.id+'\')">📅</button>'+
       '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳</button>'+
       (esActivo
         ?'<button class="btn btn-sm btn-danger" title="Cambiar estado" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴</button>'
@@ -1006,7 +1003,6 @@ function renderGestion(){
       '<div class="lic-card-fila"><span class="lbl">Cobro</span>'+cobroBadge(u)+'</div>'+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" title="Editar" onclick="abrirEditarGestion(\''+u.id+'\')">✏️ Editar</button>'+
-        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" title="Extender vencimiento" onclick="extenderGestion(\''+u.id+'\')">📅 Extender</button>'+
         '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'gestion\',\''+u.id+'\')">💳 Cobrar</button>'+
         (esActivo
           ?'<button class="btn btn-sm btn-danger" title="Cambiar estado" onclick="cambiarEstadoGestion(\''+u.id+'\',\'inactivo\')">🔴 Suspender</button>'
@@ -1078,8 +1074,10 @@ async function crearLicenciaGestion(){
   var plan=document.getElementById("gnv-plan").value;
   var notas=(document.getElementById("gnv-notas").value||"").trim();
   if(!codigo||!pin){toast("El código y PIN son obligatorios",false);return;}
-  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
-  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  if(!ema){toast("El email del cliente es obligatorio ✉️",false);return;}
+  if(!cel){toast("El celular del cliente es obligatorio 📱",false);return;}
+  if(!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
   try{
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({
@@ -1181,10 +1179,7 @@ function renderPolleria(){
   var filtrados=polleriaClientes.filter(function(c){if(!filtroPolleriaClientes)return true;return(c.nombre||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0||(c.email||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0||(c.negocioId||c.id||"").toLowerCase().indexOf(filtroPolleriaClientes)>=0;});
   var filas=filtrados.map(function(c){
     var acc='<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none;margin-right:4px" title="Editar" onclick="abrirEditarPoll(\''+c.id+'\')">✏️</button>'+
-      '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none;margin-right:4px" title="Ver estadísticas" onclick="verStatsPoll(\''+c.id+'\')">📊</button>'+
-      '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none;margin-right:4px" title="Copiar link" onclick="copiarLinkPoll(\''+c.id+'\')">🔗</button>'+
       '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳</button>'+
-      '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none;margin-right:4px" title="Extender vencimiento" onclick="extenderPoll(\''+c.id+'\')">📅</button>'+
       (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',false)">🔴</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',true)">✅</button>')+
       '<button class="btn btn-sm btn-danger" style="margin-left:4px" title="Eliminar" onclick="eliminarPoll(\''+c.id+'\')">🗑️</button>';
     return'<tr><td><div style="font-weight:600">'+c.nombre+'</div><code style="color:#f5a442;font-size:0.72rem">'+(c.negocioId||c.id)+'</code></td><td>'+planBadge(c.plan)+'</td><td>'+estadoBadgeActivo(c)+'</td><td>'+vencLabel(c)+'</td><td>'+cobroBadge(c)+'</td><td style="color:#7a9ab8;font-size:0.8rem">'+(c.email||"—")+'</td><td><code style="color:#f5a442;font-weight:700;font-size:0.85rem">'+(c.codigoActivacion||"—")+'</code></td><td><code style="color:#f5b942;font-weight:700">'+(c.pin||"—")+'</code></td><td>'+acc+'</td></tr>';
@@ -1198,10 +1193,7 @@ function renderPolleria(){
       (c.email?'<div class="lic-card-fila"><span class="lbl">Email</span><span class="val">'+c.email+'</span></div>':'')+
       '<div class="lic-card-actions">'+
         '<button class="btn btn-sm" style="background:#1e3a5f;color:#5daaff;border:none" title="Editar" onclick="abrirEditarPoll(\''+c.id+'\')">✏️ Editar</button>'+
-        '<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:none" title="Ver estadísticas" onclick="verStatsPoll(\''+c.id+'\')">📊 Stats</button>'+
-        '<button class="btn btn-sm" style="background:#1a2b3c;color:#5daaff;border:none" title="Copiar link" onclick="copiarLinkPoll(\''+c.id+'\')">🔗 Link</button>'+
         '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" title="Registrar cobro" onclick="abrirCobrar(\'polleria\',\''+c.id+'\')">💳 Cobrar</button>'+
-        '<button class="btn btn-sm" style="background:#1e3a12;color:#6ee836;border:none" title="Extender vencimiento" onclick="extenderPoll(\''+c.id+'\')">📅 Extender</button>'+
         (c.activo?'<button class="btn btn-sm btn-danger" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',false)">🔴 Suspender</button>':'<button class="btn btn-sm btn-success" title="Suspender" onclick="suspenderPoll(\''+c.id+'\',true)">✅ Activar</button>')+
         '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarPoll(\''+c.id+'\')">🗑️ Eliminar</button>'+
       '</div></div>';
@@ -1247,8 +1239,10 @@ async function crearClientePoll(){
   var tel=(document.getElementById("p-tel").value||"").trim();
   var plan=document.getElementById("p-plan").value;
   if(!nom||!id||!codigo||!pin){toast("Completá el nombre, código y PIN",false);return;}
-  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
-  if(tel&&!validarCelular(tel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  if(!ema){toast("El email del cliente es obligatorio ✉️",false);return;}
+  if(!tel){toast("El celular del cliente es obligatorio 📱",false);return;}
+  if(!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(!validarCelular(tel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
   try{
     await dbPolleria.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,codigoActivacion:codigo,pin:pin,fechaAlta:new Date().toISOString()},cobro));
@@ -1446,8 +1440,10 @@ async function crearLicenciaReposteria(){
   var cel=(document.getElementById("mr-cel").value||"").trim();
   var notas=(document.getElementById("mr-notas").value||"").trim();
   if(!codigo||!pin){toast("Completá código y PIN",false);return;}
-  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
-  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  if(!ema){toast("El email del cliente es obligatorio ✉️",false);return;}
+  if(!cel){toast("El celular del cliente es obligatorio 📱",false);return;}
+  if(!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
   try{
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({
@@ -1809,8 +1805,10 @@ async function crearNuevoRepartoMulti(){
   var cel=(document.getElementById("rm-cel").value||"").trim();
   var notas=(document.getElementById("rm-notas").value||"").trim();
   if(!nom||!codigo||!pin){toast("Completá nombre, código y PIN",false);return;}
-  if(ema&&!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
-  if(cel&&!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
+  if(!ema){toast("El email del dueño es obligatorio ✉️",false);return;}
+  if(!cel){toast("El celular del dueño es obligatorio 📱",false);return;}
+  if(!validarEmail(ema)){toast("El email no es válido ✉️",false);return;}
+  if(!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();
   try{
     var ref=await dbRepartoMulti.collection("negocios").add({
