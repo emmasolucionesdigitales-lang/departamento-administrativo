@@ -828,7 +828,15 @@ async function resetDispositivoKio(id){
   try{await dbControl.collection("licencias").doc(codigo).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}
   catch(e){toast(e.message,false);}
 }
-async function resetDispositivoPoll(id){
+async function resetDispositivoMulti(id){
+  var n=repartoMultiNegocios.find(function(x){return x.id===id;});
+  var nombre=n?n.nombre||id:id;
+  var codigo=n?n.codigoActivacion||"":id;
+  if(!codigo){toast("Este negocio no tiene código de licencia registrado",false);return;}
+  if(!confirm("¿Resetear dispositivo de "+nombre+"? El dueño podrá activar desde un celular nuevo."))return;
+  try{await dbControl.collection("licencias").doc(codigo).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}
+  catch(e){toast(e.message,false);}
+}
   var c=polleriaClientes.find(function(x){return x.id===id;});
   var nombre=c?c.nombre||id:id;
   var codigo=c?c.codigoActivacion||"":id;
@@ -1422,10 +1430,11 @@ function renderReposteria(){
     return(l.id||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.negocio||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.email||"").toLowerCase().indexOf(filtroReposteria)>=0||(l.celular||"").indexOf(filtroReposteria)>=0;
   });
   var filas=filtrados.map(function(l){
-    var acc='<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none;margin-right:4px" title="Editar" title="Editar" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️</button>'+
-      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" title="Cambiar estado" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" title="Cambiar estado" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+    var acc='<button class="btn btn-sm" style="background:#2e1a4a;color:#f5a0c8;border:none;margin-right:4px" title="Editar" onclick="abrirEditarReposteria(\''+l.id+'\')">✏️</button>'+
+      ((l.estado==="inactivo"||l.estado==="pendiente")?'<button class="btn btn-sm btn-success" style="margin-right:4px" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'activo\')">✅</button>':'<button class="btn btn-sm btn-danger" style="margin-right:4px" title="Cambiar estado" onclick="cambiarEstadoReposteria(\''+l.id+'\',\'inactivo\')">🔴</button>')+
+      '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'reposteria\',\''+l.id+'\')">💳</button>'+
       '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942;margin-right:4px" title="Reset dispositivo" onclick="resetDispositivoReposteria(\''+l.id+'\')">📱</button>'+
-      '<button class="btn btn-sm btn-danger" title="Eliminar" title="Eliminar" onclick="eliminarLicenciaReposteria(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️</button>';
+      '<button class="btn btn-sm btn-danger" title="Eliminar" onclick="eliminarLicenciaReposteria(\''+l.id+'\',\''+escHtml(l.negocio||l.id)+'\')">🗑️</button>';
     return'<tr>'+
       '<td><code style="color:#f5a0c8;font-size:0.85rem">'+l.id+'</code></td>'+
       '<td style="font-weight:500">'+(l.negocio||'<span style="color:#4a6a85">—</span>')+'</td>'+
@@ -1637,6 +1646,7 @@ function renderRepartoMulti(){
         ?'<button class="btn btn-sm btn-success" title="Activar negocio" onclick="bloquearNegocioMulti(\''+n.id+'\',false,\''+escHtml(n.nombre)+'\')">✅</button>'
         :'<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:0.5px solid #f5a442;margin-right:4px" title="Bloquear negocio" onclick="bloquearNegocioMulti(\''+n.id+'\',true,\''+escHtml(n.nombre)+'\')">🔒</button>')+
       '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none;margin-right:4px" title="Registrar cobro" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳</button>'+
+      '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942;margin-right:4px" title="Reset dispositivo" onclick="resetDispositivoMulti(\''+n.id+'\')">📱</button>'+
       '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee;margin-right:4px" title="Ver y gestionar repartidores" onclick="verRepartidores(\''+n.id+'\')">👥 '+n.cantRepartidores+'</button>'+
       '<button class="btn btn-sm btn-danger" title="Eliminar negocio" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️</button>';
     return'<tr>'+
@@ -1670,6 +1680,7 @@ function renderRepartoMulti(){
         (n.bloqueado?'<button class="btn btn-sm btn-success" onclick="bloquearNegocioMulti(\''+n.id+'\',false,\''+escHtml(n.nombre)+'\')">✅ Activar</button>':'<button class="btn btn-sm" style="background:#2e1800;color:#f5a442;border:0.5px solid #f5a442" onclick="bloquearNegocioMulti(\''+n.id+'\',true,\''+escHtml(n.nombre)+'\')">🔒 Bloquear</button>')+
         '<button class="btn btn-sm" style="background:#0a2e3f;color:#5dffee;border:0.5px solid #5dffee" onclick="verRepartidores(\''+n.id+'\')">👥 Repartidores</button>'+
         '<button class="btn btn-sm" style="background:#2d1a4a;color:#c9a5f5;border:none" onclick="abrirCobrar(\'repartomulti\',\''+n.id+'\')">💳 Cobrar</button>'+
+        '<button class="btn btn-sm" style="background:#2e2006;color:#f5b942;border:0.5px solid #f5b942" title="Reset dispositivo" onclick="resetDispositivoMulti(\''+n.id+'\')">📱 Reset</button>'+
         '<button class="btn btn-sm btn-danger" onclick="eliminarNegocioMulti(\''+n.id+'\',\''+escHtml(n.nombre)+'\')">🗑️ Eliminar</button>'+
       '</div>'+
     '</div>';
