@@ -837,6 +837,7 @@ async function resetDispositivoMulti(id){
   try{await dbControl.collection("licencias").doc(codigo).update({deviceId:"",estado:"activo"});toast("✅ Dispositivo reseteado");cargarTodo();}
   catch(e){toast(e.message,false);}
 }
+async function resetDispositivoPoll(id){
   var c=polleriaClientes.find(function(x){return x.id===id;});
   var nombre=c?c.nombre||id:id;
   var codigo=c?c.codigoActivacion||"":id;
