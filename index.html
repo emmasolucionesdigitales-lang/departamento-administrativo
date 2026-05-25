@@ -753,7 +753,9 @@ function renderReparto(){
     '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias</p>';
 }
 function abrirNuevaRep(){
-  var codigo="SR2026-"+Math.random().toString(36).slice(2,6).toUpperCase();
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var rand=Array.from({length:6},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='SR-'+rand;
   var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
@@ -897,8 +899,8 @@ function renderKiosco(){
 }
 function abrirNuevoKio(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
-  var codigo='KIO-'+rand;
+  var rand=Array.from({length:6},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='KI-'+rand;
   var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
@@ -1110,10 +1112,9 @@ function renderGestion(){
   '<p style="font-size:0.75rem;color:#4a6a85;text-align:center;margin-top:8px;padding-bottom:70px">'+filtrados.length+' de '+total+' licencias Emma Control</p>';
 }
 function abrirNuevoGestion(){
-  var anio=new Date().getFullYear();
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
-  var codigo='EC'+anio+'-'+rand;
+  var rand=Array.from({length:6},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='EC-'+rand;
   var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
@@ -1294,8 +1295,8 @@ function renderPolleria(){
 }
 function abrirNuevoPoll(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
-  var codigo='POLL-'+rand;
+  var rand=Array.from({length:6},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='PO-'+rand;
   var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
@@ -1495,8 +1496,8 @@ function renderReposteria(){
 
 function abrirNuevaReposteria(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
-  var codigo='REPOS-'+rand;
+  var rand=Array.from({length:6},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var codigo='RE-'+rand;
   var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
@@ -1869,7 +1870,7 @@ async function eliminarLicenciaReposteria(id, nombre){
 ════════════════════════════════════════ */
 function abrirNuevoRepartoMulti(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var rand=Array.from({length:4},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
+  var rand=Array.from({length:6},function(){return chars[Math.floor(Math.random()*chars.length)];}).join('');
   var codigo='RM-'+rand;
   var pin=Math.floor(1000+Math.random()*9000);
   document.getElementById("modal-container").innerHTML=
