@@ -358,6 +358,8 @@ function cambiarProducto(p){productoActivo=p;renderMain();}
 /* ── HELPERS ── */
 function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
 function diasRestantes(f){if(!f)return null;return Math.ceil((new Date(f)-new Date())/(1000*60*60*24));}
+function fechaPrueba15(){var d=new Date();d.setDate(d.getDate()+15);return d.toISOString().slice(0,10);}
+function activarPrueba(idCampo){var el=document.getElementById(idCampo);if(el){el.value=fechaPrueba15();var f=new Date(el.value).toLocaleDateString("es-AR");toast("🎁 15 días de prueba gratis — vence el "+f);}}
 function formatFecha(f){if(!f)return"—";return new Date(f).toLocaleDateString("es-AR");}
 
 /* ════════════════════════════════════════
@@ -767,6 +769,8 @@ function abrirNuevaRep(){
       '<label>Celular</label><input id="m-cel" type="tel" placeholder="381 123-4567"/>'+
       camposDueno(null)+
       '<label>Notas (opcional)</label><input id="m-notas" placeholder="Ej: Plan mensual - vence 30/06"/>'+
+      '<label>Vencimiento (opcional)</label><input id="m-venc" type="date"/>'+
+      '<button type="button" onclick="activarPrueba(\'m-venc\')" style="width:100%;margin-bottom:14px;padding:12px;border-radius:10px;border:0.5px solid #4dd9a0;background:#0a2e1f;color:#4dd9a0;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation">🎁 15 días de prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:10px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div></div></div>';
 }
@@ -785,7 +789,8 @@ async function crearLicenciaRep(){
   var cobro=getCobroData();
   var dueno=getDuenoData();
   try{
-    await dbControl.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,app:"reparto",plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
+    var vencRep=(document.getElementById("m-venc")||{value:""}).value||null;
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,app:"reparto",plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,vencimiento:vencRep,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("reparto",neg,ema,codigo,pin);
     toast("✅ Licencia "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();cargarTodo();
@@ -913,6 +918,8 @@ function abrirNuevoKio(){
       '<label>Celular 📱</label><input id="k-tel" type="tel" placeholder="381 123-4567"/>'+
       camposDueno(null)+
       '<label>Plan</label><select id="k-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
+      '<label>Vencimiento (opcional)</label><input id="k-venc" type="date"/>'+
+      '<button type="button" onclick="activarPrueba(\'k-venc\')" style="width:100%;margin-bottom:14px;padding:12px;border-radius:10px;border:0.5px solid #4dd9a0;background:#0a2e1f;color:#4dd9a0;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation">🎁 15 días de prueba gratis</button>'+
       camposCobro(null)+
       '<div style="background:#0a1e2e;border:0.5px solid rgba(93,170,255,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#5daaff">'+
         '📧 Al crear, se enviará el código al email del cliente automáticamente.'+
@@ -936,8 +943,9 @@ async function crearClienteKio(){
   var cobro=getCobroData();
   var dueno=getDuenoData();
   try{
-    await dbKiosco.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,codigoActivacion:codigo,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
-    await dbControl.collection("licencias").doc(codigo).set(Object.assign({app:"kiosco",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
+    var vencKio=(document.getElementById("k-venc")||{value:""}).value||null;
+    await dbKiosco.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:vencKio,codigoActivacion:codigo,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({app:"kiosco",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:vencKio,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("kiosco",nom,ema,codigo,pin);
     toast("✅ "+nom+" — Código: "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();cargarTodo();
@@ -1134,6 +1142,7 @@ function abrirNuevoGestion(){
       '<select id="gnv-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Fecha de vencimiento</label>'+
       '<input id="gnv-venc" type="date"/>'+
+      '<button type="button" onclick="activarPrueba(\'gnv-venc\')" style="width:100%;margin-bottom:14px;padding:12px;border-radius:10px;border:0.5px solid #4dd9a0;background:#0a2e1f;color:#4dd9a0;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation">🎁 15 días de prueba gratis</button>'+
       '<label>Notas (opcional)</label>'+
       '<input id="gnv-notas" placeholder="Ej: Plan mensual"/>'+
       camposCobro(null)+
@@ -1161,9 +1170,10 @@ async function crearLicenciaGestion(){
   var cobro=getCobroData();
   var dueno=getDuenoData();
   try{
+    var vencGes=(document.getElementById("gnv-venc")||{value:""}).value||null;
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({
       app:"emma-control",negocio:negocio,plan:plan,estado:"activo",
-      pin:pin,email:ema,celular:cel,deviceId:"",notas:notas,
+      pin:pin,email:ema,celular:cel,deviceId:"",notas:notas,vencimiento:vencGes,
       aceptoTerminos:false,fechaAlta:new Date().toISOString()
     },dueno,cobro));
     if(ema)await enviarCodigoBrevo("emma-control",negocio,ema,codigo,pin);
@@ -1311,6 +1321,8 @@ function abrirNuevoPoll(){
       '<label>Teléfono</label><input id="p-tel" type="tel" placeholder="381 123-4567"/>'+
       camposDueno(null)+
       '<label>Plan</label><select id="p-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
+      '<label>Vencimiento (opcional)</label><input id="p-venc" type="date"/>'+
+      '<button type="button" onclick="activarPrueba(\'p-venc\')" style="width:100%;margin-bottom:14px;padding:12px;border-radius:10px;border:0.5px solid #4dd9a0;background:#0a2e1f;color:#4dd9a0;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation">🎁 15 días de prueba gratis</button>'+
       camposCobro(null)+
       '<div style="background:#2e1800;border:0.5px solid rgba(245,164,66,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#f5a442">'+
         '📧 Al crear, se enviará el código al email del cliente automáticamente.'+
@@ -1333,8 +1345,9 @@ async function crearClientePoll(){
   if(!validarCelular(tel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();var dueno=getDuenoData();
   try{
-    await dbPolleria.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,codigoActivacion:codigo,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
-    await dbControl.collection("licencias").doc(codigo).set(Object.assign({app:"polleria",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
+    var vencPoll=(document.getElementById("p-venc")||{value:""}).value||null;
+    await dbPolleria.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,vencimiento:vencPoll,codigoActivacion:codigo,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
+    await dbControl.collection("licencias").doc(codigo).set(Object.assign({app:"polleria",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:vencPoll,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("polleria",nom,ema,codigo,pin);
     toast("✅ "+nom+" — Código: "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();cargarTodo();
@@ -1515,6 +1528,8 @@ function abrirNuevaReposteria(){
       camposDueno(null)+
       '<label>Notas (opcional)</label>'+
       '<input id="mr-notas" placeholder="Ej: Plan mensual - vence 30/06"/>'+
+      '<label>Vencimiento (opcional)</label><input id="mr-venc" type="date"/>'+
+      '<button type="button" onclick="activarPrueba(\'mr-venc\')" style="width:100%;margin-bottom:14px;padding:12px;border-radius:10px;border:0.5px solid #4dd9a0;background:#0a2e1f;color:#4dd9a0;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation">🎁 15 días de prueba gratis</button>'+
       camposCobro(null)+
       '<div style="background:#2e0a1a;border:0.5px solid rgba(245,160,200,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.8rem;color:#f5a0c8;line-height:1.6">'+
         '📋 La clienta abre <b>Dulce Gestión</b>, va a ingresar, y usa este código + PIN para activar su cuenta.'+
@@ -1539,9 +1554,10 @@ async function crearLicenciaReposteria(){
   if(!validarCelular(cel)){toast("El celular debe tener al menos 8 dígitos 📱",false);return;}
   var cobro=getCobroData();var dueno=getDuenoData();
   try{
+    var vencRepo=(document.getElementById("mr-venc")||{value:""}).value||null;
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({
       app:"reposteria",estado:"activo",pin:pin,negocio:neg,
-      email:ema,celular:cel,notas:notas,
+      email:ema,celular:cel,notas:notas,vencimiento:vencRepo,
       aceptoTerminos:false,deviceId:"",creadoEn:new Date().toISOString()
     },dueno,cobro));
     if(ema)await enviarCodigoBrevo("reposteria",neg,ema,codigo,pin);
@@ -1889,6 +1905,8 @@ function abrirNuevoRepartoMulti(){
       camposDueno(null)+
       '<label>Notas (opcional)</label>'+
       '<input id="rm-notas" placeholder="Ej: Plan mensual"/>'+
+      '<label>Vencimiento (opcional)</label><input id="rm-venc" type="date"/>'+
+      '<button type="button" onclick="activarPrueba(\'rm-venc\')" style="width:100%;margin-bottom:14px;padding:12px;border-radius:10px;border:0.5px solid #4dd9a0;background:#0a2e1f;color:#4dd9a0;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation">🎁 15 días de prueba gratis</button>'+
       camposCobro(null)+
       '<div style="background:#0a2e3f;border:0.5px solid rgba(93,255,238,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:#5dffee">'+
         '📧 Al crear, se enviará el código al email del dueño automáticamente.'+
@@ -1918,9 +1936,10 @@ async function crearNuevoRepartoMulti(){
       notas:notas,codigoActivacion:codigo,pin:pin,
       aceptoTerminos:false,creadoEn:new Date().toISOString()
     },dueno));
+    var vencRM=(document.getElementById("rm-venc")||{value:""}).value||null;
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({
       app:"reparto-multi",estado:"activo",pin:pin,
-      negocioId:ref.id,negocio:nom,email:ema,celular:cel,
+      negocioId:ref.id,negocio:nom,email:ema,celular:cel,vencimiento:vencRM,
       aceptoTerminos:false,deviceId:"",creadoEn:new Date().toISOString()
     },dueno,cobro));
     if(ema)await enviarCodigoBrevo("reparto-multi",nom,ema,codigo,pin);
