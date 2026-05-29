@@ -1942,6 +1942,12 @@ async function crearNuevoRepartoMulti(){
       negocioId:ref.id,negocio:nom,email:ema,celular:cel,vencimiento:vencRM,
       aceptoTerminos:false,deviceId:"",creadoEn:new Date().toISOString()
     },dueno,cobro));
+    // Guardar en app-reparto-multiple para que la app pueda canjear el código
+    await dbRepartoMulti.collection("repartidores").doc(codigo).set({
+      negocioId:ref.id, nombre:nom, sectores:[], activo:true,
+      activado:false, deviceId:"", rol:"dueño",
+      creadoEn:new Date().toISOString()
+    });
     if(ema)await enviarCodigoBrevo("reparto-multi",nom,ema,codigo,pin);
     toast("✅ "+nom+" — Código: "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();
