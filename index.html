@@ -363,7 +363,7 @@ function renderPINEntry(){
   overlay.innerHTML =
     '<div style="width:100%;max-width:340px;text-align:center;">' +
       '<div style="margin-bottom:28px;">' +
-        '<img src="icon-192.png" onerror="this.style.display='none'" style="width:64px;height:64px;border-radius:16px;margin-bottom:12px;"/>' +
+        '<img src="icon-192.png" onerror="this.remove()" style="width:64px;height:64px;border-radius:16px;margin-bottom:12px;"/>' +
         '<h2 style="font-size:1.2rem;font-weight:700;color:#e2eaf4;margin:0;">Emma Control</h2>' +
         '<p style="font-size:0.85rem;color:#7a9ab8;margin-top:4px;">Bienvenido, '+nombre+'</p>' +
       '</div>' +
@@ -371,7 +371,7 @@ function renderPINEntry(){
       '<div id="pin-entry-error" style="color:#f07070;font-size:0.85rem;min-height:20px;margin-bottom:12px;"></div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center;">' +
         [1,2,3,4,5,6,7,8,9].map(function(n){
-          return '<button onclick="presionarPIN(''+n+'')" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">'+n+'</button>';
+          return '<button onclick="presionarPIN(\"'+n+'\")" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">'+n+'</button>';
         }).join("")+
         '<div></div>'+
         '<button onclick="presionarPIN('0')" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">0</button>'+
