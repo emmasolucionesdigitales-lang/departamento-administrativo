@@ -127,10 +127,26 @@
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 "></div>
 
-<div id="app"></div>
+<div id="app" style="display:none;"></div>
 <div id="modal-container"></div>
 <button id="btn-escala" onclick="ciclarEscala()">M</button>
 
+<script>
+/* ── INIT INMEDIATO: ocultar todo hasta verificar auth ── */
+(function(){
+  var app = document.getElementById("app");
+  var overlay = document.getElementById("auth-overlay");
+  if(app) app.style.display = "none";
+  if(overlay) overlay.style.display = "flex";
+  // Spinner de carga mientras Firebase inicializa
+  if(overlay) overlay.innerHTML = 
+    '<div style="text-align:center;color:#7a9ab8;">' +
+    '<div style="font-size:2.5rem;margin-bottom:16px;">🛡️</div>' +
+    '<p style="font-size:1rem;font-weight:600;color:#e2eaf4;">Emma Control</p>' +
+    '<p style="font-size:0.85rem;margin-top:8px;">Verificando acceso...</p>' +
+    '</div>';
+})();
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -413,13 +429,17 @@ function logout(){
 
 /* cargarTodo ahora incluye repostería ← MODIFICADO */
 async function cargarTodo(){
-  // Asegurarse de que el overlay está oculto y el app visible
+  // ── GUARDIA DE PIN — siempre verifica antes de cargar ──
+  var pinGuardado = localStorage.getItem("ec_admin_pin");
+  if(!pinGuardado) { renderSetupPIN(); return; }
+  if(!window._adminPinOk) { renderPINEntry(); return; }
+  // ── FIN GUARDIA ──
   var overlay=document.getElementById("auth-overlay");
   if(overlay) overlay.style.display="none";
   var app=document.getElementById("app");
   if(app) app.style.display="";
   var btn=document.getElementById("btn-escala");
-  if(btn && window._adminPinOk) btn.style.display="flex";
+  if(btn) btn.style.display="flex";
   await Promise.all([
     cargarLicencias(),
     cargarKioscoClientes(),
