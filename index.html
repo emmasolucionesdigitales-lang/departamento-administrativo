@@ -369,18 +369,21 @@ function renderPINEntry(){
       '</div>' +
       '<div id="pin-dots" style="display:flex;gap:16px;justify-content:center;margin-bottom:28px;"></div>' +
       '<div id="pin-entry-error" style="color:#f07070;font-size:0.85rem;min-height:20px;margin-bottom:12px;"></div>' +
-      '<div style="display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center;">' +
-        [1,2,3,4,5,6,7,8,9].map(function(n){
-          return '<button onclick="presionarPIN(\"'+n+'\")" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">'+n+'</button>';
-        }).join("")+
-        '<div></div>'+
-        '<button onclick="presionarPIN('0')" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">0</button>'+
-        '<button onclick="borrarPIN()" style="width:72px;height:72px;border-radius:50%;border:none;background:rgba(240,112,112,0.12);color:#f07070;font-size:1.4rem;cursor:pointer;">⌫</button>'+
-      '</div>' +
+      '<div id="pin-teclado" style="display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center;"><button id="pbt1" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">1</button><button id="pbt2" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">2</button><button id="pbt3" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">3</button><button id="pbt4" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">4</button><button id="pbt5" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">5</button><button id="pbt6" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">6</button><button id="pbt7" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">7</button><button id="pbt8" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">8</button><button id="pbt9" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">9</button><div></div><button id="pbt0" style="width:72px;height:72px;border-radius:50%;border:none;background:#1a2b3c;color:#e2eaf4;font-size:1.4rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);">0</button><button id="pbtdel" style="width:72px;height:72px;border-radius:50%;border:none;background:rgba(240,112,112,0.12);color:#f07070;font-size:1.4rem;cursor:pointer;">&#9003;</button></div>' +
       '<button onclick="logout()" style="margin-top:28px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 18px;color:#4a6a85;font-size:0.78rem;cursor:pointer;">Cerrar sesión</button>' +
     '</div>';
 
   actualizarPuntos();
+
+  // Event listeners para el teclado (evita problemas de comillas en onclick)
+  setTimeout(function(){
+    [1,2,3,4,5,6,7,8,9,0].forEach(function(n){
+      var btn=document.getElementById("pbt"+n);
+      if(btn) btn.addEventListener("click",function(){ presionarPIN(String(n)); });
+    });
+    var del=document.getElementById("pbtdel");
+    if(del) del.addEventListener("click",borrarPIN);
+  },50);
 
   window.presionarPIN = function(d){
     if(pinIngresado.length >= 4) return;
