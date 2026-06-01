@@ -226,6 +226,8 @@ firebase.initializeApp({
   appId:"1:568126542462:web:e8071e9f287a7fcaf67e2f"
 },"repartomulti");
 const dbRepartoMulti=firebase.app("repartomulti").firestore();
+// ▶ Autenticar anónimamente con el proyecto app-reparto-multiple
+firebase.app("repartomulti").auth().signInAnonymously().catch(function(e){console.warn("Auth repartomulti:",e);});
 
 /* ── ESTADO GLOBAL ── */
 var productoActivo="reparto";
