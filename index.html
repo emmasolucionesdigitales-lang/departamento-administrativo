@@ -1631,10 +1631,12 @@ async function cargarRepartoMulti(){
   try{
     var snapNeg=await dbRepartoMulti.collection("negocios").get();
     var snapUsers=await dbRepartoMulti.collection("users").get();
+    // ▶ También cargar repartidores de subcolección (nueva estructura)
     var users=snapUsers.docs.map(function(d){return Object.assign({uid:d.id},d.data());});
     repartoMultiNegocios=snapNeg.docs.map(function(d){
       var neg=Object.assign({id:d.id},d.data());
       var dueno=users.find(function(u){return u.uid===neg.ownerId&&u.rol==="dueño";});
+      // ▶ Priorizar subcolección del negocio (nueva estructura)
       var repartidores=users.filter(function(u){return u.negocioId===neg.id&&u.rol==="repartidor";});
       neg.ownerEmail=dueno?dueno.email||"—":"—";
       neg.ownerNombre=dueno?dueno.nombre||"—":"—";
@@ -1730,7 +1732,11 @@ function escHtml(s){return(s||"").replace(/'/g,"&#39;").replace(/"/g,"&quot;");}
 function verRepartidores(negocioId){
   var neg=repartoMultiNegocios.find(function(n){return n.id===negocioId;});
   if(!neg)return;
-  var lista=(neg.repartidores||[]);
+  // ▶ Cargar repartidores desde subcolección del negocio
+  var repSnap=null;
+  try{ repSnap=await dbRepartoMulti.collection("negocios").doc(negocioId).collection("repartidores").get(); }catch(e){}
+  if(repSnap&&!repSnap.empty){
+    var lista=repSnap.docs.map(function(d){return Object.assign({uid:d.id,codigo:d.id},d.data());});
   var filas=lista.length===0
     ?'<p style="color:#7a9ab8;font-size:0.85rem;text-align:center;padding:16px">No tiene repartidores aún.</p>'
     :lista.map(function(r){
@@ -1942,12 +1948,13 @@ async function crearNuevoRepartoMulti(){
       negocioId:ref.id,negocio:nom,email:ema,celular:cel,vencimiento:vencRM,
       aceptoTerminos:false,deviceId:"",creadoEn:new Date().toISOString()
     },dueno,cobro));
-    // Guardar en app-reparto-multiple para que la app pueda canjear el código
-    await dbRepartoMulti.collection("repartidores").doc(codigo).set({
-      negocioId:ref.id, nombre:nom, sectores:[], activo:true,
-      activado:false, deviceId:"", rol:"dueño",
-      creadoEn:new Date().toISOString()
-    });
+    // ▶ Guardar en subcolección del negocio (nueva estructura)
+    await dbRepartoMulti.collection("negocios").doc(ref.id)
+      .collection("repartidores").doc(codigo).set({
+        negocioId:ref.id, nombre:nom, sectores:[], activo:true,
+        activado:false, deviceId:"", rol:"dueño",
+        creadoEn:new Date().toISOString()
+      });
     if(ema)await enviarCodigoBrevo("reparto-multi",nom,ema,codigo,pin);
     toast("✅ "+nom+" — Código: "+codigo+" — PIN: "+pin+(ema?" · Email enviado ✉️":""));
     cerrarModalBtn();
