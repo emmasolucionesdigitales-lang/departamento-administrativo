@@ -1731,14 +1731,15 @@ function renderRepartoMulti(){
 
 function escHtml(s){return(s||"").replace(/'/g,"&#39;").replace(/"/g,"&quot;");}
 
-function verRepartidores(negocioId){
+async function verRepartidores(negocioId){
   var neg=repartoMultiNegocios.find(function(n){return n.id===negocioId;});
   if(!neg)return;
   // ▶ Cargar repartidores desde subcolección del negocio
   var repSnap=null;
   try{ repSnap=await dbRepartoMulti.collection("negocios").doc(negocioId).collection("repartidores").get(); }catch(e){}
-  if(repSnap&&!repSnap.empty){
-    var lista=repSnap.docs.map(function(d){return Object.assign({uid:d.id,codigo:d.id},d.data());});
+  var lista=(repSnap&&!repSnap.empty)
+    ?repSnap.docs.map(function(d){return Object.assign({uid:d.id,codigo:d.id},d.data());})
+    :(neg.repartidores||[]);
   var filas=lista.length===0
     ?'<p style="color:#7a9ab8;font-size:0.85rem;text-align:center;padding:16px">No tiene repartidores aún.</p>'
     :lista.map(function(r){
