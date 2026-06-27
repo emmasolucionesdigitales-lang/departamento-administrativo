@@ -309,7 +309,7 @@ function renderMain(){
     var cfg=getAppConfig(t.key);
     var cls="ptab"+(productoActivo===t.key?" activo":"");
     var badge=t.count>0?'<span class="ptab-badge">'+t.count+'</span>':"";
-    return '<div class="'+cls+'" data-app="'+t.key+'" onclick="cambiarProducto(''+t.key+'')">'+
+    return '<div class="'+cls+'" data-app="'+t.key+'" onclick="cambiarProducto(\''+t.key+'\')">'+
       '<span class="ptab-icon">'+cfg.icon+'</span>'+
       '<span class="ptab-label">'+cfg.label+'</span>'+
       badge+
@@ -581,56 +581,52 @@ function accionesBotones(tipo,item,f,modo){
   var esActivo=f.esActivo;
   var s=modo==="sm"?"btn-sm ":"";
   var acc="";
+  var neg=escHtml(f.negocio||"");
+  var nom=escHtml(item.nombre||f.negocio||id);
 
-  /* editar */
-  if(tipo==="reparto")acc+='<button class="btn '+s+'" style="background:#0a1a2e;color:#4a9eff;border-color:#4a9eff40" onclick="abrirEditarRep(''+id+'')">✏️</button>';
-  else if(tipo==="kiosco")acc+='<button class="btn '+s+'" style="background:#18102e;color:#a070ff;border-color:#a070ff40" onclick="abrirEditarKio(''+id+'')">✏️</button>';
-  else if(tipo==="gestion")acc+='<button class="btn '+s+'" style="background:#0a2018;color:#4dd9a0;border-color:#4dd9a040" onclick="abrirEditarGestion(''+id+'')">✏️</button>';
-  else if(tipo==="polleria")acc+='<button class="btn '+s+'" style="background:#201400;color:#f5a442;border-color:#f5a44240" onclick="abrirEditarPoll(''+id+'')">✏️</button>';
-  else if(tipo==="reposteria")acc+='<button class="btn '+s+'" style="background:#200818;color:#f5a0c8;border-color:#f5a0c840" onclick="abrirEditarReposteria(''+id+'')">✏️</button>';
-  else if(tipo==="repartomulti")acc+='<button class="btn '+s+'" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="abrirEditarMulti(''+id+'')">✏️</button>';
+  if(tipo==="reparto")acc+=`<button class="btn ${s}" style="background:#0a1a2e;color:#4a9eff;border-color:#4a9eff40" onclick="abrirEditarRep('${id}')">✏️</button>`;
+  else if(tipo==="kiosco")acc+=`<button class="btn ${s}" style="background:#18102e;color:#a070ff;border-color:#a070ff40" onclick="abrirEditarKio('${id}')">✏️</button>`;
+  else if(tipo==="gestion")acc+=`<button class="btn ${s}" style="background:#0a2018;color:#4dd9a0;border-color:#4dd9a040" onclick="abrirEditarGestion('${id}')">✏️</button>`;
+  else if(tipo==="polleria")acc+=`<button class="btn ${s}" style="background:#201400;color:#f5a442;border-color:#f5a44240" onclick="abrirEditarPoll('${id}')">✏️</button>`;
+  else if(tipo==="reposteria")acc+=`<button class="btn ${s}" style="background:#200818;color:#f5a0c8;border-color:#f5a0c840" onclick="abrirEditarReposteria('${id}')">✏️</button>`;
+  else if(tipo==="repartomulti")acc+=`<button class="btn ${s}" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="abrirEditarMulti('${id}')">✏️</button>`;
 
-  /* cobrar */
-  acc+='<button class="btn '+s+'" style="background:#18103a;color:#a070ff;border-color:#a070ff40" onclick="abrirCobrar(''+tipo+'',''+id+'')">💳</button>';
+  acc+=`<button class="btn ${s}" style="background:#18103a;color:#a070ff;border-color:#a070ff40" onclick="abrirCobrar('${tipo}','${id}')">💳</button>`;
 
-  /* reset */
-  if(tipo==="reparto")acc+='<button class="btn '+s+'" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivo(''+id+'')">📱</button>';
-  else if(tipo==="kiosco")acc+='<button class="btn '+s+'" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoKio(''+id+'')">📱</button>';
-  else if(tipo==="polleria")acc+='<button class="btn '+s+'" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoPoll(''+id+'')">📱</button>';
-  else if(tipo==="reposteria")acc+='<button class="btn '+s+'" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoReposteria(''+id+'')">📱</button>';
-  else if(tipo==="repartomulti")acc+='<button class="btn '+s+'" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoMulti(''+id+'')">📱</button>';
+  if(tipo==="reparto")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivo('${id}')">📱</button>`;
+  else if(tipo==="kiosco")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoKio('${id}')">📱</button>`;
+  else if(tipo==="polleria")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoPoll('${id}')">📱</button>`;
+  else if(tipo==="reposteria")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoReposteria('${id}')">📱</button>`;
+  else if(tipo==="repartomulti")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoMulti('${id}')">📱</button>`;
 
-  /* activar/desactivar */
   if(tipo==="reparto"){
-    if(esActivo)acc+='<button class="btn '+s+' btn-danger" onclick="cambiarEstadoRep(''+id+'','inactivo')">🔴</button>';
-    else acc+='<button class="btn '+s+' btn-success" onclick="cambiarEstadoRep(''+id+'','activo')">✅</button>';
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="cambiarEstadoRep('${id}','inactivo')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" onclick="cambiarEstadoRep('${id}','activo')">✅</button>`;
   }else if(tipo==="kiosco"){
-    if(esActivo)acc+='<button class="btn '+s+' btn-danger" onclick="suspenderKio(''+id+'',false)">🔴</button>';
-    else acc+='<button class="btn '+s+' btn-success" onclick="suspenderKio(''+id+'',true)">✅</button>';
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="suspenderKio('${id}',false)">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" onclick="suspenderKio('${id}',true)">✅</button>`;
   }else if(tipo==="gestion"){
-    if(esActivo)acc+='<button class="btn '+s+' btn-danger" onclick="cambiarEstadoGestion(''+id+'','inactivo')">🔴</button>';
-    else acc+='<button class="btn '+s+' btn-success" onclick="cambiarEstadoGestion(''+id+'','usado')">✅</button>';
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="cambiarEstadoGestion('${id}','inactivo')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" onclick="cambiarEstadoGestion('${id}','usado')">✅</button>`;
   }else if(tipo==="polleria"){
-    if(esActivo)acc+='<button class="btn '+s+' btn-danger" onclick="suspenderPoll(''+id+'',false)">🔴</button>';
-    else acc+='<button class="btn '+s+' btn-success" onclick="suspenderPoll(''+id+'',true)">✅</button>';
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="suspenderPoll('${id}',false)">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" onclick="suspenderPoll('${id}',true)">✅</button>`;
   }else if(tipo==="reposteria"){
-    if(esActivo)acc+='<button class="btn '+s+' btn-danger" onclick="cambiarEstadoReposteria(''+id+'','inactivo')">🔴</button>';
-    else acc+='<button class="btn '+s+' btn-success" onclick="cambiarEstadoReposteria(''+id+'','activo')">✅</button>';
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="cambiarEstadoReposteria('${id}','inactivo')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" onclick="cambiarEstadoReposteria('${id}','activo')">✅</button>`;
   }else if(tipo==="repartomulti"){
-    if(esActivo)acc+='<button class="btn '+s+' btn-danger" onclick="bloquearNegocioMulti(''+id+'',true,''+escHtml(item.nombre||id)+'')">🔴</button>';
-    else acc+='<button class="btn '+s+' btn-success" onclick="bloquearNegocioMulti(''+id+'',false,''+escHtml(item.nombre||id)+'')">✅</button>';
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="bloquearNegocioMulti('${id}',true,'${nom}')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" onclick="bloquearNegocioMulti('${id}',false,'${nom}')">✅</button>`;
   }
 
-  /* repartidores (solo multi) */
-  if(tipo==="repartomulti")acc+='<button class="btn '+s+'" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="verRepartidores(''+id+'')">👥</button>';
+  if(tipo==="repartomulti")acc+=`<button class="btn ${s}" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="verRepartidores('${id}')">👥</button>`;
 
-  /* eliminar */
-  if(tipo==="reparto")acc+='<button class="btn '+s+' btn-danger" onclick="eliminarLicenciaRep(''+id+'',''+escHtml(f.negocio)+'')">🗑️</button>';
-  else if(tipo==="kiosco")acc+='<button class="btn '+s+' btn-danger" onclick="eliminarKioscoCliente(''+id+'',''+escHtml(f.negocio)+'')">🗑️</button>';
-  else if(tipo==="gestion")acc+='<button class="btn '+s+' btn-danger" onclick="eliminarLicenciaGestion(''+id+'',''+escHtml(f.negocio)+'')">🗑️</button>';
-  else if(tipo==="polleria")acc+='<button class="btn '+s+' btn-danger" onclick="eliminarPoll(''+id+'')">🗑️</button>';
-  else if(tipo==="reposteria")acc+='<button class="btn '+s+' btn-danger" onclick="eliminarLicenciaReposteria(''+id+'',''+escHtml(f.negocio)+'')">🗑️</button>';
-  else if(tipo==="repartomulti")acc+='<button class="btn '+s+' btn-danger" onclick="eliminarNegocioMulti(''+id+'',''+escHtml(item.nombre||id)+'')">🗑️</button>';
+  if(tipo==="reparto")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarLicenciaRep('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="kiosco")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarKioscoCliente('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="gestion")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarLicenciaGestion('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="polleria")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarPoll('${id}')">🗑️</button>`;
+  else if(tipo==="reposteria")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarLicenciaReposteria('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="repartomulti")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarNegocioMulti('${id}','${nom}')">🗑️</button>`;
 
   return acc;
 }
@@ -704,7 +700,7 @@ function abrirNuevaRep(){
       camposDueno(null)+
       '<label>Notas (opcional)</label><input id="m-notas" placeholder="Plan mensual"/>'+
       '<label>Vencimiento (opcional)</label><input id="m-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba('m-venc')" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace;letter-spacing:0.06em">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;m-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace;letter-spacing:0.06em">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
@@ -743,7 +739,7 @@ function abrirEditarRep(id){
       camposDueno(l)+
       '<label>Notas</label><input id="e-not" value="'+(l.notas||"")+'"/>'+
       camposCobro(l)+
-      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="guardarEdicionRep(''+id+'')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="guardarEdicionRep(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionRep(id){
@@ -770,7 +766,7 @@ function abrirNuevoKio(){
       camposDueno(null)+
       '<label>Plan</label><select id="k-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Vencimiento</label><input id="k-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba('k-venc')" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;k-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
@@ -809,7 +805,7 @@ function abrirEditarKio(id){
       '<label>Vencimiento</label><input id="ke-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
       '<label>Estado</label><select id="ke-activo"><option value="1"'+(c.activo?" selected":"")+'>Activo</option><option value="0"'+(!c.activo?" selected":"")+'>Suspendido</option></select>'+
       camposCobro(c)+
-      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="guardarEdicionKio(''+id+'')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarKio(''+id+'')">🗑</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="guardarEdicionKio(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarKio(\''+id+'\')">🗑</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionKio(id){
@@ -836,7 +832,7 @@ function abrirNuevoGestion(){
       camposDueno(null)+
       '<label>Plan</label><select id="gnv-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Vencimiento</label><input id="gnv-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba('gnv-venc')" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;gnv-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       '<label>Notas</label><input id="gnv-notas" placeholder="Plan mensual"/>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-success" style="flex:1" onclick="crearLicenciaGestion()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
@@ -878,7 +874,7 @@ function abrirEditarGestion(id){
       '<label>Estado</label><select id="ge-est"><option value="disponible"'+(u.estado==="disponible"?" selected":"")+'>Disponible</option><option value="usado"'+(esActivo?" selected":"")+'>Activo</option><option value="inactivo"'+(u.estado==="inactivo"?" selected":"")+'>Suspendido</option></select>'+
       '<label>Notas</label><input id="ge-not" value="'+(u.notas||"")+'"/>'+
       camposCobro(u)+
-      '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-success" style="flex:1" onclick="guardarEdicionGestion(''+id+'')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-success" style="flex:1" onclick="guardarEdicionGestion(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionGestion(id){
@@ -913,7 +909,7 @@ function abrirNuevoPoll(){
       camposDueno(null)+
       '<label>Plan</label><select id="p-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Vencimiento</label><input id="p-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba('p-venc')" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;p-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="crearClientePoll()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
@@ -952,7 +948,7 @@ function abrirEditarPoll(id){
       '<label>Vencimiento</label><input id="pe-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
       '<label>Estado</label><select id="pe-activo"><option value="1"'+(c.activo?" selected":"")+'>Activo</option><option value="0"'+(!c.activo?" selected":"")+'>Suspendido</option></select>'+
       camposCobro(c)+
-      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(''+id+'')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarPoll(''+id+'')">🗑</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarPoll(\''+id+'\')">🗑</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionPoll(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbPolleria.collection("clientes").doc(id).update(Object.assign({nombre:document.getElementById("pe-nom").value.trim(),email:document.getElementById("pe-ema").value.trim(),telefono:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,activo:document.getElementById("pe-activo").value==="1"},dueno,cobro));toast("Polleria actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
@@ -974,7 +970,7 @@ function abrirNuevaReposteria(){
       camposDueno(null)+
       '<label>Notas</label><input id="mr-notas" placeholder="Plan mensual"/>'+
       '<label>Vencimiento</label><input id="mr-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba('mr-venc')" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;mr-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-pink" style="flex:1" onclick="crearLicenciaReposteria()">Crear licencia</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
@@ -1010,7 +1006,7 @@ function abrirEditarReposteria(id){
       camposDueno(l)+
       '<label>Notas</label><input id="er-not" value="'+(l.notas||"")+'"/>'+
       camposCobro(l)+
-      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-pink" style="flex:1" onclick="guardarEdicionReposteria(''+id+'')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-pink" style="flex:1" onclick="guardarEdicionReposteria(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionReposteria(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbControl.collection("licencias").doc(id).update(Object.assign({pin:Number(document.getElementById("er-pin").value),negocio:document.getElementById("er-neg").value.trim(),email:document.getElementById("er-ema").value.trim(),celular:document.getElementById("er-cel").value.trim(),notas:document.getElementById("er-not").value.trim()},dueno,cobro));toast("Licencia actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
@@ -1032,7 +1028,7 @@ function abrirNuevoRepartoMulti(){
       camposDueno(null)+
       '<label>Notas</label><input id="rm-notas" placeholder="Plan mensual"/>'+
       '<label>Vencimiento</label><input id="rm-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba('rm-venc')" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;rm-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1;background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="crearNuevoRepartoMulti()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
@@ -1069,7 +1065,7 @@ function abrirEditarMulti(id){
       '<label>Codigo</label><input id="em-cod" value="'+(n.codigoActivacion||"")+'"/>'+
       '<label>PIN</label><input id="em-pin" type="number" value="'+(n.pin||"")+'"/>'+
       camposCobro(n)+
-      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1;background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="guardarEdicionMulti(''+id+'')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1;background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="guardarEdicionMulti(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionMulti(id){
@@ -1092,17 +1088,23 @@ async function verRepartidores(negocioId){
   var lista=(repSnap&&!repSnap.empty)?repSnap.docs.map(function(d){return Object.assign({uid:d.id},d.data());}):(neg.repartidores||[]);
   var filas=lista.length===0?'<p style="color:#3a4a58;font-size:0.82rem;text-align:center;padding:16px;font-family:monospace">Sin repartidores</p>':lista.map(function(r){
     var bl=r.bloqueado===true;
-    return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e242e">'+
-      '<div><div style="font-weight:500;color:#c0c8d0;font-size:0.88rem">'+(r.nombre||"Sin nombre")+(bl?'<span style="background:#1a0808;color:#d06060;font-size:0.65rem;padding:1px 6px;border-radius:3px;margin-left:6px;border:1px solid #d0606050">BLOQ</span>':'')+'</div>'+
-      '<div style="font-size:0.75rem;color:#506070;font-family:monospace">'+(r.email||"—")+'</div></div>'+
-      '<div style="display:flex;gap:5px">'+
-        (bl?'<button class="btn btn-sm btn-success" onclick="toggleBloqueoRepartidor(''+r.uid+'',false,''+escHtml(r.nombre)+'')">✅</button>':
-            '<button class="btn btn-sm btn-danger" onclick="toggleBloqueoRepartidor(''+r.uid+'',true,''+escHtml(r.nombre)+'')">🔴</button>')+
-        '<button class="btn btn-sm btn-danger" onclick="eliminarRepartidorMulti(''+r.uid+'',''+escHtml(r.nombre||"")+'')" >🗑</button>'+
-      '</div>'+
-    '</div>';
+    var rn=escHtml(r.nombre||"");
+    var uid=r.uid||"";
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e242e">
+      <div>
+        <div style="font-weight:500;color:#c0c8d0;font-size:0.88rem">${r.nombre||"Sin nombre"}${bl?'<span style="background:#1a0808;color:#d06060;font-size:0.65rem;padding:1px 6px;border-radius:3px;margin-left:6px;border:1px solid #d0606050">BLOQ</span>':""}</div>
+        <div style="font-size:0.75rem;color:#506070;font-family:monospace">${r.email||"—"}</div>
+      </div>
+      <div style="display:flex;gap:5px">
+        ${bl
+          ?`<button class="btn btn-sm btn-success" onclick="toggleBloqueoRepartidor('${uid}',false,'${rn}')">✅</button>`
+          :`<button class="btn btn-sm btn-danger" onclick="toggleBloqueoRepartidor('${uid}',true,'${rn}')">🔴</button>`}
+        <button class="btn btn-sm btn-danger" onclick="eliminarRepartidorMulti('${uid}','${rn}')">🗑</button>
+      </div>
+    </div>`;
   }).join("");
-  document.getElementById("modal-container").innerHTML=
+  
+document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:0.95rem;font-weight:600;color:#5dffee;margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Repartidores</h2>'+
       '<p style="font-family:monospace;font-size:0.82rem;color:#5dffee;margin-bottom:14px">'+escHtml(neg.nombre)+'</p>'+
@@ -1135,10 +1137,10 @@ function abrirCobrar(tipo,id){
       estadoBox+
       '<label>Monto a registrar ($)</label><input id="cobro-monto" type="number" value="'+montoFinal+'"/>'+
       '<div style="display:flex;gap:8px;margin-bottom:12px">'+
-        '<button class="btn btn-success" style="flex:1" onclick="marcarPagado(''+tipo+'',''+id+'')">Marcar pagado</button>'+
-        '<button class="btn" style="background:#0a1a2e;color:#4a9eff;border-color:#4a9eff30;flex:1" onclick="verificarPagoMP(''+tipo+'',''+id+'')">Verificar MP</button>'+
+        `<button class="btn btn-success" style="flex:1" onclick="marcarPagado('${tipo}','${id}')">Marcar pagado</button>`+
+        `<button class="btn" style="background:#0a1a2e;color:#4a9eff;border-color:#4a9eff30;flex:1" onclick="verificarPagoMP('${tipo}','${id}')">Verificar MP</button>`+
       '</div>'+
-      (ec.estado==="suspender"?'<button class="btn btn-danger" style="width:100%;margin-bottom:10px" onclick="suspenderPorPago(''+tipo+'',''+id+'')">Suspender acceso ahora</button>':'')+
+      (ec.estado==="suspender"?`<button class="btn btn-danger" style="width:100%;margin-bottom:10px" onclick="suspenderPorPago('${tipo}','${id}')">Suspender acceso ahora</button>`:'')+ 
       '<div style="border-top:1px solid #2a3040;padding-top:10px"><p style="font-size:0.72rem;color:#506070;margin-bottom:8px;font-family:monospace;text-transform:uppercase;letter-spacing:0.06em">Ultimos pagos</p>'+histHtml+'</div>'+
       '<button class="btn" style="width:100%;margin-top:10px" onclick="cerrarModalBtn()">Cerrar</button>'+
     '</div></div>';
