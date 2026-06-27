@@ -289,7 +289,7 @@ function renderLogin(err){
       (err?'<p style="color:#d06060;font-size:0.82rem;text-align:center;font-family:monospace">'+err+'</p>':'')+
       '<div class="login-box">'+
         '<label>Email</label><input id="adminEmail" type="email" placeholder="admin@ejemplo.com" autocomplete="username"/>'+
-        '<label>Contraseña</label><input id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')loginGoogle()"/>'+
+        '<label>Contraseña</label><input id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.keyCode===13)loginGoogle()"/>'+
         '<button class="btn btn-primary" style="width:100%;padding:12px;font-size:0.9rem;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase" onclick="loginGoogle()">Ingresar al sistema</button>'+
       '</div>'+
     '</div>';
