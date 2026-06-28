@@ -584,49 +584,55 @@ function accionesBotones(tipo,item,f,modo){
   var neg=escHtml(f.negocio||"");
   var nom=escHtml(item.nombre||f.negocio||id);
 
-  if(tipo==="reparto")acc+=`<button class="btn ${s}" style="background:#0a1a2e;color:#4a9eff;border-color:#4a9eff40" onclick="abrirEditarRep('${id}')">✏️</button>`;
-  else if(tipo==="kiosco")acc+=`<button class="btn ${s}" style="background:#18102e;color:#a070ff;border-color:#a070ff40" onclick="abrirEditarKio('${id}')">✏️</button>`;
-  else if(tipo==="gestion")acc+=`<button class="btn ${s}" style="background:#0a2018;color:#4dd9a0;border-color:#4dd9a040" onclick="abrirEditarGestion('${id}')">✏️</button>`;
-  else if(tipo==="polleria")acc+=`<button class="btn ${s}" style="background:#201400;color:#f5a442;border-color:#f5a44240" onclick="abrirEditarPoll('${id}')">✏️</button>`;
-  else if(tipo==="reposteria")acc+=`<button class="btn ${s}" style="background:#200818;color:#f5a0c8;border-color:#f5a0c840" onclick="abrirEditarReposteria('${id}')">✏️</button>`;
-  else if(tipo==="repartomulti")acc+=`<button class="btn ${s}" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="abrirEditarMulti('${id}')">✏️</button>`;
+  /* ✏️ Editar */
+  if(tipo==="reparto")acc+=`<button class="btn ${s}" title="Editar licencia" style="background:#0a1a2e;color:#4a9eff;border-color:#4a9eff40" onclick="abrirEditarRep('${id}')">✏️</button>`;
+  else if(tipo==="kiosco")acc+=`<button class="btn ${s}" title="Editar cliente" style="background:#18102e;color:#a070ff;border-color:#a070ff40" onclick="abrirEditarKio('${id}')">✏️</button>`;
+  else if(tipo==="gestion")acc+=`<button class="btn ${s}" title="Editar licencia" style="background:#0a2018;color:#4dd9a0;border-color:#4dd9a040" onclick="abrirEditarGestion('${id}')">✏️</button>`;
+  else if(tipo==="polleria")acc+=`<button class="btn ${s}" title="Editar pollería" style="background:#201400;color:#f5a442;border-color:#f5a44240" onclick="abrirEditarPoll('${id}')">✏️</button>`;
+  else if(tipo==="reposteria")acc+=`<button class="btn ${s}" title="Editar licencia" style="background:#200818;color:#f5a0c8;border-color:#f5a0c840" onclick="abrirEditarReposteria('${id}')">✏️</button>`;
+  else if(tipo==="repartomulti")acc+=`<button class="btn ${s}" title="Editar negocio" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="abrirEditarMulti('${id}')">✏️</button>`;
 
-  acc+=`<button class="btn ${s}" style="background:#18103a;color:#a070ff;border-color:#a070ff40" onclick="abrirCobrar('${tipo}','${id}')">💳</button>`;
+  /* 💳 Cobrar */
+  acc+=`<button class="btn ${s}" title="Registrar cobro / ver historial de pagos" style="background:#18103a;color:#a070ff;border-color:#a070ff40" onclick="abrirCobrar('${tipo}','${id}')">💳</button>`;
 
-  if(tipo==="reparto")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivo('${id}')">📱</button>`;
-  else if(tipo==="kiosco")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoKio('${id}')">📱</button>`;
-  else if(tipo==="polleria")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoPoll('${id}')">📱</button>`;
-  else if(tipo==="reposteria")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoReposteria('${id}')">📱</button>`;
-  else if(tipo==="repartomulti")acc+=`<button class="btn ${s}" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoMulti('${id}')">📱</button>`;
+  /* 📱 Reset dispositivo */
+  if(tipo==="reparto")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivo('${id}')">📱</button>`;
+  else if(tipo==="kiosco")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoKio('${id}')">📱</button>`;
+  else if(tipo==="polleria")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoPoll('${id}')">📱</button>`;
+  else if(tipo==="reposteria")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoReposteria('${id}')">📱</button>`;
+  else if(tipo==="repartomulti")acc+=`<button class="btn ${s}" title="Resetear dispositivo del dueño — podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoMulti('${id}')">📱</button>`;
 
+  /* 🔴/✅ Activar / Desactivar */
   if(tipo==="reparto"){
-    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="cambiarEstadoRep('${id}','inactivo')">🔴</button>`;
-    else acc+=`<button class="btn ${s} btn-success" onclick="cambiarEstadoRep('${id}','activo')">✅</button>`;
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" title="Desactivar — el cliente perderá el acceso" onclick="cambiarEstadoRep('${id}','inactivo')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" title="Activar licencia" onclick="cambiarEstadoRep('${id}','activo')">✅</button>`;
   }else if(tipo==="kiosco"){
-    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="suspenderKio('${id}',false)">🔴</button>`;
-    else acc+=`<button class="btn ${s} btn-success" onclick="suspenderKio('${id}',true)">✅</button>`;
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" title="Suspender acceso" onclick="suspenderKio('${id}',false)">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" title="Activar acceso" onclick="suspenderKio('${id}',true)">✅</button>`;
   }else if(tipo==="gestion"){
-    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="cambiarEstadoGestion('${id}','inactivo')">🔴</button>`;
-    else acc+=`<button class="btn ${s} btn-success" onclick="cambiarEstadoGestion('${id}','usado')">✅</button>`;
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" title="Suspender licencia" onclick="cambiarEstadoGestion('${id}','inactivo')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" title="Activar licencia" onclick="cambiarEstadoGestion('${id}','usado')">✅</button>`;
   }else if(tipo==="polleria"){
-    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="suspenderPoll('${id}',false)">🔴</button>`;
-    else acc+=`<button class="btn ${s} btn-success" onclick="suspenderPoll('${id}',true)">✅</button>`;
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" title="Suspender acceso" onclick="suspenderPoll('${id}',false)">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" title="Activar acceso" onclick="suspenderPoll('${id}',true)">✅</button>`;
   }else if(tipo==="reposteria"){
-    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="cambiarEstadoReposteria('${id}','inactivo')">🔴</button>`;
-    else acc+=`<button class="btn ${s} btn-success" onclick="cambiarEstadoReposteria('${id}','activo')">✅</button>`;
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" title="Desactivar licencia" onclick="cambiarEstadoReposteria('${id}','inactivo')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" title="Activar licencia" onclick="cambiarEstadoReposteria('${id}','activo')">✅</button>`;
   }else if(tipo==="repartomulti"){
-    if(esActivo)acc+=`<button class="btn ${s} btn-danger" onclick="bloquearNegocioMulti('${id}',true,'${nom}')">🔴</button>`;
-    else acc+=`<button class="btn ${s} btn-success" onclick="bloquearNegocioMulti('${id}',false,'${nom}')">✅</button>`;
+    if(esActivo)acc+=`<button class="btn ${s} btn-danger" title="Bloquear negocio — el dueño no podrá entrar" onclick="bloquearNegocioMulti('${id}',true,'${nom}')">🔴</button>`;
+    else acc+=`<button class="btn ${s} btn-success" title="Desbloquear negocio" onclick="bloquearNegocioMulti('${id}',false,'${nom}')">✅</button>`;
   }
 
-  if(tipo==="repartomulti")acc+=`<button class="btn ${s}" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="verRepartidores('${id}')">👥</button>`;
+  /* 👥 Repartidores (solo multi) */
+  if(tipo==="repartomulti")acc+=`<button class="btn ${s}" title="Ver y gestionar repartidores" style="background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="verRepartidores('${id}')">👥</button>`;
 
-  if(tipo==="reparto")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarLicenciaRep('${id}','${neg}')">🗑️</button>`;
-  else if(tipo==="kiosco")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarKioscoCliente('${id}','${neg}')">🗑️</button>`;
-  else if(tipo==="gestion")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarLicenciaGestion('${id}','${neg}')">🗑️</button>`;
-  else if(tipo==="polleria")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarPoll('${id}')">🗑️</button>`;
-  else if(tipo==="reposteria")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarLicenciaReposteria('${id}','${neg}')">🗑️</button>`;
-  else if(tipo==="repartomulti")acc+=`<button class="btn ${s} btn-danger" onclick="eliminarNegocioMulti('${id}','${nom}')">🗑️</button>`;
+  /* 🗑️ Eliminar */
+  if(tipo==="reparto")acc+=`<button class="btn ${s} btn-danger" title="Eliminar licencia permanentemente" onclick="eliminarLicenciaRep('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="kiosco")acc+=`<button class="btn ${s} btn-danger" title="Eliminar cliente permanentemente" onclick="eliminarKioscoCliente('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="gestion")acc+=`<button class="btn ${s} btn-danger" title="Eliminar licencia permanentemente" onclick="eliminarLicenciaGestion('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="polleria")acc+=`<button class="btn ${s} btn-danger" title="Eliminar pollería permanentemente" onclick="eliminarPoll('${id}')">🗑️</button>`;
+  else if(tipo==="reposteria")acc+=`<button class="btn ${s} btn-danger" title="Eliminar licencia permanentemente" onclick="eliminarLicenciaReposteria('${id}','${neg}')">🗑️</button>`;
+  else if(tipo==="repartomulti")acc+=`<button class="btn ${s} btn-danger" title="Eliminar negocio y repartidores" onclick="eliminarNegocioMulti('${id}','${nom}')">🗑️</button>`;
 
   return acc;
 }
