@@ -309,7 +309,7 @@ function renderMain(){
     var cfg=getAppConfig(t.key);
     var cls="ptab"+(productoActivo===t.key?" activo":"");
     var badge=t.count>0?'<span class="ptab-badge">'+t.count+'</span>':"";
-    return '<div class="'+cls+'" data-app="'+t.key+'" onclick="cambiarProducto(\''+t.key+'\')">'+
+    return '<div class="'+cls+'" data-app="'+t.key+'" title="'+cfg.label+(t.count>0?' ('+t.count+' registros)':'')+'" onclick="cambiarProducto(\''+t.key+'\')">'+
       '<span class="ptab-icon">'+cfg.icon+'</span>'+
       '<span class="ptab-label">'+cfg.label+'</span>'+
       badge+
@@ -454,7 +454,7 @@ function resumenCobrosMes(){
   var todos=[];
   function ag(arr,t){arr.forEach(function(c){if(c.precioMensual)todos.push({t:t,c:c,ec:calcularEstadoCobro(c)});});}
   ag(licencias,"reparto");ag(kioscoClientes,"kiosco");ag(gestionUsuarios,"gestion");ag(polleriaClientes,"polleria");ag(reposteriaLicencias,"reposteria");
-  if(!todos.length)return'<div class="seccion-cobro" style="text-align:center;padding:12px"><p style="color:#3a4a58;font-size:0.8rem;font-family:monospace">Sin precios configurados — cobros no disponibles</p></div>';
+  if(!todos.length)return'<div class="seccion-cobro" style="text-align:center;padding:12px 16px"><p style="color:#3a4a58;font-size:0.8rem;font-family:monospace">Sin precios configurados</p><p style="color:#3a4a58;font-size:0.72rem;margin-top:4px">Editá un cliente y completá el precio mensual en la sección <b style="color:#506070">Datos de cobro</b></p></div>';
   var alDia=todos.filter(function(t){return t.ec.estado==="al_dia";});
   var pend=todos.filter(function(t){return t.ec.estado==="pendiente";});
   var rec=todos.filter(function(t){return t.ec.estado==="con_recargo";});
@@ -548,7 +548,7 @@ function renderAppUnificada(tipo, lista, filtro, setFiltro, onNuevo, extraTop){
     '</div>';
   }).join("");
 
-  return'<div class="app-tag" style="border-color:'+cfg.colorBorder+';color:'+cfg.color+'">'+cfg.icon+' '+cfg.firebase+'</div>'+
+  return'<div style="margin:12px 0 10px"><div style="font-size:1.15rem;font-weight:700;color:'+cfg.color+';letter-spacing:0.06em">'+cfg.icon+' '+cfg.label+'</div><div style="font-size:0.68rem;color:#3a4a58;font-family:monospace;margin-top:2px">'+cfg.firebase+'</div></div>'+
     '<div class="grid4" style="margin-bottom:12px">'+
       '<div class="stat-card"><div class="stat-num">'+lista.length+'</div><div class="stat-label">Total</div></div>'+
       '<div class="stat-card"><div class="stat-num" style="color:#4dd9a0">'+activos+'</div><div class="stat-label">Activos</div></div>'+
