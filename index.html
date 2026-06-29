@@ -597,6 +597,7 @@ function accionesBotones(tipo,item,f,modo){
 
   /* 📱 Reset dispositivo */
   if(tipo==="reparto")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivo('${id}')">📱</button>`;
+  else if(tipo==="gestion")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoGestion('${id}')">📱</button>`;
   else if(tipo==="kiosco")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoKio('${id}')">📱</button>`;
   else if(tipo==="polleria")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoPoll('${id}')">📱</button>`;
   else if(tipo==="reposteria")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoReposteria('${id}')">📱</button>`;
@@ -673,11 +674,17 @@ async function cargarRepartoMulti(){
     var snapNeg=await dbRepartoMulti.collection("negocios").get();
     var snapUsers=await dbRepartoMulti.collection("users").get();
     var users=snapUsers.docs.map(function(d){return Object.assign({uid:d.id},d.data());});
+    // Las licencias de control guardan el email y el celular cargados en el alta
+    var snapCtrl=await dbControl.collection("licencias").get();
+    var ctrlLics={};
+    snapCtrl.docs.forEach(function(d){var dd=d.data();if(dd.app==="reparto-multi")ctrlLics[d.id]=dd;});
     repartoMultiNegocios=snapNeg.docs.map(function(d){
       var neg=Object.assign({id:d.id},d.data());
       var dueno=users.find(function(u){return u.uid===neg.ownerId&&u.rol==="dueno";});
       var repartidores=users.filter(function(u){return u.negocioId===neg.id&&u.rol==="repartidor";});
-      neg.ownerEmail=dueno?dueno.email||"—":"—";
+      var lic=ctrlLics[neg.codigoActivacion]||{};
+      neg.ownerEmail=(dueno&&dueno.email)||neg.ownerEmail||lic.email||"—";
+      neg.celular=neg.celular||lic.celular||(dueno&&(dueno.celular||dueno.telefono))||"—";
       neg.cantRepartidores=repartidores.length;
       neg.repartidores=repartidores;
       return neg;
@@ -899,6 +906,7 @@ async function guardarEdicionGestion(id){
 }
 async function cambiarEstadoGestion(id,estado){var u=gestionUsuarios.find(function(x){return x.id===id;});var n=u?u.negocio||u.nombre||id:id;if(!confirm((estado==="inactivo"?"Suspender":"Activar")+" a "+n+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"Suspendida":"Activada");cargarTodo();}catch(e){toast(e.message,false);}}
 async function eliminarLicenciaGestion(id,nombre){if(!confirm("Eliminar licencia de "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Licencia eliminada");cargarTodo();}catch(e){toast(e.message,false);}}
+async function resetDispositivoGestion(id){var l=gestionUsuarios.find(function(x){return x.id===id;});var n=l?l.negocio||l.nombre||id:id;if(!confirm("Resetear dispositivo de "+n+"?"))return;try{await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
 
 /* ─── POLLERIA ─── */
 function abrirNuevoPoll(){
@@ -1051,7 +1059,7 @@ async function crearNuevoRepartoMulti(){
   if(!cel||!validarCelular(cel)){toast("Celular invalido",false);return;}
   var cobro=getCobroData(),dueno=getDuenoData();
   try{
-    var ref=await dbRepartoMulti.collection("negocios").add(Object.assign({nombre:nom,ownerEmail:ema,ownerId:"",notas:notas,codigoActivacion:cod,pin:pin,aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno));
+    var ref=await dbRepartoMulti.collection("negocios").add(Object.assign({nombre:nom,ownerEmail:ema,celular:cel,ownerId:"",notas:notas,codigoActivacion:cod,pin:pin,aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno));
     var venc=(document.getElementById("rm-venc")||{value:""}).value||null;
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"reparto-multi",estado:"activo",pin:pin,negocioId:ref.id,negocio:nom,email:ema,celular:cel,vencimiento:venc,aceptoTerminos:false,deviceId:"",creadoEn:new Date().toISOString()},dueno,cobro));
     await dbRepartoMulti.collection("negocios").doc(ref.id).collection("repartidores").doc(cod).set({negocioId:ref.id,nombre:nom,sectores:[],activo:true,activado:false,deviceId:"",rol:"dueno",creadoEn:new Date().toISOString()});
@@ -1066,6 +1074,7 @@ function abrirEditarMulti(id){
       '<h2 style="font-size:0.95rem;font-weight:600;color:#5dffee;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Reparto Multi</h2>'+
       '<label>Nombre</label><input id="em-nom" value="'+(n.nombre||"")+'"/>'+
       '<label>Email</label><input id="em-ema" type="email" value="'+(n.ownerEmail||"")+'"/>'+
+      '<label>Celular</label><input id="em-cel" type="tel" value="'+(n.celular&&n.celular!=="—"?n.celular:"")+'"/>'+
       camposDueno(n)+
       '<label>Notas</label><input id="em-notas" value="'+(n.notas||"")+'"/>'+
       '<label>Codigo</label><input id="em-cod" value="'+(n.codigoActivacion||"")+'"/>'+
@@ -1077,12 +1086,13 @@ function abrirEditarMulti(id){
 async function guardarEdicionMulti(id){
   var nom=(document.getElementById("em-nom").value||"").trim();
   var ema=(document.getElementById("em-ema").value||"").trim();
+  var cel=(document.getElementById("em-cel").value||"").trim();
   var notas=(document.getElementById("em-notas").value||"").trim();
   var cod=(document.getElementById("em-cod").value||"").trim().toUpperCase();
   var pin=Number(document.getElementById("em-pin").value);
   var dueno=getDuenoData();
   if(!nom){toast("El nombre es obligatorio",false);return;}
-  try{await dbRepartoMulti.collection("negocios").doc(id).update(Object.assign({nombre:nom,ownerEmail:ema,notas:notas,codigoActivacion:cod,pin:pin},dueno));toast("Negocio actualizado");cerrarModalBtn();cargarTodo();}
+  try{await dbRepartoMulti.collection("negocios").doc(id).update(Object.assign({nombre:nom,ownerEmail:ema,celular:cel,notas:notas,codigoActivacion:cod,pin:pin},dueno));toast("Negocio actualizado");cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
 async function bloquearNegocioMulti(id,bloquear,nombre){if(!confirm((bloquear?"Bloquear":"Desbloquear")+" "+nombre+"?"))return;try{await dbRepartoMulti.collection("negocios").doc(id).update({bloqueado:bloquear});toast(bloquear?"Bloqueado":"Desbloqueado");cargarTodo();}catch(e){toast(e.message,false);}}
