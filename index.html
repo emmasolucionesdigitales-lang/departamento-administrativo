@@ -163,6 +163,7 @@ tr:hover td{background:rgba(192,200,208,0.03);}
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 /* ─── ESCALA ─── */
 var ESCALAS={S:12,M:14,L:16,XL:18};
@@ -595,6 +596,9 @@ function accionesBotones(tipo,item,f,modo){
   /* 💳 Cobrar */
   acc+=`<button class="btn ${s}" title="Registrar cobro / ver historial de pagos" style="background:#18103a;color:#a070ff;border-color:#a070ff40" onclick="abrirCobrar('${tipo}','${id}')">💳</button>`;
 
+  /* 🔳 Ver QR de acceso */
+  acc+=`<button class="btn ${s}" title="Ver código QR de acceso a la app" style="background:#10141a;color:#c0c8d0;border-color:#3a4050" onclick="verQR('${tipo}','${id}')">🔳</button>`;
+
   /* 📱 Reset dispositivo */
   if(tipo==="reparto")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivo('${id}')">📱</button>`;
   else if(tipo==="gestion")acc+=`<button class="btn ${s}" title="Resetear dispositivo — el cliente podrá activar desde un celular nuevo" style="background:#1a1400;color:#c0a060;border-color:#c0a06040" onclick="resetDispositivoGestion('${id}')">📱</button>`;
@@ -699,6 +703,61 @@ function renderRepartoMulti(){return renderAppUnificada("repartomulti",repartoMu
 function genCodigo(pref){var chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return pref+"-"+Array.from({length:6},function(){return chars[Math.floor(Math.random()*chars.length)];}).join("");}
 function genPin(){return Math.floor(1000+Math.random()*9000);}
 
+/* ─── URLS DE ACCESO POR APP (para QR) ─── */
+var APP_URLS={
+  reparto:"https://emmasolucionesdigitales-lang.github.io/sistema-de-reparto-2026/",
+  repartomulti:"https://emmasolucionesdigitales-lang.github.io/sistema-de-reparto-multiple/",
+  kiosco:"https://emmasolucionesdigitales-lang.github.io/app-kiosco/",
+  gestion:"https://emmasolucionesdigitales-lang.github.io/emma-control/",
+  polleria:"https://emmasolucionesdigitales-lang.github.io/app-polleria/",
+  reposteria:"https://emmasolucionesdigitales-lang.github.io/reposteria/"
+};
+function getAppAccessUrl(tipo,codigo,negocioId){
+  var base=APP_URLS[tipo];if(!base)return"";
+  var sep=base.indexOf("?")>=0?"&":"?";
+  if((tipo==="kiosco"||tipo==="polleria")&&negocioId)return base+sep+"id="+encodeURIComponent(negocioId);
+  return base+sep+"codigo="+encodeURIComponent(codigo||"");
+}
+
+/* ─── MODAL QR DE ACCESO ─── */
+function mostrarModalQR(tipo,nombre,codigo,url){
+  var cfg=getAppConfig(tipo);
+  if(!url){toast("URL de la app no configurada para "+cfg.label,false);return;}
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal" style="text-align:center">'+
+      '<div class="modal-drag"></div>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:'+cfg.color+';margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">QR de acceso \u00b7 '+cfg.label+'</h2>'+
+      '<p style="font-family:monospace;font-size:0.8rem;color:#506070;margin-bottom:14px">'+escHtml(nombre||"")+' \u00b7 '+escHtml(codigo||"")+'</p>'+
+      '<div id="qr-canvas-wrap" style="display:flex;justify-content:center;margin-bottom:14px;background:#fff;padding:14px;border-radius:8px"></div>'+
+      '<p style="font-size:0.68rem;color:#3a4a58;word-break:break-all;font-family:monospace;margin-bottom:14px">'+escHtml(url)+'</p>'+
+      '<div style="display:flex;gap:8px">'+
+        '<button class="btn btn-primary" style="flex:1" id="btn-descargar-qr">\u2b07 Descargar</button>'+
+        '<button class="btn" style="flex:1" id="btn-copiar-qr">Copiar link</button>'+
+      '</div>'+
+      '<button class="btn" style="width:100%;margin-top:8px" onclick="cerrarModalBtn()">Cerrar</button>'+
+    '</div></div>';
+  var wrap=document.getElementById("qr-canvas-wrap");
+  var canvas=document.createElement("canvas");
+  wrap.appendChild(canvas);
+  if(window.QRCode&&QRCode.toCanvas){QRCode.toCanvas(canvas,url,{width:220,margin:1},function(err){if(err)console.warn(err);});}
+  else{wrap.innerHTML='<span style="color:#333;font-size:0.8rem">No se pudo cargar el generador de QR</span>';}
+  var btnD=document.getElementById("btn-descargar-qr");
+  if(btnD)btnD.onclick=function(){
+    var c=wrap.querySelector("canvas");if(!c)return;
+    var a=document.createElement("a");a.href=c.toDataURL("image/png");a.download="QR-"+(codigo||nombre||"acceso")+".png";a.click();
+  };
+  var btnC=document.getElementById("btn-copiar-qr");
+  if(btnC)btnC.onclick=function(){
+    navigator.clipboard.writeText(url).then(function(){toast("Link copiado");}).catch(function(){toast("No se pudo copiar",false);});
+  };
+}
+function verQR(tipo,id){
+  var item=getClienteByTipo(tipo,id);if(!item)return;
+  var f=getLicenciaFields(item,tipo);
+  var negocioId=item.negocioId||item.id;
+  mostrarModalQR(tipo,f.negocio,f.codigo,getAppAccessUrl(tipo,f.codigo,negocioId));
+}
+
 /* ─── NUEVO REPARTO ─── */
 function abrirNuevaRep(){
   var cod=genCodigo("SR"),pin=genPin();
@@ -734,7 +793,7 @@ async function crearLicenciaRep(){
     await dbControl.collection("licencias").doc(codigo).set(Object.assign({estado:"activo",pin:pin,app:"reparto",plan:"individual",negocio:neg,email:ema,celular:cel,notas:notas,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("reparto",neg,ema,codigo,pin);
     toast("Licencia "+codigo+" — PIN: "+pin+(ema?" · Email enviado":""));
-    cerrarModalBtn();cargarTodo();
+    cargarTodo();mostrarModalQR("reparto",neg,codigo,getAppAccessUrl("reparto",codigo));
   }catch(e){toast(e.message,false);}
 }
 
@@ -802,7 +861,7 @@ async function crearClienteKio(){
     await dbKiosco.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,codigoActivacion:cod,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"kiosco",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("kiosco",nom,ema,cod,pin);
-    toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cerrarModalBtn();cargarTodo();
+    toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("kiosco",nom,cod,getAppAccessUrl("kiosco",cod,id));
   }catch(e){toast(e.message,false);}
 }
 function abrirEditarKio(id){
@@ -867,7 +926,7 @@ async function crearLicenciaGestion(){
     var venc=(document.getElementById("gnv-venc")||{value:""}).value||null;
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"emma-control",negocio:neg,plan:plan,estado:"activo",pin:pin,email:ema,celular:cel,deviceId:"",notas:notas,vencimiento:venc,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("emma-control",neg,ema,cod,pin);
-    toast("Licencia "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cerrarModalBtn();cargarTodo();
+    toast("Licencia "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("gestion",neg,cod,getAppAccessUrl("gestion",cod));
   }catch(e){toast(e.message,false);}
 }
 function abrirEditarGestion(id){
@@ -946,7 +1005,7 @@ async function crearClientePoll(){
     await dbPolleria.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,vencimiento:venc,codigoActivacion:cod,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"polleria",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("polleria",nom,ema,cod,pin);
-    toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cerrarModalBtn();cargarTodo();
+    toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("polleria",nom,cod,getAppAccessUrl("polleria",cod,id));
   }catch(e){toast(e.message,false);}
 }
 function abrirEditarPoll(id){
@@ -1004,7 +1063,7 @@ async function crearLicenciaReposteria(){
     var venc=(document.getElementById("mr-venc")||{value:""}).value||null;
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"reposteria",estado:"activo",pin:pin,negocio:neg,email:ema,celular:cel,notas:notas,vencimiento:venc,aceptoTerminos:false,deviceId:"",creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("reposteria",neg,ema,cod,pin);
-    toast("Licencia "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cerrarModalBtn();cargarTodo();
+    toast("Licencia "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("reposteria",neg,cod,getAppAccessUrl("reposteria",cod));
   }catch(e){toast(e.message,false);}
 }
 function abrirEditarReposteria(id){
@@ -1064,7 +1123,7 @@ async function crearNuevoRepartoMulti(){
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"reparto-multi",estado:"activo",pin:pin,negocioId:ref.id,negocio:nom,email:ema,celular:cel,vencimiento:venc,aceptoTerminos:false,deviceId:"",creadoEn:new Date().toISOString()},dueno,cobro));
     await dbRepartoMulti.collection("negocios").doc(ref.id).collection("repartidores").doc(cod).set({negocioId:ref.id,nombre:nom,sectores:[],activo:true,activado:false,deviceId:"",rol:"dueno",creadoEn:new Date().toISOString()});
     if(ema)await enviarCodigoBrevo("reparto-multi",nom,ema,cod,pin);
-    toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cerrarModalBtn();cargarTodo();
+    toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("repartomulti",nom,cod,getAppAccessUrl("repartomulti",cod,ref.id));
   }catch(e){toast(e.message,false);}
 }
 function abrirEditarMulti(id){
