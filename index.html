@@ -116,6 +116,7 @@ tr:hover td{background:rgba(192,200,208,0.03);}
 
 /* ─── TOAST ─── */
 #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#181e26;border:1px solid #4a9eff;color:#4a9eff;padding:10px 20px;border-radius:4px;font-size:0.85rem;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;font-family:monospace;letter-spacing:0.04em;}
+#banner-cuentas{position:fixed;top:0;left:0;right:0;z-index:190;}
 
 /* ─── BTN ESCALA ─── */
 #btn-escala{position:fixed;bottom:16px;right:14px;z-index:300;background:#181e26;border:1px solid #3a4050;border-radius:4px;padding:8px 14px;font-size:0.8rem;font-weight:700;color:#8090a8;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.5);touch-action:manipulation;display:none;font-family:monospace;}
@@ -157,6 +158,7 @@ tr:hover td{background:rgba(192,200,208,0.03);}
 </head>
 <body>
 <div id="toast"></div>
+<div id="banner-cuentas"></div>
 <div id="app"></div>
 <div id="modal-container"></div>
 <button id="btn-escala" onclick="ciclarEscala()">M</button>
@@ -2601,15 +2603,74 @@ auth.onAuthStateChanged(async function(user){
   // arrancado a leer antes de tiempo.
   await (window.sesionesSecundariasReady || window.sesionesSecundariasListo);
   var faltantes = Object.keys(window.adminSecundarios).filter(function(k){return window.adminSecundarios[k]===false;});
-  if(faltantes.length) toast("Faltó crear tu usuario admin en: "+faltantes.join(", ")+" — esas apps quedan limitadas.", false);
+  renderBannerCuentas(faltantes);
   cargarTodo();
 });
 function loginGoogle(){
   var email=document.getElementById("adminEmail")?document.getElementById("adminEmail").value:"";
   var pass=document.getElementById("adminPass")?document.getElementById("adminPass").value:"";
   if(!email||!pass){toast("Completá email y contraseña",false);return;}
+  // Se guarda SOLO en memoria (no en localStorage) — sirve para poder
+  // reparar con un click las cuentas admin que falten en los proyectos
+  // secundarios, sin tener que volver a escribir la contraseña.
+  window._adminEmail = email; window._adminPass = pass;
   window.sesionesSecundariasReady = abrirSesionesSecundarias(email, pass);
   auth.signInWithEmailAndPassword(email,pass).catch(function(e){toast("Email o contraseña incorrectos",false);});
+}
+
+var NOMBRES_APP_LEGIBLE = {repartomulti:"Reparto Multi", kiosco:"Kiosco", polleria:"Pollería", reparto:"Reparto Individual", reposteria:"Repostería"};
+
+function renderBannerCuentas(faltantes, resultado){
+  var el = document.getElementById("banner-cuentas");
+  if(!el) return;
+  if(!faltantes || !faltantes.length){ el.innerHTML=""; return; }
+  var lista = faltantes.map(function(k){ return NOMBRES_APP_LEGIBLE[k]||k; }).join(", ");
+  var detalle = "";
+  if(resultado && resultado.manual && resultado.manual.length){
+    detalle = '<div style="margin-top:6px;font-size:0.78rem;color:#f0b060">'+
+      resultado.manual.map(function(m){ return "• "+(NOMBRES_APP_LEGIBLE[m.app]||m.app)+": "+m.motivo; }).join("<br>") +
+      '</div>';
+  }
+  el.innerHTML =
+    '<div style="background:#1a1400;border-bottom:1px solid #c0a060;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;font-family:monospace">'+
+      '<span style="color:#e0c080;font-size:0.82rem">Falta tu cuenta admin en: <b>'+lista+'</b></span>'+
+      '<button onclick="repararCuentasFaltantes()" style="background:#c0a060;color:#181000;border:none;border-radius:4px;padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:monospace">🔧 Reparar automáticamente</button>'+
+    '</div>' + detalle;
+}
+
+async function repararCuentasFaltantes(){
+  var pass = window._adminPass;
+  var email = window._adminEmail || (auth.currentUser?auth.currentUser.email:"");
+  if(!pass){
+    pass = prompt("Ingresá tu contraseña del panel admin para reparar las cuentas faltantes:");
+    if(!pass) return;
+  }
+  var faltantes = Object.keys(window.adminSecundarios).filter(function(k){return window.adminSecundarios[k]===false;});
+  if(!faltantes.length) return;
+  toast("Reparando "+faltantes.length+" cuenta(s)...");
+  var manual = [];
+  for(var i=0;i<faltantes.length;i++){
+    var nombreApp = faltantes[i];
+    try{
+      await firebase.app(nombreApp).auth().createUserWithEmailAndPassword(email, pass);
+      window.adminSecundarios[nombreApp] = true;
+    }catch(e){
+      if(e.code==="auth/email-already-in-use"){
+        manual.push({app:nombreApp, motivo:"ya existe una cuenta con ese email pero con OTRA contraseña — borrala en Firebase Console → Authentication → Users y tocá 'Reparar' de nuevo."});
+      } else if(e.code==="auth/operation-not-allowed"){
+        manual.push({app:nombreApp, motivo:"falta habilitar 'Email/Password' en Firebase Console → Authentication → Sign-in method."});
+      } else if(e.code==="auth/weak-password"){
+        manual.push({app:nombreApp, motivo:"tu contraseña del panel es muy corta para Firebase (mínimo 6 caracteres) — no se pudo crear ahí."});
+      } else {
+        manual.push({app:nombreApp, motivo:e.message});
+      }
+    }
+  }
+  var faltantesFinal = Object.keys(window.adminSecundarios).filter(function(k){return window.adminSecundarios[k]===false;});
+  var arregladas = faltantes.length - faltantesFinal.length;
+  if(arregladas>0) toast(arregladas+" cuenta(s) creada(s) — ya podés usar el reset en esas apps.");
+  else if(manual.length) toast("No se pudo reparar solo: revisá el detalle abajo.", false);
+  renderBannerCuentas(faltantesFinal, {manual:manual});
 }
 function logout(){auth.signOut();document.getElementById("btn-escala").style.display="none";}
 
