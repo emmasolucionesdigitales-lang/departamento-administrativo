@@ -2518,17 +2518,6 @@ function getAppConfig(tipo){
 
 /* ─── NORMALIZAR CAMPOS POR APP ─── */
 function getLicenciaFields(item,tipo){
-  if(tipo==="kiosco"||tipo==="polleria"){
-    return{
-      codigo:item.codigoActivacion||item.id,
-      pin:item.pin||"—",
-      negocio:item.nombre||"—",
-      email:item.email||"—",
-      celular:item.telefono||item.celular||"—",
-      estadoKey:item.activo?"activo":"inactivo",
-      esActivo:!!item.activo
-    };
-  }
   if(tipo==="repartomulti"){
     return{
       codigo:item.codigoActivacion||item.id,
@@ -2560,16 +2549,15 @@ function escHtmlBasico(s){return escHtml(s);}
 /* ─── AUTH ─── */
 // Guarda si cada proyecto secundario quedó (o no) con sesión de admin —
 // se usa para esperar antes de cargar datos y para avisar si alguno falló.
-window.adminSecundarios = {repartomulti:null, kiosco:null, polleria:null};
+// Reparto, Kiosco, Gestión, Pollería y Repostería se administran todos
+// desde la base de licencias compartida (con tu login normal del panel,
+// sin pasos extra). Repartos Múltiples es la ÚNICA app cuyos negocios
+// viven en su propio proyecto de Firebase — por eso es la única que
+// necesita esta sesión aparte.
+window.adminSecundarios = {repartomulti:null};
 
 function abrirSesionesSecundarias(email, pass) {
-  // Mismo usuario/contraseña, pero DENTRO de cada uno de estos otros
-  // proyectos (son bases de Firebase separadas — la sesión del proyecto
-  // principal no sirve ahí). Hace falta crear el mismo usuario admin en
-  // cada uno desde la consola de Firebase (una sola vez). Se espera a
-  // que las 3 terminen (bien o mal) antes de seguir, para no disparar
-  // las cargas de datos mientras todavía no hay sesión en alguna.
-  var nombres = ["repartomulti","kiosco","polleria"];
+  var nombres = ["repartomulti"];
   return Promise.all(nombres.map(function(nombreApp){
     return firebase.app(nombreApp).auth().signInWithEmailAndPassword(email,pass)
       .then(function(){ window.adminSecundarios[nombreApp]=true; })
@@ -2582,21 +2570,15 @@ function abrirSesionesSecundarias(email, pass) {
 
 // Si la sesión ya estaba guardada de antes (recargaste la página sin
 // loguearte de nuevo), Firebase la restaura sola en el proyecto admin,
-// pero NO tenemos la contraseña para repetir el login en los otros 3
-// proyectos automáticamente. Si esas sesiones secundarias también
-// quedaron guardadas de una vez anterior, se restauran solas; si nunca
-// se establecieron, hace falta salir y volver a entrar una vez.
+// pero NO tenemos la contraseña para repetir el login en repartomulti
+// automáticamente. Si esa sesión secundaria también quedó guardada de
+// una vez anterior, se restaura sola; si nunca se estableció, hace
+// falta salir y volver a entrar una vez.
 window.sesionesSecundariasListo = new Promise(function(resolve){
-  var pendientes = ["repartomulti","kiosco","polleria"].length;
-  var revisar = function(nombreApp, user){
-    if(window.adminSecundarios[nombreApp]===null) window.adminSecundarios[nombreApp] = !!user;
-    if(--pendientes<=0) resolve();
-  };
-  ["repartomulti","kiosco","polleria"].forEach(function(nombreApp){
-    var unsub = firebase.app(nombreApp).auth().onAuthStateChanged(function(u){
-      unsub();
-      revisar(nombreApp, u);
-    });
+  var unsub = firebase.app("repartomulti").auth().onAuthStateChanged(function(u){
+    unsub();
+    if(window.adminSecundarios.repartomulti===null) window.adminSecundarios.repartomulti = !!u;
+    resolve();
   });
 });
 
@@ -2780,20 +2762,17 @@ function getClienteByTipo(tipo,id){
   return null;
 }
 function getDbByTipo(tipo){
-  if(tipo==="reparto")return{db:dbControl,col:"licencias"};
-  if(tipo==="kiosco")return{db:dbKiosco,col:"clientes"};
-  if(tipo==="gestion")return{db:dbControl,col:"licencias"};
-  if(tipo==="polleria")return{db:dbPolleria,col:"clientes"};
-  if(tipo==="reposteria")return{db:dbControl,col:"licencias"};
+  // Reparto, Kiosco, Gestión, Pollería y Repostería se administran todos
+  // desde el mismo lugar: la base de licencias compartida. Repartos
+  // Múltiples es la única excepción real (los negocios con sus
+  // repartidores viven en su propio proyecto).
+  if(tipo==="reparto"||tipo==="kiosco"||tipo==="gestion"||tipo==="polleria"||tipo==="reposteria")return{db:dbControl,col:"licencias"};
   if(tipo==="repartomulti")return{db:dbRepartoMulti,col:"negocios"};
   return null;
 }
 
 /* ─── BADGES DE ESTADO ─── */
 function estadoBadgeUnif(estadoKey,tipo){
-  if(tipo==="kiosco"||tipo==="polleria"){
-    return estadoKey==="activo"?'<span class="badge badge-green">Activo</span>':'<span class="badge badge-red">Suspendido</span>';
-  }
   if(tipo==="repartomulti"){
     return estadoKey==="activo"?'<span class="badge badge-cyan">Activo</span>':'<span class="badge badge-red">Bloqueado</span>';
   }
@@ -3008,7 +2987,7 @@ function renderReparto(){
 }
 
 /* ─── KIOSCO ─── */
-async function cargarKioscoClientes(){try{var snap=await dbKiosco.collection("clientes").get();kioscoClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}catch(e){console.warn(e);}}
+async function cargarKioscoClientes(){try{var snap=await dbControl.collection("licencias").get();kioscoClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).filter(function(l){return l.app==="kiosco";});}catch(e){console.warn(e);}}
 function getKioscoUrl(c){var base=window.location.origin+window.location.pathname.replace("admin_emma.html","").replace("admin.html","");return base+"kiosco.html?id="+(c.negocioId||c.id);}
 function renderKiosco(){return renderAppUnificada("kiosco",kioscoClientes,filtroKiosco,"filtroKiosco","abrirNuevoKio()","");}
 
@@ -3017,7 +2996,7 @@ async function cargarGestionUsuarios(){try{var snap=await dbControl.collection("
 function renderGestion(){return renderAppUnificada("gestion",gestionUsuarios,filtroGestion,"filtroGestion","abrirNuevoGestion()","");}
 
 /* ─── POLLERIA ─── */
-async function cargarPolleriaClientes(){try{var snap=await dbPolleria.collection("clientes").get();polleriaClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});}catch(e){console.warn(e);}}
+async function cargarPolleriaClientes(){try{var snap=await dbControl.collection("licencias").get();polleriaClientes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());}).filter(function(l){return l.app==="polleria";});}catch(e){console.warn(e);}}
 function getPolleriaUrl(c){var base=window.location.origin+window.location.pathname.replace("admin_emma.html","").replace("admin.html","");return base+"polleria.html?id="+(c.negocioId||c.id);}
 function renderPolleria(){return renderAppUnificada("polleria",polleriaClientes,filtroPolleriaClientes,"filtroPolleriaClientes","abrirNuevoPoll()","");}
 
@@ -3229,8 +3208,11 @@ async function crearClienteKio(){
   var cobro=getCobroData(),dueno=getDuenoData();
   try{
     var venc=(document.getElementById("k-venc")||{value:""}).value||null;
-    await dbKiosco.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,vencimiento:venc,codigoActivacion:cod,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
-    await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"kiosco",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
+    // Antes esto escribía dos veces (acá y en la base de licencias
+    // compartida) — ahora todo vive en un solo lugar, igual que Reparto,
+    // Repostería y Emma Control. Así el panel no necesita una cuenta
+    // aparte para administrar Kiosco.
+    await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"kiosco",estado:"activo",plan:plan,pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("kiosco",nom,ema,cod,pin);
     toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("kiosco",nom,cod,getAppAccessUrl("kiosco",cod,id));
   }catch(e){toast(e.message,false);}
@@ -3240,26 +3222,26 @@ function abrirEditarKio(id){
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:0.95rem;font-weight:600;color:#a070ff;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Kiosco</h2>'+
-      '<label>Nombre</label><input id="ke-nom" value="'+(c.nombre||"")+'"/>'+
+      '<label>Nombre</label><input id="ke-nom" value="'+(c.negocio||"")+'"/>'+
       '<label>Email</label><input id="ke-ema" type="email" value="'+(c.email||"")+'"/>'+
-      '<label>Telefono</label><input id="ke-tel" type="tel" value="'+(c.telefono||"")+'"/>'+
+      '<label>Telefono</label><input id="ke-tel" type="tel" value="'+(c.celular||"")+'"/>'+
       camposDueno(c)+
       '<label>Plan</label><select id="ke-plan"><option value="demo"'+(c.plan==="demo"?" selected":"")+'>Demo</option><option value="basic"'+(c.plan==="basic"?" selected":"")+'>Basic</option><option value="pro"'+(c.plan==="pro"?" selected":"")+'>Pro</option></select>'+
       '<label>Vencimiento</label><input id="ke-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
-      '<label>Estado</label><select id="ke-activo"><option value="1"'+(c.activo?" selected":"")+'>Activo</option><option value="0"'+(!c.activo?" selected":"")+'>Suspendido</option></select>'+
+      '<label>Estado</label><select id="ke-activo"><option value="1"'+(c.estado==="activo"?" selected":"")+'>Activo</option><option value="0"'+(c.estado!=="activo"?" selected":"")+'>Suspendido</option></select>'+
       camposCobro(c)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="guardarEdicionKio(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarKio(\''+id+'\')">🗑</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionKio(id){
   var cobro=getCobroData(),dueno=getDuenoData();
-  try{await dbKiosco.collection("clientes").doc(id).update(Object.assign({nombre:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),telefono:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,activo:document.getElementById("ke-activo").value==="1"},dueno,cobro));toast("Cliente actualizado");cerrarModalBtn();cargarTodo();}
+  try{await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),celular:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,estado:document.getElementById("ke-activo").value==="1"?"activo":"inactivo"},dueno,cobro));toast("Cliente actualizado");cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
 }
-async function eliminarKio(id){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.nombre:id)+"?"))return;try{await dbKiosco.collection("clientes").doc(id).delete();toast("Eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
-async function suspenderKio(id,activo){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.nombre:id)+"?"))return;try{await dbKiosco.collection("clientes").doc(id).update({activo:activo});toast(activo?"Activado":"Suspendido");cargarTodo();}catch(e){toast(e.message,false);}}
-async function resetDispositivoKio(id){var c=kioscoClientes.find(function(x){return x.id===id;});var cod=c?c.codigoActivacion||"":id;if(!cod){toast("Sin codigo de licencia",false);return;}if(!confirm("Resetear dispositivo?"))return;try{await dbControl.collection("licencias").doc(cod).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
-async function eliminarKioscoCliente(id,nombre){if(!confirm("Eliminar a "+nombre+"?"))return;try{await dbKiosco.collection("clientes").doc(id).delete();toast("Eliminado");cargarTodo();}catch(e){toast(e.message,false);}}
+async function eliminarKio(id){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
+async function suspenderKio(id,activo){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:activo?"activo":"inactivo"});toast(activo?"Activado":"Suspendido");cargarTodo();}catch(e){toast(e.message,false);}}
+async function resetDispositivoKio(id){if(!confirm("Resetear dispositivo?"))return;try{await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
+async function eliminarKioscoCliente(id,nombre){if(!confirm("Eliminar a "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminado");cargarTodo();}catch(e){toast(e.message,false);}}
 
 /* ─── EMMA CONTROL ─── */
 function abrirNuevoGestion(){
@@ -3373,8 +3355,9 @@ async function crearClientePoll(){
   var cobro=getCobroData(),dueno=getDuenoData();
   try{
     var venc=(document.getElementById("p-venc")||{value:""}).value||null;
-    await dbPolleria.collection("clientes").doc(id).set(Object.assign({nombre:nom,negocioId:id,email:ema,telefono:tel,plan:plan,activo:true,pendiente:false,vencimiento:venc,codigoActivacion:cod,pin:pin,aceptoTerminos:false,fechaAlta:new Date().toISOString()},dueno,cobro));
-    await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"polleria",estado:"activo",pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
+    // Mismo cambio que en Kiosco: un solo lugar (licencias compartidas)
+    // en vez de escribir también en la base propia de Pollería.
+    await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"polleria",estado:"activo",plan:plan,pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
     if(ema)await enviarCodigoBrevo("polleria",nom,ema,cod,pin);
     toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("polleria",nom,cod,getAppAccessUrl("polleria",cod,id));
   }catch(e){toast(e.message,false);}
@@ -3384,20 +3367,20 @@ function abrirEditarPoll(id){
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:0.95rem;font-weight:600;color:#f5a442;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Polleria</h2>'+
-      '<label>Nombre</label><input id="pe-nom" value="'+(c.nombre||"")+'"/>'+
+      '<label>Nombre</label><input id="pe-nom" value="'+(c.negocio||"")+'"/>'+
       '<label>Email</label><input id="pe-ema" type="email" value="'+(c.email||"")+'"/>'+
-      '<label>Telefono</label><input id="pe-tel" type="tel" value="'+(c.telefono||"")+'"/>'+
+      '<label>Telefono</label><input id="pe-tel" type="tel" value="'+(c.celular||"")+'"/>'+
       camposDueno(c)+
       '<label>Plan</label><select id="pe-plan"><option value="demo"'+(c.plan==="demo"?" selected":"")+'>Demo</option><option value="basic"'+(c.plan==="basic"?" selected":"")+'>Basic</option><option value="pro"'+(c.plan==="pro"?" selected":"")+'>Pro</option></select>'+
       '<label>Vencimiento</label><input id="pe-venc" type="date" value="'+(c.vencimiento||"")+'"/>'+
-      '<label>Estado</label><select id="pe-activo"><option value="1"'+(c.activo?" selected":"")+'>Activo</option><option value="0"'+(!c.activo?" selected":"")+'>Suspendido</option></select>'+
+      '<label>Estado</label><select id="pe-activo"><option value="1"'+(c.estado==="activo"?" selected":"")+'>Activo</option><option value="0"'+(c.estado!=="activo"?" selected":"")+'>Suspendido</option></select>'+
       camposCobro(c)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarPoll(\''+id+'\')">🗑</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
-async function guardarEdicionPoll(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbPolleria.collection("clientes").doc(id).update(Object.assign({nombre:document.getElementById("pe-nom").value.trim(),email:document.getElementById("pe-ema").value.trim(),telefono:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,activo:document.getElementById("pe-activo").value==="1"},dueno,cobro));toast("Polleria actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
-async function eliminarPoll(id){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.nombre:id)+"?"))return;try{await dbPolleria.collection("clientes").doc(id).delete();toast("Eliminada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
-async function suspenderPoll(id,activo){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.nombre:id)+"?"))return;try{await dbPolleria.collection("clientes").doc(id).update({activo:activo});toast(activo?"Activada":"Suspendida");cargarTodo();}catch(e){toast(e.message,false);}}
+async function guardarEdicionPoll(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:document.getElementById("pe-nom").value.trim(),email:document.getElementById("pe-ema").value.trim(),celular:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,estado:document.getElementById("pe-activo").value==="1"?"activo":"inactivo"},dueno,cobro));toast("Polleria actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
+async function eliminarPoll(id){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
+async function suspenderPoll(id,activo){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:activo?"activo":"inactivo"});toast(activo?"Activada":"Suspendida");cargarTodo();}catch(e){toast(e.message,false);}}
 async function resetDispositivoPoll(id){var c=polleriaClientes.find(function(x){return x.id===id;});var cod=c?c.codigoActivacion||"":id;if(!cod){toast("Sin codigo de licencia",false);return;}if(!confirm("Resetear dispositivo?"))return;try{await dbControl.collection("licencias").doc(cod).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
 
 /* ─── REPOSTERIA ─── */
@@ -3599,8 +3582,7 @@ async function marcarPagado(tipo,id){
   var hoy=new Date().toISOString().slice(0,10);
   hist.push({fecha:hoy,monto:monto,via:"Manual"});
   var upd={ultimoPago:hoy,historialPagos:hist};
-  if(tipo==="reparto"||tipo==="reposteria"){if(c.estado==="inactivo")upd.estado="activo";}
-  else if(tipo==="kiosco"||tipo==="polleria"){if(!c.activo)upd.activo=true;}
+  if(tipo==="reparto"||tipo==="reposteria"||tipo==="kiosco"||tipo==="polleria"){if(c.estado==="inactivo")upd.estado="activo";}
   else if(tipo==="gestion"){if(c.estado==="inactivo")upd.estado="usado";}
   try{await ref.db.collection(ref.col).doc(id).update(upd);toast("Pago $"+monto.toLocaleString("es-AR")+" registrado");cerrarModalBtn();cargarTodo();}
   catch(e){toast(e.message,false);}
@@ -3619,8 +3601,7 @@ async function verificarPagoMP(tipo,id){
       var ref=getDbByTipo(tipo),c=getClienteByTipo(tipo,id);
       var hist=(c&&c.historialPagos)||[];hist.push({fecha:fechaPago,monto:monto,via:"MercadoPago",mpId:pago.id});
       var upd={ultimoPago:fechaPago,historialPagos:hist};
-      if(tipo==="reparto"||tipo==="reposteria"){if(c&&c.estado==="inactivo")upd.estado="activo";}
-      else if(tipo==="kiosco"||tipo==="polleria"){if(c&&!c.activo)upd.activo=true;}
+      if(tipo==="reparto"||tipo==="reposteria"||tipo==="kiosco"||tipo==="polleria"){if(c&&c.estado==="inactivo")upd.estado="activo";}
       else if(tipo==="gestion"){if(c&&c.estado==="inactivo")upd.estado="usado";}
       await ref.db.collection(ref.col).doc(id).update(upd);
       toast("Pago verificado MP: $"+monto.toLocaleString("es-AR"));cerrarModalBtn();cargarTodo();
@@ -3632,8 +3613,7 @@ async function suspenderPorPago(tipo,id){
   if(!confirm("Suspender acceso a "+nombre+" por falta de pago?"))return;
   var ref=getDbByTipo(tipo);if(!ref)return;
   var upd={};
-  if(tipo==="reparto"||tipo==="reposteria")upd.estado="inactivo";
-  else if(tipo==="kiosco"||tipo==="polleria")upd.activo=false;
+  if(tipo==="reparto"||tipo==="reposteria"||tipo==="kiosco"||tipo==="polleria")upd.estado="inactivo";
   else if(tipo==="gestion")upd.estado="inactivo";
   try{await ref.db.collection(ref.col).doc(id).update(upd);toast(nombre+" suspendido");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}
 }
@@ -3646,9 +3626,9 @@ async function chequearSuspensionesAutomaticas(){
   function necesita(c){return c.precioMensual&&!(c.ultimoPago||"").startsWith(mes);}
   var pr=[],susp=0;
   licencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){pr.push(dbControl.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
-  kioscoClientes.forEach(function(c){if(necesita(c)&&c.activo){pr.push(dbKiosco.collection("clientes").doc(c.id).update({activo:false}));c.activo=false;susp++;}});
+  kioscoClientes.forEach(function(c){if(necesita(c)&&c.estado!=="inactivo"){pr.push(dbControl.collection("licencias").doc(c.id).update({estado:"inactivo"}));c.estado="inactivo";susp++;}});
   gestionUsuarios.forEach(function(u){if(necesita(u)&&u.estado!=="inactivo"&&u.estado!=="disponible"){pr.push(dbControl.collection("licencias").doc(u.id).update({estado:"inactivo"}));u.estado="inactivo";susp++;}});
-  polleriaClientes.forEach(function(c){if(necesita(c)&&c.activo){pr.push(dbPolleria.collection("clientes").doc(c.id).update({activo:false}));c.activo=false;susp++;}});
+  polleriaClientes.forEach(function(c){if(necesita(c)&&c.estado!=="inactivo"){pr.push(dbControl.collection("licencias").doc(c.id).update({estado:"inactivo"}));c.estado="inactivo";susp++;}});
   reposteriaLicencias.forEach(function(l){if(necesita(l)&&l.estado!=="inactivo"&&l.estado!=="pendiente"){pr.push(dbControl.collection("licencias").doc(l.id).update({estado:"inactivo"}));l.estado="inactivo";susp++;}});
   if(pr.length)try{await Promise.all(pr);if(susp>0)toast(susp+" cliente(s) suspendidos automaticamente",false);}catch(e){console.warn(e);}
 }
