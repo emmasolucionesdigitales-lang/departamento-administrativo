@@ -3182,8 +3182,13 @@ async function resetDispositivo(id){
   if(!confirm("Resetear dispositivo? Va a poder activar de nuevo desde un celular nuevo."))return;
   try{
     await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
-    try{await dbReparto.collection("users").doc(id).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}
-    toast("Dispositivo reseteado");cargarTodo();
+    try{
+      await dbReparto.collection("users").doc(id).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});
+      toast("Dispositivo reseteado");
+    }catch(e2){
+      toast("Licencia reseteada, pero no se pudo liberar el dispositivo anterior (sesión admin faltante en Reparto Individual) — salí y volvé a entrar al panel con tu email y contraseña.",false);
+    }
+    cargarTodo();
   }catch(e){toast(e.message,false);}
 }
 async function eliminarLicenciaRep(id,nombre){if(!confirm("Eliminar licencia de "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Licencia eliminada");cargarTodo();}catch(e){toast(e.message,false);}}
@@ -3262,8 +3267,14 @@ async function resetDispositivoKio(id){
     await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
     // Libera también la marca de "ya reclamado" en el negocio (si no,
     // sigue rechazando la reactivación aunque la licencia ya esté libre).
-    if(c&&c.negocioId){try{await dbKiosco.collection("negocios").doc(c.negocioId).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}}
-    toast("Dispositivo reseteado");cargarTodo();
+    var liberado=true;
+    if(c&&c.negocioId){
+      try{await dbKiosco.collection("negocios").doc(c.negocioId).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}
+      catch(e2){liberado=false;}
+    }
+    if(liberado) toast("Dispositivo reseteado");
+    else toast("Licencia reseteada, pero no se pudo liberar el dispositivo anterior (sesión admin faltante en Kiosco) — salí y volvé a entrar al panel con tu email y contraseña.",false);
+    cargarTodo();
   }catch(e){toast(e.message,false);}
 }
 async function eliminarKioscoCliente(id,nombre){if(!confirm("Eliminar a "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminado");cargarTodo();}catch(e){toast(e.message,false);}}
@@ -3415,8 +3426,14 @@ async function resetDispositivoPoll(id){
     // En Pollería el "dueño reclamado" se guarda en polleria/{deviceId} —
     // hay que liberar justo ESE documento (el del dispositivo viejo),
     // si no la reactivación se sigue rechazando.
-    if(deviceIdViejo){try{await dbPolleria.collection("polleria").doc(deviceIdViejo).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}}
-    toast("Dispositivo reseteado");cargarTodo();
+    var liberado=true;
+    if(deviceIdViejo){
+      try{await dbPolleria.collection("polleria").doc(deviceIdViejo).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}
+      catch(e2){liberado=false;}
+    }
+    if(liberado) toast("Dispositivo reseteado");
+    else toast("Licencia reseteada, pero no se pudo liberar el dispositivo anterior (sesión admin faltante en Pollería) — salí y volvé a entrar al panel con tu email y contraseña.",false);
+    cargarTodo();
   }catch(e){toast(e.message,false);}
 }
 
@@ -3481,8 +3498,14 @@ async function resetDispositivoReposteria(id){
   try{
     var deviceIdViejo=l?l.deviceId||"":"";
     await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
-    if(deviceIdViejo){try{await dbReposteria.collection("reposteria").doc(deviceIdViejo).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}}
-    toast("Dispositivo reseteado");cargarTodo();
+    var liberado=true;
+    if(deviceIdViejo){
+      try{await dbReposteria.collection("reposteria").doc(deviceIdViejo).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}
+      catch(e2){liberado=false;}
+    }
+    if(liberado) toast("Dispositivo reseteado");
+    else toast("Licencia reseteada, pero no se pudo liberar el dispositivo anterior (sesión admin faltante en Repostería) — salí y volvé a entrar al panel con tu email y contraseña.",false);
+    cargarTodo();
   }catch(e){toast(e.message,false);}
 }
 async function eliminarLicenciaReposteria(id,nombre){if(!confirm("Eliminar licencia de "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Licencia eliminada");cargarTodo();}catch(e){toast(e.message,false);}}
