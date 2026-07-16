@@ -2558,29 +2558,68 @@ function escHtml(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").rep
 function escHtmlBasico(s){return escHtml(s);}
 
 /* ─── AUTH ─── */
-auth.onAuthStateChanged(function(user){
+// Guarda si cada proyecto secundario quedó (o no) con sesión de admin —
+// se usa para esperar antes de cargar datos y para avisar si alguno falló.
+window.adminSecundarios = {repartomulti:null, kiosco:null, polleria:null};
+
+function abrirSesionesSecundarias(email, pass) {
+  // Mismo usuario/contraseña, pero DENTRO de cada uno de estos otros
+  // proyectos (son bases de Firebase separadas — la sesión del proyecto
+  // principal no sirve ahí). Hace falta crear el mismo usuario admin en
+  // cada uno desde la consola de Firebase (una sola vez). Se espera a
+  // que las 3 terminen (bien o mal) antes de seguir, para no disparar
+  // las cargas de datos mientras todavía no hay sesión en alguna.
+  var nombres = ["repartomulti","kiosco","polleria"];
+  return Promise.all(nombres.map(function(nombreApp){
+    return firebase.app(nombreApp).auth().signInWithEmailAndPassword(email,pass)
+      .then(function(){ window.adminSecundarios[nombreApp]=true; })
+      .catch(function(e){
+        window.adminSecundarios[nombreApp]=false;
+        console.warn("Admin sin cuenta todavía en "+nombreApp+":",e.code);
+      });
+  }));
+}
+
+// Si la sesión ya estaba guardada de antes (recargaste la página sin
+// loguearte de nuevo), Firebase la restaura sola en el proyecto admin,
+// pero NO tenemos la contraseña para repetir el login en los otros 3
+// proyectos automáticamente. Si esas sesiones secundarias también
+// quedaron guardadas de una vez anterior, se restauran solas; si nunca
+// se establecieron, hace falta salir y volver a entrar una vez.
+window.sesionesSecundariasListo = new Promise(function(resolve){
+  var pendientes = ["repartomulti","kiosco","polleria"].length;
+  var revisar = function(nombreApp, user){
+    if(window.adminSecundarios[nombreApp]===null) window.adminSecundarios[nombreApp] = !!user;
+    if(--pendientes<=0) resolve();
+  };
+  ["repartomulti","kiosco","polleria"].forEach(function(nombreApp){
+    var unsub = firebase.app(nombreApp).auth().onAuthStateChanged(function(u){
+      unsub();
+      revisar(nombreApp, u);
+    });
+  });
+});
+
+auth.onAuthStateChanged(async function(user){
   var btn=document.getElementById("btn-escala");
   if(!user){if(btn)btn.style.display="none";renderLogin("");return;}
   if(user.uid!==ADMIN_UID){auth.signOut();renderLogin("Acceso denegado.");return;}
   if(btn)btn.style.display="flex";
+  // Espera a que las sesiones secundarias terminen de resolverse (recién
+  // logueadas ahora, o restauradas de una sesión guardada) ANTES de
+  // cargar los datos — así ninguna pestaña se queda en blanco por haber
+  // arrancado a leer antes de tiempo.
+  await (window.sesionesSecundariasReady || window.sesionesSecundariasListo);
+  var faltantes = Object.keys(window.adminSecundarios).filter(function(k){return window.adminSecundarios[k]===false;});
+  if(faltantes.length) toast("Faltó crear tu usuario admin en: "+faltantes.join(", ")+" — esas apps quedan limitadas.", false);
   cargarTodo();
 });
 function loginGoogle(){
   var email=document.getElementById("adminEmail")?document.getElementById("adminEmail").value:"";
   var pass=document.getElementById("adminPass")?document.getElementById("adminPass").value:"";
   if(!email||!pass){toast("Completá email y contraseña",false);return;}
-  auth.signInWithEmailAndPassword(email,pass).then(function(){
-    // Mismo usuario/contraseña, pero DENTRO de cada uno de estos otros
-    // proyectos (son bases de Firebase separadas — la sesión de acá no
-    // sirve allá). Hace falta crear el mismo usuario admin en cada uno
-    // desde la consola de Firebase (una sola vez). Si todavía no existe
-    // en alguno, esa app en particular queda sólo de lectura para vos
-    // hasta que lo crees — el resto del panel sigue funcionando.
-    ["repartomulti","kiosco","polleria"].forEach(function(nombreApp){
-      firebase.app(nombreApp).auth().signInWithEmailAndPassword(email,pass)
-        .catch(function(e){ console.warn("Admin sin cuenta todavía en "+nombreApp+":",e.code); });
-    });
-  }).catch(function(e){toast("Email o contraseña incorrectos",false);});
+  window.sesionesSecundariasReady = abrirSesionesSecundarias(email, pass);
+  auth.signInWithEmailAndPassword(email,pass).catch(function(e){toast("Email o contraseña incorrectos",false);});
 }
 function logout(){auth.signOut();document.getElementById("btn-escala").style.display="none";}
 
