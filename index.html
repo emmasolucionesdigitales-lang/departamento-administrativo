@@ -2491,7 +2491,9 @@ firebase.initializeApp({apiKey:"AIzaSyD1CqN9t984CCgZsnxTYiv-DIexEVHj2t4",authDom
 const dbReposteria=firebase.app("reposteria").firestore();
 firebase.initializeApp({apiKey:"AIzaSyDJVMa5QMX-5Ldpm5uikNEvdYwLMaMh2eU",authDomain:"app-reparto-multiple.firebaseapp.com",projectId:"app-reparto-multiple",storageBucket:"app-reparto-multiple.firebasestorage.app",messagingSenderId:"568126542462",appId:"1:568126542462:web:e8071e9f287a7fcaf67e2f"},"repartomulti");
 const dbRepartoMulti=firebase.app("repartomulti").firestore();
-firebase.app("repartomulti").auth().signInAnonymously().catch(function(e){console.warn("Auth repartomulti:",e);});
+// (la sesión de repartomulti/kiosco/polleria para el admin se abre con
+// usuario y contraseña reales en loginGoogle(), no anónima — así las
+// reglas nuevas de esas 3 apps reconocen al admin y le dan acceso total.)
 
 /* ─── ESTADO GLOBAL ─── */
 var productoActivo="reparto";
@@ -2567,7 +2569,18 @@ function loginGoogle(){
   var email=document.getElementById("adminEmail")?document.getElementById("adminEmail").value:"";
   var pass=document.getElementById("adminPass")?document.getElementById("adminPass").value:"";
   if(!email||!pass){toast("Completá email y contraseña",false);return;}
-  auth.signInWithEmailAndPassword(email,pass).catch(function(e){toast("Email o contraseña incorrectos",false);});
+  auth.signInWithEmailAndPassword(email,pass).then(function(){
+    // Mismo usuario/contraseña, pero DENTRO de cada uno de estos otros
+    // proyectos (son bases de Firebase separadas — la sesión de acá no
+    // sirve allá). Hace falta crear el mismo usuario admin en cada uno
+    // desde la consola de Firebase (una sola vez). Si todavía no existe
+    // en alguno, esa app en particular queda sólo de lectura para vos
+    // hasta que lo crees — el resto del panel sigue funcionando.
+    ["repartomulti","kiosco","polleria"].forEach(function(nombreApp){
+      firebase.app(nombreApp).auth().signInWithEmailAndPassword(email,pass)
+        .catch(function(e){ console.warn("Admin sin cuenta todavía en "+nombreApp+":",e.code); });
+    });
+  }).catch(function(e){toast("Email o contraseña incorrectos",false);});
 }
 function logout(){auth.signOut();document.getElementById("btn-escala").style.display="none";}
 
