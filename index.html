@@ -2549,15 +2549,19 @@ function escHtmlBasico(s){return escHtml(s);}
 /* ─── AUTH ─── */
 // Guarda si cada proyecto secundario quedó (o no) con sesión de admin —
 // se usa para esperar antes de cargar datos y para avisar si alguno falló.
-// Reparto, Kiosco, Gestión, Pollería y Repostería se administran todos
-// desde la base de licencias compartida (con tu login normal del panel,
-// sin pasos extra). Repartos Múltiples es la ÚNICA app cuyos negocios
-// viven en su propio proyecto de Firebase — por eso es la única que
-// necesita esta sesión aparte.
-window.adminSecundarios = {repartomulti:null};
+// Día a día, cada app se administra desde la base de licencias
+// compartida, con tu login normal del panel — no hace falta nada más
+// para crear, editar, suspender o borrar clientes.
+//
+// Esta sesión aparte SOLO se usa para el botón "Resetear dispositivo":
+// cuando un cliente pierde el celular, hay que liberar la marca de
+// "dueño reclamado" (ownerAuthUid) que vive en el proyecto propio de
+// cada app — y eso exige tu cuenta real ahí. Son 5 proyectos (todos
+// menos Emma Control, que no usa este mecanismo).
+window.adminSecundarios = {repartomulti:null, kiosco:null, polleria:null, reparto:null, reposteria:null};
 
 function abrirSesionesSecundarias(email, pass) {
-  var nombres = ["repartomulti"];
+  var nombres = ["repartomulti","kiosco","polleria","reparto","reposteria"];
   return Promise.all(nombres.map(function(nombreApp){
     return firebase.app(nombreApp).auth().signInWithEmailAndPassword(email,pass)
       .then(function(){ window.adminSecundarios[nombreApp]=true; })
@@ -2570,15 +2574,19 @@ function abrirSesionesSecundarias(email, pass) {
 
 // Si la sesión ya estaba guardada de antes (recargaste la página sin
 // loguearte de nuevo), Firebase la restaura sola en el proyecto admin,
-// pero NO tenemos la contraseña para repetir el login en repartomulti
-// automáticamente. Si esa sesión secundaria también quedó guardada de
-// una vez anterior, se restaura sola; si nunca se estableció, hace
-// falta salir y volver a entrar una vez.
+// pero NO tenemos la contraseña para repetir el login en los otros 5
+// proyectos automáticamente. Las que ya quedaron guardadas de una vez
+// anterior se restauran solas; si nunca se establecieron, hace falta
+// salir y volver a entrar una vez.
 window.sesionesSecundariasListo = new Promise(function(resolve){
-  var unsub = firebase.app("repartomulti").auth().onAuthStateChanged(function(u){
-    unsub();
-    if(window.adminSecundarios.repartomulti===null) window.adminSecundarios.repartomulti = !!u;
-    resolve();
+  var nombres = ["repartomulti","kiosco","polleria","reparto","reposteria"];
+  var pendientes = nombres.length;
+  nombres.forEach(function(nombreApp){
+    var unsub = firebase.app(nombreApp).auth().onAuthStateChanged(function(u){
+      unsub();
+      if(window.adminSecundarios[nombreApp]===null) window.adminSecundarios[nombreApp] = !!u;
+      if(--pendientes<=0) resolve();
+    });
   });
 });
 
@@ -3170,7 +3178,14 @@ async function guardarEdicionRep(id){
   catch(e){toast(e.message,false);}
 }
 async function cambiarEstadoRep(id,estado){if(!confirm((estado==="inactivo"?"Desactivar":"Activar")+" esta licencia?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"Desactivada":"Activada");cargarTodo();}catch(e){toast(e.message,false);}}
-async function resetDispositivo(id){if(!confirm("Resetear dispositivo?"))return;try{await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
+async function resetDispositivo(id){
+  if(!confirm("Resetear dispositivo? Va a poder activar de nuevo desde un celular nuevo."))return;
+  try{
+    await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
+    try{await dbReparto.collection("users").doc(id).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}
+    toast("Dispositivo reseteado");cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
 async function eliminarLicenciaRep(id,nombre){if(!confirm("Eliminar licencia de "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Licencia eliminada");cargarTodo();}catch(e){toast(e.message,false);}}
 
 /* ─── KIOSCO ─── */
@@ -3240,7 +3255,17 @@ async function guardarEdicionKio(id){
 }
 async function eliminarKio(id){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
 async function suspenderKio(id,activo){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:activo?"activo":"inactivo"});toast(activo?"Activado":"Suspendido");cargarTodo();}catch(e){toast(e.message,false);}}
-async function resetDispositivoKio(id){if(!confirm("Resetear dispositivo?"))return;try{await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
+async function resetDispositivoKio(id){
+  if(!confirm("Resetear dispositivo? Va a poder activar de nuevo desde un celular nuevo."))return;
+  try{
+    var c=kioscoClientes.find(function(x){return x.id===id;});
+    await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
+    // Libera también la marca de "ya reclamado" en el negocio (si no,
+    // sigue rechazando la reactivación aunque la licencia ya esté libre).
+    if(c&&c.negocioId){try{await dbKiosco.collection("negocios").doc(c.negocioId).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}}
+    toast("Dispositivo reseteado");cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
 async function eliminarKioscoCliente(id,nombre){if(!confirm("Eliminar a "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminado");cargarTodo();}catch(e){toast(e.message,false);}}
 
 /* ─── EMMA CONTROL ─── */
@@ -3381,7 +3406,19 @@ function abrirEditarPoll(id){
 async function guardarEdicionPoll(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:document.getElementById("pe-nom").value.trim(),email:document.getElementById("pe-ema").value.trim(),celular:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,estado:document.getElementById("pe-activo").value==="1"?"activo":"inactivo"},dueno,cobro));toast("Polleria actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
 async function eliminarPoll(id){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
 async function suspenderPoll(id,activo){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:activo?"activo":"inactivo"});toast(activo?"Activada":"Suspendida");cargarTodo();}catch(e){toast(e.message,false);}}
-async function resetDispositivoPoll(id){if(!confirm("Resetear dispositivo?"))return;try{await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
+async function resetDispositivoPoll(id){
+  if(!confirm("Resetear dispositivo? Va a poder activar de nuevo desde un celular nuevo."))return;
+  try{
+    var c=polleriaClientes.find(function(x){return x.id===id;});
+    var deviceIdViejo=c?c.deviceId||"":"";
+    await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
+    // En Pollería el "dueño reclamado" se guarda en polleria/{deviceId} —
+    // hay que liberar justo ESE documento (el del dispositivo viejo),
+    // si no la reactivación se sigue rechazando.
+    if(deviceIdViejo){try{await dbPolleria.collection("polleria").doc(deviceIdViejo).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}}
+    toast("Dispositivo reseteado");cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
 
 /* ─── REPOSTERIA ─── */
 function abrirNuevaReposteria(){
@@ -3438,7 +3475,16 @@ function abrirEditarReposteria(id){
 }
 async function guardarEdicionReposteria(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbControl.collection("licencias").doc(id).update(Object.assign({pin:Number(document.getElementById("er-pin").value),negocio:document.getElementById("er-neg").value.trim(),email:document.getElementById("er-ema").value.trim(),celular:document.getElementById("er-cel").value.trim(),notas:document.getElementById("er-not").value.trim()},dueno,cobro));toast("Licencia actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
 async function cambiarEstadoReposteria(id,estado){var l=reposteriaLicencias.find(function(x){return x.id===id;});var n=l?l.negocio||id:id;if(!confirm((estado==="inactivo"?"Desactivar":"Activar")+" a "+n+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"Desactivada":"Activada");cargarTodo();}catch(e){toast(e.message,false);}}
-async function resetDispositivoReposteria(id){var l=reposteriaLicencias.find(function(x){return x.id===id;});var n=l?l.negocio||id:id;if(!confirm("Resetear dispositivo de "+n+"?"))return;try{await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
+async function resetDispositivoReposteria(id){
+  var l=reposteriaLicencias.find(function(x){return x.id===id;});var n=l?l.negocio||id:id;
+  if(!confirm("Resetear dispositivo de "+n+"?"))return;
+  try{
+    var deviceIdViejo=l?l.deviceId||"":"";
+    await dbControl.collection("licencias").doc(id).update({deviceId:"",estado:"activo"});
+    if(deviceIdViejo){try{await dbReposteria.collection("reposteria").doc(deviceIdViejo).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});}catch(e2){}}
+    toast("Dispositivo reseteado");cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
 async function eliminarLicenciaReposteria(id,nombre){if(!confirm("Eliminar licencia de "+nombre+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Licencia eliminada");cargarTodo();}catch(e){toast(e.message,false);}}
 
 /* ─── REPARTO MULTI ─── */
@@ -3510,7 +3556,23 @@ async function guardarEdicionMulti(id){
 }
 async function bloquearNegocioMulti(id,bloquear,nombre){if(!confirm((bloquear?"Bloquear":"Desbloquear")+" "+nombre+"?"))return;try{await dbRepartoMulti.collection("negocios").doc(id).update({bloqueado:bloquear});toast(bloquear?"Bloqueado":"Desbloqueado");cargarTodo();}catch(e){toast(e.message,false);}}
 async function eliminarNegocioMulti(id,nombre){if(!confirm("Eliminar negocio "+nombre+"? Esta accion no se puede deshacer."))return;try{var neg=repartoMultiNegocios.find(function(n){return n.id===id;});var pr=[];if(neg&&neg.repartidores)neg.repartidores.forEach(function(r){pr.push(dbRepartoMulti.collection("users").doc(r.uid).delete());});pr.push(dbRepartoMulti.collection("negocios").doc(id).delete());await Promise.all(pr);toast("Negocio eliminado");cargarTodo();}catch(e){toast(e.message,false);}}
-async function resetDispositivoMulti(id){var n=repartoMultiNegocios.find(function(x){return x.id===id;});var cod=n?n.codigoActivacion||"":id;if(!cod){toast("Sin codigo de licencia",false);return;}if(!confirm("Resetear dispositivo?"))return;try{await dbControl.collection("licencias").doc(cod).update({deviceId:"",estado:"activo"});toast("Dispositivo reseteado");cargarTodo();}catch(e){toast(e.message,false);}}
+async function resetDispositivoMulti(id){
+  var n=repartoMultiNegocios.find(function(x){return x.id===id;});
+  var cod=n?n.codigoActivacion||"":id;
+  if(!cod){toast("Sin codigo de licencia",false);return;}
+  if(!confirm("Resetear dispositivo del dueño? Va a poder activar de nuevo desde un celular nuevo."))return;
+  try{
+    // Dos cosas hay que liberar, no una sola: el dispositivo guardado en
+    // la licencia (para que la app deje poner el código de nuevo), Y el
+    // "ownerAuthUid" del negocio (la marca de "ya fue reclamado" que
+    // impide que cualquier otro se haga pasar por el dueño). Si sólo se
+    // limpia la licencia, la reactivación se sigue rechazando porque el
+    // negocio todavía figura como reclamado por el dispositivo viejo.
+    await dbControl.collection("licencias").doc(cod).update({deviceId:"",estado:"activo"});
+    await dbRepartoMulti.collection("negocios").doc(id).update({ownerAuthUid:firebase.firestore.FieldValue.delete()});
+    toast("Dispositivo reseteado");cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
 async function verRepartidores(negocioId){
   var neg=repartoMultiNegocios.find(function(n){return n.id===negocioId;});if(!neg)return;
   var repSnap=null;try{repSnap=await dbRepartoMulti.collection("negocios").doc(negocioId).collection("repartidores").get();}catch(e){}
