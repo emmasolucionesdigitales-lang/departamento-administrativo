@@ -2654,7 +2654,7 @@ async function repararCuentasFaltantes(){
     try{
       await firebase.app(nombreApp).auth().createUserWithEmailAndPassword(email, pass);
       window.adminSecundarios[nombreApp] = true;
-  }catch(e){
+    }catch(e){
       if(e.code==="auth/email-already-in-use"){
         try{
           await firebase.app(nombreApp).auth().sendPasswordResetEmail(email);
