@@ -2654,9 +2654,14 @@ async function repararCuentasFaltantes(){
     try{
       await firebase.app(nombreApp).auth().createUserWithEmailAndPassword(email, pass);
       window.adminSecundarios[nombreApp] = true;
-    }catch(e){
+  }catch(e){
       if(e.code==="auth/email-already-in-use"){
-        manual.push({app:nombreApp, motivo:"ya existe una cuenta con ese email pero con OTRA contraseña — borrala en Firebase Console → Authentication → Users y tocá 'Reparar' de nuevo."});
+        try{
+          await firebase.app(nombreApp).auth().sendPasswordResetEmail(email);
+          manual.push({app:nombreApp, motivo:"ya existe una cuenta con ese email pero con OTRA contraseña — te mandamos un mail para restablecerla: abrilo, poné la MISMA contraseña que usás para entrar a este panel, y la próxima vez que entres va a iniciar sesión sola (no hace falta tocar nada en Firebase Console)."});
+        }catch(e2){
+          manual.push({app:nombreApp, motivo:"ya existe una cuenta con ese email pero con OTRA contraseña, y no se pudo enviar el mail de recuperación ("+e2.code+") — como último recurso, borrala en Firebase Console → Authentication → Users y tocá 'Reparar' de nuevo."});
+        }
       } else if(e.code==="auth/operation-not-allowed"){
         manual.push({app:nombreApp, motivo:"falta habilitar 'Email/Password' en Firebase Console → Authentication → Sign-in method."});
       } else if(e.code==="auth/weak-password"){
