@@ -56,8 +56,7 @@ function renderMain(){
         '<div><h1>Emma Admin</h1><span>Panel de control</span></div>'+
       '</div>'+
       '<div class="header-actions">'+
-        '<button class="btn btn-sm" style="color:var(--c-8090a8)" onclick="abrirConfigMP()" title="MercadoPago">💳</button>'+
-        '<button class="btn btn-sm" onclick="cargarTodo()" title="Actualizar">↻</button>'+
+        '<button class="btn btn-sm" onclick="abrirConfiguracion()" title="Configuración">⚙️</button>'+
         '<button class="btn btn-sm" onclick="logout()">Salir</button>'+
       '</div>'+
     '</div>'+
@@ -65,6 +64,77 @@ function renderMain(){
     '<div class="screen">'+resumenCobrosMes()+bodyContent+'</div>';
 }
 function cambiarProducto(p){productoActivo=p;renderMain();}
+
+/* ─── CONFIGURACIÓN (apariencia, tamaño, MP, datos, backup) ─── */
+var TEMAS_INFO=[
+  {key:"dark-titanio",label:"Oscuro Titanio",icon:"🌑",preview:["#10141a","#4a9eff","#c0c8d0"]},
+  {key:"dark-medianoche",label:"Oscuro Medianoche",icon:"🌌",preview:["#0f0d1a","#8a72ff","#e4e0f5"]},
+  {key:"light-suave",label:"Claro Suave",icon:"☀️",preview:["#f4f6f9","#1a6fd4","#1b2330"]},
+  {key:"light-contraste",label:"Claro Contraste",icon:"⚡",preview:["#ffffff","#0052cc","#000000"]}
+];
+function abrirConfiguracion(){
+  var swatches=TEMAS_INFO.map(function(t){
+    var activo=temaActual===t.key;
+    var dots=t.preview.map(function(c){return '<span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+c+';border:1px solid rgba(128,128,128,0.35)"></span>';}).join("");
+    return '<div onclick="elegirTema(\''+t.key+'\')" style="cursor:pointer;border:1px solid '+(activo?'var(--c-4a9eff)':'var(--c-2a3040)')+';background:var(--c-181e26);border-radius:6px;padding:10px 8px;text-align:center;position:relative">'+
+      (activo?'<span style="position:absolute;top:4px;right:6px;font-size:0.65rem;color:var(--c-4a9eff)">✓</span>':'')+
+      '<div style="font-size:1.1rem;margin-bottom:4px">'+t.icon+'</div>'+
+      '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:6px">'+dots+'</div>'+
+      '<div style="font-size:0.68rem;color:var(--c-9090a8);text-transform:uppercase;letter-spacing:0.04em">'+t.label+'</div>'+
+    '</div>';
+  }).join("");
+  var escalas=["S","M","L","XL"].map(function(s){
+    var activo=escalaActual===s;
+    return '<button class="btn'+(activo?' btn-primary':'')+' btn-sm" style="flex:1" onclick="elegirEscala(\''+s+'\')">'+s+'</button>';
+  }).join("");
+  document.getElementById("modal-container").innerHTML=
+    '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
+      '<h2 style="font-size:1rem;font-weight:600;color:var(--c-c0c8d0);margin-bottom:16px;letter-spacing:0.06em;text-transform:uppercase">⚙️ Configuración</h2>'+
+
+      '<label>Apariencia</label>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'+swatches+'</div>'+
+
+      '<label>Tamaño de texto</label>'+
+      '<div style="display:flex;gap:6px;margin-bottom:16px">'+escalas+'</div>'+
+
+      '<label>Cuenta y cobros</label>'+
+      '<button class="btn" style="width:100%;margin-bottom:8px;text-align:left" onclick="abrirConfigMP()">💳 Configurar MercadoPago</button>'+
+
+      '<label>Datos</label>'+
+      '<button class="btn" style="width:100%;margin-bottom:8px;text-align:left" onclick="actualizarDesdeConfig()">↻ Actualizar datos</button>'+
+      '<button class="btn" style="width:100%;margin-bottom:16px;text-align:left" onclick="generarBackup()">💾 Descargar backup (JSON)</button>'+
+
+      '<button class="btn" style="width:100%" onclick="cerrarModalBtn()">Cerrar</button>'+
+    '</div></div>';
+}
+function elegirTema(k){aplicarTema(k);abrirConfiguracion();}
+function elegirEscala(s){aplicarEscala(s);abrirConfiguracion();}
+function actualizarDesdeConfig(){cerrarModalBtn();cargarTodo();toast("Actualizando datos...");}
+function generarBackup(){
+  var payload={
+    generado:new Date().toISOString(),
+    origen:"Emma Admin",
+    reparto:licencias,
+    repartomulti:repartoMultiNegocios,
+    kiosco:kioscoClientes,
+    gestion:gestionUsuarios,
+    polleria:polleriaClientes,
+    reposteria:reposteriaLicencias
+  };
+  try{
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    var fecha=new Date().toISOString().slice(0,16).replace(/[-:T]/g,"").replace(/^(\d{8})(\d{4})$/,"$1-$2");
+    a.href=url;a.download="backup-emma-admin-"+fecha+".json";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+    toast("Backup descargado");
+    cerrarModalBtn();
+  }catch(e){
+    toast("No se pudo generar el backup: "+(e.message||""),false);
+  }
+}
 
 /* ─── HELPERS ─── */
 function toSlug(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}

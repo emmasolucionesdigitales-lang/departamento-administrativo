@@ -6,19 +6,24 @@ function aplicarEscala(s){escalaActual=s;document.documentElement.style.fontSize
 function ciclarEscala(){var idx=ORDEN_ESCALA.indexOf(escalaActual);aplicarEscala(ORDEN_ESCALA[(idx+1)%ORDEN_ESCALA.length]);}
 aplicarEscala(escalaActual);
 
-/* ─── APARIENCIA (claro / oscuro) ─── */
-var COLOR_META_TEMA={dark:"#181e26",light:"#ffffff"};
-var temaActual=localStorage.getItem("adminTema")||"dark";
+/* ─── APARIENCIA (4 temas: 2 oscuros + 2 claros) ─── */
+var TEMAS_VALIDOS=["dark-titanio","dark-medianoche","light-suave","light-contraste"];
+var COLOR_META_TEMA={"dark-titanio":"#181e26","dark-medianoche":"#1a1630","light-suave":"#ffffff","light-contraste":"#ffffff"};
+// Migración de la versión anterior (solo claro/oscuro) a las 4 variantes nuevas.
+var temaGuardado=localStorage.getItem("adminTema")||"dark-titanio";
+if(temaGuardado==="dark")temaGuardado="dark-titanio";
+if(temaGuardado==="light")temaGuardado="light-suave";
+var temaActual=TEMAS_VALIDOS.indexOf(temaGuardado)>=0?temaGuardado:"dark-titanio";
 function aplicarTema(t){
-  temaActual=(t==="light")?"light":"dark";
+  temaActual=TEMAS_VALIDOS.indexOf(t)>=0?t:"dark-titanio";
   document.documentElement.setAttribute("data-theme",temaActual);
   var btn=document.getElementById("btn-tema");
-  if(btn)btn.textContent=(temaActual==="light")?"☀️":"🌙";
+  if(btn)btn.textContent=(temaActual.indexOf("light")===0)?"☀️":"🌙";
   var meta=document.getElementById("meta-theme-color");
   if(meta)meta.setAttribute("content",COLOR_META_TEMA[temaActual]);
   localStorage.setItem("adminTema",temaActual);
 }
-function ciclarTema(){aplicarTema(temaActual==="dark"?"light":"dark");}
+function ciclarTema(){aplicarTema(TEMAS_VALIDOS[(TEMAS_VALIDOS.indexOf(temaActual)+1)%TEMAS_VALIDOS.length]);}
 aplicarTema(temaActual);
 
 /* ─── FIREBASE ADMIN ─── */
@@ -139,9 +144,14 @@ window.sesionesSecundariasListo = new Promise(function(resolve){
 
 auth.onAuthStateChanged(async function(user){
   var btn=document.getElementById("btn-escala");
-  if(!user){if(btn)btn.style.display="none";renderLogin("");return;}
+  var btnTema=document.getElementById("btn-tema");
+  // Los botones flotantes de tamaño/apariencia solo se muestran en la
+  // pantalla de login — una vez logueado, esas opciones viven dentro
+  // del botón ⚙️ Configuración del header.
+  if(!user){if(btn)btn.style.display="flex";if(btnTema)btnTema.style.display="flex";renderLogin("");return;}
   if(user.uid!==ADMIN_UID){auth.signOut();renderLogin("Acceso denegado.");return;}
-  if(btn)btn.style.display="flex";
+  if(btn)btn.style.display="none";
+  if(btnTema)btnTema.style.display="none";
   // Espera a que las sesiones secundarias terminen de resolverse (recién
   // logueadas ahora, o restauradas de una sesión guardada) ANTES de
   // cargar los datos — así ninguna pestaña se queda en blanco por haber
