@@ -90,9 +90,9 @@ function mostrarModalQR(tipo,nombre,codigo,url){
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal" style="text-align:center">'+
       '<div class="modal-drag"></div>'+
       '<h2 style="font-size:0.95rem;font-weight:600;color:'+cfg.color+';margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">QR de acceso \u00b7 '+cfg.label+'</h2>'+
-      '<p style="font-family:monospace;font-size:0.8rem;color:#506070;margin-bottom:14px">'+escHtml(nombre||"")+' \u00b7 '+escHtml(codigo||"")+'</p>'+
+      '<p style="font-family:monospace;font-size:0.8rem;color:var(--c-506070);margin-bottom:14px">'+escHtml(nombre||"")+' \u00b7 '+escHtml(codigo||"")+'</p>'+
       '<div id="qr-canvas-wrap" style="display:flex;justify-content:center;margin-bottom:14px;background:#fff;padding:14px;border-radius:8px"></div>'+
-      '<p style="font-size:0.68rem;color:#3a4a58;word-break:break-all;font-family:monospace;margin-bottom:14px">'+escHtml(url)+'</p>'+
+      '<p style="font-size:0.68rem;color:var(--c-3a4a58);word-break:break-all;font-family:monospace;margin-bottom:14px">'+escHtml(url)+'</p>'+
       '<div style="display:flex;gap:8px">'+
         '<button class="btn btn-primary" style="flex:1" id="btn-descargar-qr">\u2b07 Descargar</button>'+
         '<button class="btn" style="flex:1" id="btn-copiar-qr">Copiar link</button>'+
@@ -126,8 +126,8 @@ function abrirNuevaRep(){
   var cod=genCodigo("SR"),pin=genPin();
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#4a9eff;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Reparto</h2>'+
-      '<label>Codigo</label><input id="m-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:#4a9eff"/>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-4a9eff);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Reparto</h2>'+
+      '<label>Codigo</label><input id="m-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:var(--c-4a9eff)"/>'+
       '<label>PIN</label><input id="m-pin" type="number" value="'+pin+'"/>'+
       '<label>Negocio</label><input id="m-neg" placeholder="Distribuidora El Sol"/>'+
       '<label>Email</label><input id="m-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
@@ -135,7 +135,7 @@ function abrirNuevaRep(){
       camposDueno(null)+
       '<label>Notas (opcional)</label><input id="m-notas" placeholder="Plan mensual"/>'+
       '<label>Vencimiento (opcional)</label><input id="m-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba(&apos;m-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace;letter-spacing:0.06em">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;m-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:var(--c-081a10);color:var(--c-4dd9a0);font-size:0.85rem;cursor:pointer;font-family:monospace;letter-spacing:0.06em">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" style="flex:1" onclick="crearLicenciaRep()">Crear</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
@@ -165,8 +165,8 @@ function abrirEditarRep(id){
   var l=licencias.find(function(x){return x.id===id;});if(!l)return;
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#4a9eff;margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Editar Reparto</h2>'+
-      '<p style="font-family:monospace;font-size:0.85rem;color:#4a9eff;margin-bottom:14px">'+l.id+'</p>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-4a9eff);margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Editar Reparto</h2>'+
+      '<p style="font-family:monospace;font-size:0.85rem;color:var(--c-4a9eff);margin-bottom:14px">'+l.id+'</p>'+
       '<label>PIN</label><input id="e-pin" type="number" value="'+(l.pin||"")+'"/>'+
       '<label>Negocio</label><input id="e-neg" value="'+(l.negocio||"")+'"/>'+
       '<label>Email</label><input id="e-ema" type="email" value="'+(l.email||"")+'"/>'+
@@ -203,8 +203,8 @@ function abrirNuevoKio(){
   var cod=genCodigo("KI"),pin=genPin();
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#a070ff;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Kiosco</h2>'+
-      '<label>Codigo</label><input id="k-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:#a070ff"/>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-a070ff);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Kiosco</h2>'+
+      '<label>Codigo</label><input id="k-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:var(--c-a070ff)"/>'+
       '<label>PIN</label><input id="k-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label><input id="k-nom" placeholder="Kiosco El Sol"/>'+
       '<label>ID unico</label><input id="k-id" placeholder="kiosco-el-sol"/>'+
@@ -213,7 +213,7 @@ function abrirNuevoKio(){
       camposDueno(null)+
       '<label>Plan</label><select id="k-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Vencimiento</label><input id="k-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba(&apos;k-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;k-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:var(--c-081a10);color:var(--c-4dd9a0);font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-purple" style="flex:1" onclick="crearClienteKio()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';

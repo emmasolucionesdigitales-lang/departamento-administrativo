@@ -23,7 +23,7 @@ function abrirEditarPoll(id){
   var c=polleriaClientes.find(function(x){return x.id===id;});if(!c)return;
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#f5a442;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Polleria</h2>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-f5a442);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Polleria</h2>'+
       '<label>Nombre</label><input id="pe-nom" value="'+(c.negocio||"")+'"/>'+
       '<label>Email</label><input id="pe-ema" type="email" value="'+(c.email||"")+'"/>'+
       '<label>Telefono</label><input id="pe-tel" type="tel" value="'+(c.celular||"")+'"/>'+
@@ -63,8 +63,8 @@ function abrirNuevaReposteria(){
   var cod=genCodigo("RE"),pin=genPin();
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#f5a0c8;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Reposteria</h2>'+
-      '<label>Codigo</label><input id="mr-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:#f5a0c8"/>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-f5a0c8);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Reposteria</h2>'+
+      '<label>Codigo</label><input id="mr-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:var(--c-f5a0c8)"/>'+
       '<label>PIN</label><input id="mr-pin" type="number" value="'+pin+'"/>'+
       '<label>Negocio / Cliente</label><input id="mr-neg" placeholder="Dulce Gestion de Maria"/>'+
       '<label>Email</label><input id="mr-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
@@ -72,7 +72,7 @@ function abrirNuevaReposteria(){
       camposDueno(null)+
       '<label>Notas</label><input id="mr-notas" placeholder="Plan mensual"/>'+
       '<label>Vencimiento</label><input id="mr-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba(&apos;mr-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;mr-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:var(--c-081a10);color:var(--c-4dd9a0);font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-pink" style="flex:1" onclick="crearLicenciaReposteria()">Crear licencia</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
@@ -99,8 +99,8 @@ function abrirEditarReposteria(id){
   var l=reposteriaLicencias.find(function(x){return x.id===id;});if(!l)return;
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#f5a0c8;margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Editar Reposteria</h2>'+
-      '<p style="font-family:monospace;font-size:0.85rem;color:#f5a0c8;margin-bottom:14px">'+l.id+'</p>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-f5a0c8);margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Editar Reposteria</h2>'+
+      '<p style="font-family:monospace;font-size:0.85rem;color:var(--c-f5a0c8);margin-bottom:14px">'+l.id+'</p>'+
       '<label>PIN</label><input id="er-pin" type="number" value="'+(l.pin||"")+'"/>'+
       '<label>Negocio / Cliente</label><input id="er-neg" value="'+(l.negocio||"")+'"/>'+
       '<label>Email</label><input id="er-ema" type="email" value="'+(l.email||"")+'"/>'+
@@ -136,8 +136,8 @@ function abrirNuevoRepartoMulti(){
   var cod=genCodigo("RM"),pin=genPin();
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#5dffee;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nuevo Reparto Multi</h2>'+
-      '<label>Codigo</label><input id="rm-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:#5dffee"/>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-5dffee);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nuevo Reparto Multi</h2>'+
+      '<label>Codigo</label><input id="rm-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:var(--c-5dffee)"/>'+
       '<label>PIN</label><input id="rm-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label><input id="rm-nom" placeholder="Distribuidora La Catalina"/>'+
       '<label>Email del dueno</label><input id="rm-ema" type="email" placeholder="dueno@ejemplo.com"/>'+
@@ -145,9 +145,9 @@ function abrirNuevoRepartoMulti(){
       camposDueno(null)+
       '<label>Notas</label><input id="rm-notas" placeholder="Plan mensual"/>'+
       '<label>Vencimiento</label><input id="rm-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba(&apos;rm-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;rm-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:var(--c-081a10);color:var(--c-4dd9a0);font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
-      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1;background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="crearNuevoRepartoMulti()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1;background:var(--c-0a2028);color:var(--c-5dffee);border-color:#5dffee40" onclick="crearNuevoRepartoMulti()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function crearNuevoRepartoMulti(){

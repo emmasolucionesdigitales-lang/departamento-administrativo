@@ -6,6 +6,21 @@ function aplicarEscala(s){escalaActual=s;document.documentElement.style.fontSize
 function ciclarEscala(){var idx=ORDEN_ESCALA.indexOf(escalaActual);aplicarEscala(ORDEN_ESCALA[(idx+1)%ORDEN_ESCALA.length]);}
 aplicarEscala(escalaActual);
 
+/* ─── APARIENCIA (claro / oscuro) ─── */
+var COLOR_META_TEMA={dark:"#181e26",light:"#ffffff"};
+var temaActual=localStorage.getItem("adminTema")||"dark";
+function aplicarTema(t){
+  temaActual=(t==="light")?"light":"dark";
+  document.documentElement.setAttribute("data-theme",temaActual);
+  var btn=document.getElementById("btn-tema");
+  if(btn)btn.textContent=(temaActual==="light")?"☀️":"🌙";
+  var meta=document.getElementById("meta-theme-color");
+  if(meta)meta.setAttribute("content",COLOR_META_TEMA[temaActual]);
+  localStorage.setItem("adminTema",temaActual);
+}
+function ciclarTema(){aplicarTema(temaActual==="dark"?"light":"dark");}
+aplicarTema(temaActual);
+
 /* ─── FIREBASE ADMIN ─── */
 const ADMIN_UID="A10EnUcd3ngbzmFNwWgSFuWj1OR2";
 firebase.initializeApp({apiKey:"AIzaSyAFQ4ybqIoVV3rWe1FMjMVUZ-qzLNZbdBk",authDomain:"app-control-de-apps.firebaseapp.com",projectId:"app-control-de-apps",storageBucket:"app-control-de-apps.firebasestorage.app",messagingSenderId:"761424199819",appId:"1:761424199819:web:513eeaf0e54f4e1401d48e"},"admin");
@@ -38,14 +53,14 @@ var RECARGO_PCT=15,DIA_RECARGO=5,DIA_SUSPENSION=10;
 /* ─── CONFIGURACION POR APP ─── */
 function getAppConfig(tipo){
   var cfg={
-    reparto:{color:"#4a9eff",colorBg:"#0a1a2e",colorBorder:"#4a9eff50",icon:"🚚",label:"Reparto",firebase:"app-control-de-apps",prefijo:"SR"},
-    repartomulti:{color:"#5dffee",colorBg:"#0a2028",colorBorder:"#5dffee50",icon:"🚛",label:"Reparto Multi",firebase:"app-reparto-multiple",prefijo:"RM"},
-    kiosco:{color:"#a070ff",colorBg:"#18102e",colorBorder:"#a070ff50",icon:"🏪",label:"Kiosco",firebase:"app-kiosco-c9482",prefijo:"KI"},
-    gestion:{color:"#4dd9a0",colorBg:"#0a2018",colorBorder:"#4dd9a050",icon:"💰",label:"Emma Control",firebase:"sistema-de-gestion-diario",prefijo:"EC"},
-    polleria:{color:"#f5a442",colorBg:"#201400",colorBorder:"#f5a44250",icon:"🍗",label:"Pollería",firebase:"app-polleria-f349b",prefijo:"PO"},
-    reposteria:{color:"#f5a0c8",colorBg:"#200818",colorBorder:"#f5a0c850",icon:"🎂",label:"Repostería",firebase:"app-reposteria-7e31e",prefijo:"RE"}
+    reparto:{color:"var(--c-4a9eff)",colorBg:"var(--c-0a1a2e)",colorBorder:"#4a9eff50",icon:"🚚",label:"Reparto",firebase:"app-control-de-apps",prefijo:"SR"},
+    repartomulti:{color:"var(--c-5dffee)",colorBg:"var(--c-0a2028)",colorBorder:"#5dffee50",icon:"🚛",label:"Reparto Multi",firebase:"app-reparto-multiple",prefijo:"RM"},
+    kiosco:{color:"var(--c-a070ff)",colorBg:"var(--c-18102e)",colorBorder:"#a070ff50",icon:"🏪",label:"Kiosco",firebase:"app-kiosco-c9482",prefijo:"KI"},
+    gestion:{color:"var(--c-4dd9a0)",colorBg:"var(--c-0a2018)",colorBorder:"#4dd9a050",icon:"💰",label:"Emma Control",firebase:"sistema-de-gestion-diario",prefijo:"EC"},
+    polleria:{color:"var(--c-f5a442)",colorBg:"var(--c-201400)",colorBorder:"#f5a44250",icon:"🍗",label:"Pollería",firebase:"app-polleria-f349b",prefijo:"PO"},
+    reposteria:{color:"var(--c-f5a0c8)",colorBg:"var(--c-200818)",colorBorder:"#f5a0c850",icon:"🎂",label:"Repostería",firebase:"app-reposteria-7e31e",prefijo:"RE"}
   };
-  return cfg[tipo]||{color:"#c0c8d0",colorBg:"#181e26",colorBorder:"#3a4050",icon:"📋",label:tipo,firebase:"—",prefijo:"??"}
+  return cfg[tipo]||{color:"var(--c-c0c8d0)",colorBg:"var(--c-181e26)",colorBorder:"var(--c-3a4050)",icon:"📋",label:tipo,firebase:"—",prefijo:"??"}
 }
 
 /* ─── NORMALIZAR CAMPOS POR APP ─── */
@@ -74,7 +89,7 @@ function getLicenciaFields(item,tipo){
 }
 
 /* ─── TOAST ─── */
-function toast(msg,ok){var t=document.getElementById("toast");t.textContent=msg;t.style.background=(ok===false)?"#1a0808":"#181e26";t.style.borderColor=(ok===false)?"#d06060":"#4a9eff";t.style.color=(ok===false)?"#d06060":"#4a9eff";t.style.opacity="1";setTimeout(function(){t.style.opacity="0";},3000);}
+function toast(msg,ok){var t=document.getElementById("toast");t.textContent=msg;t.style.background=(ok===false)?"var(--c-1a0808)":"var(--c-181e26)";t.style.borderColor=(ok===false)?"var(--c-d06060)":"var(--c-4a9eff)";t.style.color=(ok===false)?"var(--c-d06060)":"var(--c-4a9eff)";t.style.opacity="1";setTimeout(function(){t.style.opacity="0";},3000);}
 function escHtml(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/'/g,"&#39;").replace(/"/g,"&quot;");}
 function escHtmlBasico(s){return escHtml(s);}
 
@@ -172,14 +187,14 @@ function renderBannerCuentas(faltantes, resultado){
   var lista = faltantes.map(function(k){ return NOMBRES_APP_LEGIBLE[k]||k; }).join(", ");
   var detalle = "";
   if(resultado && resultado.manual && resultado.manual.length){
-    detalle = '<div style="margin-top:6px;font-size:0.78rem;color:#f0b060">'+
+    detalle = '<div style="margin-top:6px;font-size:0.78rem;color:var(--c-f0b060)">'+
       resultado.manual.map(function(m){ return "• "+(NOMBRES_APP_LEGIBLE[m.app]||m.app)+": "+m.motivo; }).join("<br>") +
       '</div>';
   }
   el.innerHTML =
-    '<div style="background:#1a1400;border-bottom:1px solid #c0a060;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;font-family:monospace">'+
-      '<span style="color:#e0c080;font-size:0.82rem">Falta tu cuenta admin en: <b>'+lista+'</b></span>'+
-      '<button onclick="repararCuentasFaltantes()" style="background:#c0a060;color:#181000;border:none;border-radius:4px;padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:monospace">🔧 Reparar automáticamente</button>'+
+    '<div style="background:var(--c-1a1400);border-bottom:1px solid var(--c-c0a060);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;font-family:monospace">'+
+      '<span style="color:var(--c-e0c080);font-size:0.82rem">Falta tu cuenta admin en: <b>'+lista+'</b></span>'+
+      '<button onclick="repararCuentasFaltantes()" style="background:var(--c-c0a060);color:var(--c-181000);border:none;border-radius:4px;padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:monospace">🔧 Reparar automáticamente</button>'+
     '</div>' + detalle;
 }
 

@@ -2,7 +2,7 @@ function abrirEditarMulti(id){
   var n=repartoMultiNegocios.find(function(x){return x.id===id;});if(!n)return;
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#5dffee;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Reparto Multi</h2>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-5dffee);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Reparto Multi</h2>'+
       '<label>Nombre</label><input id="em-nom" value="'+(n.nombre||"")+'"/>'+
       '<label>Email</label><input id="em-ema" type="email" value="'+(n.ownerEmail||"")+'"/>'+
       '<label>Celular</label><input id="em-cel" type="tel" value="'+(n.celular&&n.celular!=="—"?n.celular:"")+'"/>'+
@@ -11,7 +11,7 @@ function abrirEditarMulti(id){
       '<label>Codigo</label><input id="em-cod" value="'+(n.codigoActivacion||"")+'"/>'+
       '<label>PIN</label><input id="em-pin" type="number" value="'+(n.pin||"")+'"/>'+
       camposCobro(n)+
-      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1;background:#0a2028;color:#5dffee;border-color:#5dffee40" onclick="guardarEdicionMulti(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
+      '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" style="flex:1;background:var(--c-0a2028);color:var(--c-5dffee);border-color:#5dffee40" onclick="guardarEdicionMulti(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
 async function guardarEdicionMulti(id){
@@ -49,14 +49,14 @@ async function verRepartidores(negocioId){
   var neg=repartoMultiNegocios.find(function(n){return n.id===negocioId;});if(!neg)return;
   var repSnap=null;try{repSnap=await dbRepartoMulti.collection("negocios").doc(negocioId).collection("repartidores").get();}catch(e){}
   var lista=(repSnap&&!repSnap.empty)?repSnap.docs.map(function(d){return Object.assign({uid:d.id},d.data());}):(neg.repartidores||[]);
-  var filas=lista.length===0?'<p style="color:#3a4a58;font-size:0.82rem;text-align:center;padding:16px;font-family:monospace">Sin repartidores</p>':lista.map(function(r){
+  var filas=lista.length===0?'<p style="color:var(--c-3a4a58);font-size:0.82rem;text-align:center;padding:16px;font-family:monospace">Sin repartidores</p>':lista.map(function(r){
     var bl=r.bloqueado===true;
     var rn=escHtml(r.nombre||"");
     var uid=r.uid||"";
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e242e">
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--c-1e242e)">
       <div>
-        <div style="font-weight:500;color:#c0c8d0;font-size:0.88rem">${r.nombre||"Sin nombre"}${bl?'<span style="background:#1a0808;color:#d06060;font-size:0.65rem;padding:1px 6px;border-radius:3px;margin-left:6px;border:1px solid #d0606050">BLOQ</span>':""}</div>
-        <div style="font-size:0.75rem;color:#506070;font-family:monospace">${r.email||"—"}</div>
+        <div style="font-weight:500;color:var(--c-c0c8d0);font-size:0.88rem">${r.nombre||"Sin nombre"}${bl?'<span style="background:var(--c-1a0808);color:var(--c-d06060);font-size:0.65rem;padding:1px 6px;border-radius:3px;margin-left:6px;border:1px solid #d0606050">BLOQ</span>':""}</div>
+        <div style="font-size:0.75rem;color:var(--c-506070);font-family:monospace">${r.email||"—"}</div>
       </div>
       <div style="display:flex;gap:5px">
         ${bl
@@ -69,8 +69,8 @@ async function verRepartidores(negocioId){
   
 document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#5dffee;margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Repartidores</h2>'+
-      '<p style="font-family:monospace;font-size:0.82rem;color:#5dffee;margin-bottom:14px">'+escHtml(neg.nombre)+'</p>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-5dffee);margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Repartidores</h2>'+
+      '<p style="font-family:monospace;font-size:0.82rem;color:var(--c-5dffee);margin-bottom:14px">'+escHtml(neg.nombre)+'</p>'+
       filas+
       '<button class="btn" style="width:100%;margin-top:12px" onclick="cerrarModalBtn()">Cerrar</button>'+
     '</div></div>';
@@ -86,25 +86,25 @@ function abrirCobrar(tipo,id){
   var f=getLicenciaFields(c,tipo);
   var nombre=f.negocio||id;
   var hist=(c.historialPagos||[]).slice(-5).reverse();
-  var histHtml=hist.length===0?'<p style="color:#3a4a58;font-size:0.8rem;text-align:center;padding:10px;font-family:monospace">Sin pagos registrados</p>':hist.map(function(p){return'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1e242e;font-size:0.8rem"><span style="color:#506070;font-family:monospace">'+formatFecha(p.fecha)+'</span><span style="color:#4dd9a0;font-weight:700;font-family:monospace">$'+Number(p.monto).toLocaleString("es-AR")+'</span><span style="color:#506070;font-family:monospace">'+(p.via||"Manual")+'</span></div>';}).join("");
+  var histHtml=hist.length===0?'<p style="color:var(--c-3a4a58);font-size:0.8rem;text-align:center;padding:10px;font-family:monospace">Sin pagos registrados</p>':hist.map(function(p){return'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--c-1e242e);font-size:0.8rem"><span style="color:var(--c-506070);font-family:monospace">'+formatFecha(p.fecha)+'</span><span style="color:var(--c-4dd9a0);font-weight:700;font-family:monospace">$'+Number(p.monto).toLocaleString("es-AR")+'</span><span style="color:var(--c-506070);font-family:monospace">'+(p.via||"Manual")+'</span></div>';}).join("");
   var montoFinal=ec.montoFinal||0;
   var estadoBox="";
-  if(ec.estado==="al_dia")estadoBox='<div style="background:#081a10;border:1px solid #4dd9a050;border-radius:4px;padding:10px;margin-bottom:12px;text-align:center;color:#4dd9a0;font-family:monospace;font-size:0.85rem">PAGO REGISTRADO ESTE MES</div>';
-  else if(ec.estado==="pendiente")estadoBox='<div style="background:#1a2000;border:1px solid #c8e01a50;border-radius:4px;padding:10px;margin-bottom:12px;color:#c8e01a;font-family:monospace;font-size:0.82rem">PENDIENTE · Sin recargo hasta dia '+DIA_RECARGO+' · $'+montoFinal.toLocaleString("es-AR")+'</div>';
-  else if(ec.estado==="con_recargo")estadoBox='<div style="background:#201400;border:1px solid #f5a44250;border-radius:4px;padding:10px;margin-bottom:12px;color:#f5a442;font-family:monospace;font-size:0.82rem">CON RECARGO +'+RECARGO_PCT+'% · $'+montoFinal.toLocaleString("es-AR")+'</div>';
-  else estadoBox='<div style="background:#1a0808;border:1px solid #d0606050;border-radius:4px;padding:10px;margin-bottom:12px;color:#d06060;font-family:monospace;font-size:0.82rem">VENCIDO — SUSPENDER ACCESO · $'+montoFinal.toLocaleString("es-AR")+'</div>';
+  if(ec.estado==="al_dia")estadoBox='<div style="background:var(--c-081a10);border:1px solid #4dd9a050;border-radius:4px;padding:10px;margin-bottom:12px;text-align:center;color:var(--c-4dd9a0);font-family:monospace;font-size:0.85rem">PAGO REGISTRADO ESTE MES</div>';
+  else if(ec.estado==="pendiente")estadoBox='<div style="background:var(--c-1a2000);border:1px solid #c8e01a50;border-radius:4px;padding:10px;margin-bottom:12px;color:var(--c-c8e01a);font-family:monospace;font-size:0.82rem">PENDIENTE · Sin recargo hasta dia '+DIA_RECARGO+' · $'+montoFinal.toLocaleString("es-AR")+'</div>';
+  else if(ec.estado==="con_recargo")estadoBox='<div style="background:var(--c-201400);border:1px solid #f5a44250;border-radius:4px;padding:10px;margin-bottom:12px;color:var(--c-f5a442);font-family:monospace;font-size:0.82rem">CON RECARGO +'+RECARGO_PCT+'% · $'+montoFinal.toLocaleString("es-AR")+'</div>';
+  else estadoBox='<div style="background:var(--c-1a0808);border:1px solid #d0606050;border-radius:4px;padding:10px;margin-bottom:12px;color:var(--c-d06060);font-family:monospace;font-size:0.82rem">VENCIDO — SUSPENDER ACCESO · $'+montoFinal.toLocaleString("es-AR")+'</div>';
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
       '<h2 style="font-size:0.95rem;font-weight:600;color:'+cfg.color+';margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Cobrar</h2>'+
-      '<p style="font-family:monospace;font-size:0.82rem;color:#506070;margin-bottom:12px">'+escHtml(nombre)+'</p>'+
+      '<p style="font-family:monospace;font-size:0.82rem;color:var(--c-506070);margin-bottom:12px">'+escHtml(nombre)+'</p>'+
       estadoBox+
       '<label>Monto a registrar ($)</label><input id="cobro-monto" type="number" value="'+montoFinal+'"/>'+
       '<div style="display:flex;gap:8px;margin-bottom:12px">'+
         `<button class="btn btn-success" style="flex:1" onclick="marcarPagado('${tipo}','${id}')">Marcar pagado</button>`+
-        `<button class="btn" style="background:#0a1a2e;color:#4a9eff;border-color:#4a9eff30;flex:1" onclick="verificarPagoMP('${tipo}','${id}')">Verificar MP</button>`+
+        `<button class="btn" style="background:var(--c-0a1a2e);color:var(--c-4a9eff);border-color:#4a9eff30;flex:1" onclick="verificarPagoMP('${tipo}','${id}')">Verificar MP</button>`+
       '</div>'+
       (ec.estado==="suspender"?`<button class="btn btn-danger" style="width:100%;margin-bottom:10px" onclick="suspenderPorPago('${tipo}','${id}')">Suspender acceso ahora</button>`:'')+ 
-      '<div style="border-top:1px solid #2a3040;padding-top:10px"><p style="font-size:0.72rem;color:#506070;margin-bottom:8px;font-family:monospace;text-transform:uppercase;letter-spacing:0.06em">Ultimos pagos</p>'+histHtml+'</div>'+
+      '<div style="border-top:1px solid var(--c-2a3040);padding-top:10px"><p style="font-size:0.72rem;color:var(--c-506070);margin-bottom:8px;font-family:monospace;text-transform:uppercase;letter-spacing:0.06em">Ultimos pagos</p>'+histHtml+'</div>'+
       '<button class="btn" style="width:100%;margin-top:10px" onclick="cerrarModalBtn()">Cerrar</button>'+
     '</div></div>';
 }

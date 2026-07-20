@@ -1,23 +1,23 @@
 
 /* ─── LOGO SVG ─── */
-function logoSVG(size){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="'+size+'" height="'+size+'" style="flex-shrink:0"><line x1="12" y1="16" x2="34" y2="38" stroke="#4a9eff" stroke-width="2" opacity="0.4"/><line x1="76" y1="16" x2="54" y2="38" stroke="#4a9eff" stroke-width="2" opacity="0.4"/><line x1="12" y1="72" x2="34" y2="50" stroke="#8090a8" stroke-width="2" opacity="0.4"/><line x1="76" y1="72" x2="54" y2="50" stroke="#8090a8" stroke-width="2" opacity="0.4"/><circle cx="10" cy="14" r="6" fill="#4a9eff"/><circle cx="78" cy="14" r="6" fill="#8090a8"/><circle cx="10" cy="74" r="6" fill="#8090a8"/><circle cx="78" cy="74" r="6" fill="#4a9eff"/><circle cx="44" cy="44" r="20" fill="#181e26" stroke="#4a9eff" stroke-width="1"/><rect x="34" y="35" width="14" height="2.5" rx="1" fill="#c0c8d0"/><rect x="34" y="43" width="10" height="2.5" rx="1" fill="#c0c8d0"/><rect x="34" y="51" width="14" height="2.5" rx="1" fill="#c0c8d0"/></svg>';}
+function logoSVG(size){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="'+size+'" height="'+size+'" style="flex-shrink:0"><line x1="12" y1="16" x2="34" y2="38" stroke="var(--c-4a9eff)" stroke-width="2" opacity="0.4"/><line x1="76" y1="16" x2="54" y2="38" stroke="var(--c-4a9eff)" stroke-width="2" opacity="0.4"/><line x1="12" y1="72" x2="34" y2="50" stroke="var(--c-8090a8)" stroke-width="2" opacity="0.4"/><line x1="76" y1="72" x2="54" y2="50" stroke="var(--c-8090a8)" stroke-width="2" opacity="0.4"/><circle cx="10" cy="14" r="6" fill="var(--c-4a9eff)"/><circle cx="78" cy="14" r="6" fill="var(--c-8090a8)"/><circle cx="10" cy="74" r="6" fill="var(--c-8090a8)"/><circle cx="78" cy="74" r="6" fill="var(--c-4a9eff)"/><circle cx="44" cy="44" r="20" fill="var(--c-181e26)" stroke="var(--c-4a9eff)" stroke-width="1"/><rect x="34" y="35" width="14" height="2.5" rx="1" fill="var(--c-c0c8d0)"/><rect x="34" y="43" width="10" height="2.5" rx="1" fill="var(--c-c0c8d0)"/><rect x="34" y="51" width="14" height="2.5" rx="1" fill="var(--c-c0c8d0)"/></svg>';}
 
 /* ─── LOGIN ─── */
 function renderLogin(err){
   document.getElementById("app").innerHTML=
     '<div class="login-screen">'+
       '<div style="text-align:center">'+logoSVG(64)+
-        '<h1 style="font-size:1.2rem;font-weight:600;color:#c0c8d0;margin:12px 0 4px;letter-spacing:0.1em;text-transform:uppercase">Panel Admin</h1>'+
-        '<p style="font-size:0.8rem;color:#506070;letter-spacing:0.06em">EMMA SOLUCIONES DIGITALES</p>'+
+        '<h1 style="font-size:1.2rem;font-weight:600;color:var(--c-c0c8d0);margin:12px 0 4px;letter-spacing:0.1em;text-transform:uppercase">Panel Admin</h1>'+
+        '<p style="font-size:0.8rem;color:var(--c-506070);letter-spacing:0.06em">EMMA SOLUCIONES DIGITALES</p>'+
       '</div>'+
-      (err?'<p style="color:#d06060;font-size:0.82rem;text-align:center;font-family:monospace">'+err+'</p>':'')+
+      (err?'<p style="color:var(--c-d06060);font-size:0.82rem;text-align:center;font-family:monospace">'+err+'</p>':'')+
       '<div class="login-box">'+
         '<label>Email</label><input id="adminEmail" type="email" placeholder="admin@ejemplo.com" autocomplete="username"/>'+
         '<label>Contraseña</label><input id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.keyCode===13)loginGoogle()"/>'+
         '<button class="btn btn-primary" style="width:100%;padding:12px;font-size:0.9rem;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase" onclick="loginGoogle()">Ingresar al sistema</button>'+
         (bioSoportado()&&bioEnrolado()?(
           '<button class="btn" style="width:100%;padding:12px;font-size:0.9rem;margin-top:10px;letter-spacing:0.05em" onclick="srBioVerificar()">🔒 Ingresar con huella</button>'+
-          '<p style="text-align:center;margin-top:8px"><a href="#" style="color:#506070;font-size:0.72rem;text-decoration:underline" onclick="srBioOlvidar();return false;">Olvidar huella en este dispositivo</a></p>'
+          '<p style="text-align:center;margin-top:8px"><a href="#" style="color:var(--c-506070);font-size:0.72rem;text-decoration:underline" onclick="srBioOlvidar();return false;">Olvidar huella en este dispositivo</a></p>'
         ):'')+
       '</div>'+
     '</div>';
@@ -56,7 +56,7 @@ function renderMain(){
         '<div><h1>Emma Admin</h1><span>Panel de control</span></div>'+
       '</div>'+
       '<div class="header-actions">'+
-        '<button class="btn btn-sm" style="color:#8090a8" onclick="abrirConfigMP()" title="MercadoPago">💳</button>'+
+        '<button class="btn btn-sm" style="color:var(--c-8090a8)" onclick="abrirConfigMP()" title="MercadoPago">💳</button>'+
         '<button class="btn btn-sm" onclick="cargarTodo()" title="Actualizar">↻</button>'+
         '<button class="btn btn-sm" onclick="logout()">Salir</button>'+
       '</div>'+
@@ -115,8 +115,8 @@ async function enviarCodigoBrevo(app,negocio,email,codigo,pin){
 /* ─── CAMPOS COBRO / DUENO ─── */
 function camposCobro(c){
   var mp=c&&c.medioPago||"transferencia";
-  return'<div style="margin:14px 0 8px;border-top:1px solid #2a3040;padding-top:12px">'+
-    '<p style="font-size:0.7rem;color:#8090a8;font-weight:700;margin-bottom:10px;letter-spacing:0.08em;text-transform:uppercase">Datos de cobro</p>'+
+  return'<div style="margin:14px 0 8px;border-top:1px solid var(--c-2a3040);padding-top:12px">'+
+    '<p style="font-size:0.7rem;color:var(--c-8090a8);font-weight:700;margin-bottom:10px;letter-spacing:0.08em;text-transform:uppercase">Datos de cobro</p>'+
     '<label>Inicio del contrato</label><input id="cobro-fecha" type="date" value="'+(c&&c.fechaContrato||"")+'"/>'+
     '<label>Precio mensual ($)</label><input id="cobro-precio" type="number" placeholder="Ej: 8000" value="'+(c&&c.precioMensual||"")+'"/>'+
     '<label>Medio de pago</label>'+
@@ -133,8 +133,8 @@ function camposCobro(c){
 function toggleAliasMP(val){var el=document.getElementById("campo-alias");if(el)el.style.display=(val==="mercadopago"||val==="transferencia")?"block":"none";}
 function getCobroData(){return{fechaContrato:(document.getElementById("cobro-fecha")||{value:""}).value||null,precioMensual:Number((document.getElementById("cobro-precio")||{value:0}).value)||0,medioPago:(document.getElementById("cobro-medio")||{value:"transferencia"}).value,aliasMp:((document.getElementById("cobro-alias")||{value:""}).value||"").trim()};}
 function camposDueno(d){
-  return'<div style="margin:12px 0 8px;border-top:1px solid #2a3040;padding-top:12px">'+
-    '<p style="font-size:0.7rem;color:#8090a8;font-weight:700;margin-bottom:10px;letter-spacing:0.08em;text-transform:uppercase">Datos del titular</p>'+
+  return'<div style="margin:12px 0 8px;border-top:1px solid var(--c-2a3040);padding-top:12px">'+
+    '<p style="font-size:0.7rem;color:var(--c-8090a8);font-weight:700;margin-bottom:10px;letter-spacing:0.08em;text-transform:uppercase">Datos del titular</p>'+
     '<label>Nombre</label><input id="cd-nombre" placeholder="Juan" value="'+(d&&d.nombreDueno||"")+'"/>'+
     '<label>Apellido</label><input id="cd-apellido" placeholder="Perez" value="'+(d&&d.apellidoDueno||"")+'"/>'+
     '<label>DNI</label><input id="cd-dni" placeholder="28123456" value="'+(d&&d.dni||"")+'"/>'+
@@ -179,7 +179,7 @@ function resumenCobrosMes(){
   var todos=[];
   function ag(arr,t){arr.forEach(function(c){if(c.precioMensual)todos.push({t:t,c:c,ec:calcularEstadoCobro(c)});});}
   ag(licencias,"reparto");ag(kioscoClientes,"kiosco");ag(gestionUsuarios,"gestion");ag(polleriaClientes,"polleria");ag(reposteriaLicencias,"reposteria");
-  if(!todos.length)return'<div class="seccion-cobro" style="text-align:center;padding:12px 16px"><p style="color:#3a4a58;font-size:0.8rem;font-family:monospace">Sin precios configurados</p><p style="color:#3a4a58;font-size:0.72rem;margin-top:4px">Editá un cliente y completá el precio mensual en la sección <b style="color:#506070">Datos de cobro</b></p></div>';
+  if(!todos.length)return'<div class="seccion-cobro" style="text-align:center;padding:12px 16px"><p style="color:var(--c-3a4a58);font-size:0.8rem;font-family:monospace">Sin precios configurados</p><p style="color:var(--c-3a4a58);font-size:0.72rem;margin-top:4px">Editá un cliente y completá el precio mensual en la sección <b style="color:var(--c-506070)">Datos de cobro</b></p></div>';
   var alDia=todos.filter(function(t){return t.ec.estado==="al_dia";});
   var pend=todos.filter(function(t){return t.ec.estado==="pendiente";});
   var rec=todos.filter(function(t){return t.ec.estado==="con_recargo";});
@@ -188,18 +188,18 @@ function resumenCobrosMes(){
   var totalPend=[].concat(pend,rec,susp).reduce(function(s,t){return s+t.ec.montoFinal;},0);
   return'<div class="seccion-cobro">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
-      '<span style="font-size:0.78rem;font-weight:600;color:#8090a8;text-transform:uppercase;letter-spacing:0.07em">Cobros del mes</span>'+
-      '<button class="btn btn-sm" style="font-size:0.7rem;color:#8090a8" onclick="abrirConfigMP()">Config MP</button>'+
+      '<span style="font-size:0.78rem;font-weight:600;color:var(--c-8090a8);text-transform:uppercase;letter-spacing:0.07em">Cobros del mes</span>'+
+      '<button class="btn btn-sm" style="font-size:0.7rem;color:var(--c-8090a8)" onclick="abrirConfigMP()">Config MP</button>'+
     '</div>'+
     '<div class="grid4" style="margin-bottom:8px">'+
-      '<div style="background:#081a10;border:1px solid #4dd9a050;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:#4dd9a0;font-family:monospace">'+alDia.length+'</div><div style="font-size:0.62rem;color:#4dd9a0;text-transform:uppercase;letter-spacing:0.05em">Al dia</div></div>'+
-      '<div style="background:#1a2000;border:1px solid #c8e01a50;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:#c8e01a;font-family:monospace">'+pend.length+'</div><div style="font-size:0.62rem;color:#c8e01a;text-transform:uppercase;letter-spacing:0.05em">Pendiente</div></div>'+
-      '<div style="background:#201400;border:1px solid #f5a44250;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:#f5a442;font-family:monospace">'+rec.length+'</div><div style="font-size:0.62rem;color:#f5a442;text-transform:uppercase;letter-spacing:0.05em">Recargo</div></div>'+
-      '<div style="background:#1a0808;border:1px solid #d0606050;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:#d06060;font-family:monospace">'+susp.length+'</div><div style="font-size:0.62rem;color:#d06060;text-transform:uppercase;letter-spacing:0.05em">Suspender</div></div>'+
+      '<div style="background:var(--c-081a10);border:1px solid #4dd9a050;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--c-4dd9a0);font-family:monospace">'+alDia.length+'</div><div style="font-size:0.62rem;color:var(--c-4dd9a0);text-transform:uppercase;letter-spacing:0.05em">Al dia</div></div>'+
+      '<div style="background:var(--c-1a2000);border:1px solid #c8e01a50;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--c-c8e01a);font-family:monospace">'+pend.length+'</div><div style="font-size:0.62rem;color:var(--c-c8e01a);text-transform:uppercase;letter-spacing:0.05em">Pendiente</div></div>'+
+      '<div style="background:var(--c-201400);border:1px solid #f5a44250;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--c-f5a442);font-family:monospace">'+rec.length+'</div><div style="font-size:0.62rem;color:var(--c-f5a442);text-transform:uppercase;letter-spacing:0.05em">Recargo</div></div>'+
+      '<div style="background:var(--c-1a0808);border:1px solid #d0606050;border-radius:4px;padding:8px;text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--c-d06060);font-family:monospace">'+susp.length+'</div><div style="font-size:0.62rem;color:var(--c-d06060);text-transform:uppercase;letter-spacing:0.05em">Suspender</div></div>'+
     '</div>'+
     '<div style="display:flex;justify-content:space-between;font-size:0.78rem;font-family:monospace">'+
-      '<span style="color:#506070">Cobrado: <b style="color:#4dd9a0">$'+totalCobrado.toLocaleString("es-AR")+'</b></span>'+
-      '<span style="color:#506070">Por cobrar: <b style="color:#f5a442">$'+totalPend.toLocaleString("es-AR")+'</b></span>'+
+      '<span style="color:var(--c-506070)">Cobrado: <b style="color:var(--c-4dd9a0)">$'+totalCobrado.toLocaleString("es-AR")+'</b></span>'+
+      '<span style="color:var(--c-506070)">Por cobrar: <b style="color:var(--c-f5a442)">$'+totalPend.toLocaleString("es-AR")+'</b></span>'+
     '</div>'+
   '</div>';
 }

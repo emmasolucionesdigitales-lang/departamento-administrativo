@@ -25,7 +25,7 @@ function abrirEditarKio(id){
   var c=kioscoClientes.find(function(x){return x.id===id;});if(!c)return;
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#a070ff;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Kiosco</h2>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-a070ff);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Editar Kiosco</h2>'+
       '<label>Nombre</label><input id="ke-nom" value="'+(c.negocio||"")+'"/>'+
       '<label>Email</label><input id="ke-ema" type="email" value="'+(c.email||"")+'"/>'+
       '<label>Telefono</label><input id="ke-tel" type="tel" value="'+(c.celular||"")+'"/>'+
@@ -68,8 +68,8 @@ function abrirNuevoGestion(){
   var cod=genCodigo("EC"),pin=genPin();
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#4dd9a0;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Emma Control</h2>'+
-      '<label>Codigo</label><input id="gnv-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:#4dd9a0"/>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-4dd9a0);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva licencia Emma Control</h2>'+
+      '<label>Codigo</label><input id="gnv-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:var(--c-4dd9a0)"/>'+
       '<label>PIN</label><input id="gnv-pin" type="number" value="'+pin+'"/>'+
       '<label>Negocio / Cliente</label><input id="gnv-neg" placeholder="Distribuidora El Sol"/>'+
       '<label>Email</label><input id="gnv-ema" type="email" placeholder="cliente@ejemplo.com"/>'+
@@ -77,7 +77,7 @@ function abrirNuevoGestion(){
       camposDueno(null)+
       '<label>Plan</label><select id="gnv-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Vencimiento</label><input id="gnv-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba(&apos;gnv-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;gnv-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:var(--c-081a10);color:var(--c-4dd9a0);font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       '<label>Notas</label><input id="gnv-notas" placeholder="Plan mensual"/>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-success" style="flex:1" onclick="crearLicenciaGestion()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
@@ -107,10 +107,10 @@ function abrirEditarGestion(id){
   var esActivo=u.estado==="usado"||u.estado==="activo";
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#4dd9a0;margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Editar Emma Control</h2>'+
-      '<p style="font-family:monospace;font-size:0.85rem;color:#4dd9a0;margin-bottom:14px">'+id+'</p>'+
-      (u.nombre||u.email?'<div style="background:#0a2018;border:1px solid #4dd9a030;border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:0.8rem;color:#506070;font-family:monospace">Activado por: '+(u.nombre||"")+(u.email?" · "+u.email:"")+'</div>':
-       '<div style="background:#18102e;border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:0.8rem;color:#506070;font-family:monospace">Sin activar todavia</div>')+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-4dd9a0);margin-bottom:4px;letter-spacing:0.08em;text-transform:uppercase">Editar Emma Control</h2>'+
+      '<p style="font-family:monospace;font-size:0.85rem;color:var(--c-4dd9a0);margin-bottom:14px">'+id+'</p>'+
+      (u.nombre||u.email?'<div style="background:var(--c-0a2018);border:1px solid #4dd9a030;border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:0.8rem;color:var(--c-506070);font-family:monospace">Activado por: '+(u.nombre||"")+(u.email?" · "+u.email:"")+'</div>':
+       '<div style="background:var(--c-18102e);border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:0.8rem;color:var(--c-506070);font-family:monospace">Sin activar todavia</div>')+
       '<label>PIN de acceso</label><input id="gnv-pin" type="number" value="'+(u.pin||"")+'"/>'+
       '<label>Negocio / Cliente</label><input id="ge-neg" value="'+(u.negocio||"")+'"/>'+
       camposDueno(u)+
@@ -145,8 +145,8 @@ function abrirNuevoPoll(){
   var cod=genCodigo("PO"),pin=genPin();
   document.getElementById("modal-container").innerHTML=
     '<div class="modal-overlay" onclick="cerrarModal(event)"><div class="modal"><div class="modal-drag"></div>'+
-      '<h2 style="font-size:0.95rem;font-weight:600;color:#f5a442;margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva Polleria</h2>'+
-      '<label>Codigo</label><input id="p-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:#f5a442"/>'+
+      '<h2 style="font-size:0.95rem;font-weight:600;color:var(--c-f5a442);margin-bottom:14px;letter-spacing:0.08em;text-transform:uppercase">Nueva Polleria</h2>'+
+      '<label>Codigo</label><input id="p-cod" value="'+cod+'" style="font-family:monospace;font-weight:700;color:var(--c-f5a442)"/>'+
       '<label>PIN</label><input id="p-pin" type="number" value="'+pin+'"/>'+
       '<label>Nombre del negocio</label><input id="p-nom" placeholder="Polleria El Gallo"/>'+
       '<label>ID unico</label><input id="p-id" placeholder="polleria-el-gallo"/>'+
@@ -155,7 +155,7 @@ function abrirNuevoPoll(){
       camposDueno(null)+
       '<label>Plan</label><select id="p-plan"><option value="demo">Demo</option><option value="basic" selected>Basic</option><option value="pro">Pro</option></select>'+
       '<label>Vencimiento</label><input id="p-venc" type="date"/>'+
-      '<button type="button" onclick="activarPrueba(&apos;p-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:#081a10;color:#4dd9a0;font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
+      '<button type="button" onclick="activarPrueba(&apos;p-venc&apos;)" style="width:100%;margin-bottom:10px;padding:10px;border-radius:4px;border:1px solid #4dd9a050;background:var(--c-081a10);color:var(--c-4dd9a0);font-size:0.85rem;cursor:pointer;font-family:monospace">15 dias prueba gratis</button>'+
       camposCobro(null)+
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="crearClientePoll()">Crear y enviar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
