@@ -39,8 +39,15 @@ function abrirEditarKio(id){
 }
 async function guardarEdicionKio(id){
   var cobro=getCobroData(),dueno=getDuenoData();
-  try{await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:document.getElementById("ke-nom").value.trim(),email:document.getElementById("ke-ema").value.trim(),celular:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,estado:document.getElementById("ke-activo").value==="1"?"activo":"inactivo"},dueno,cobro));toast("Cliente actualizado");cerrarModalBtn();cargarTodo();}
-  catch(e){toast(e.message,false);}
+  var original=kioscoClientes.find(function(x){return x.id===id;});
+  var nom=document.getElementById("ke-nom").value.trim();
+  var ema=document.getElementById("ke-ema").value.trim();
+  try{
+    await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:nom,email:ema,celular:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,estado:document.getElementById("ke-activo").value==="1"?"activo":"inactivo"},dueno,cobro));
+    var reenviar=ema&&validarEmail(ema)&&ema!==(original&&original.email);
+    if(reenviar)await enviarCodigoBrevo("kiosco",nom,ema,id,original&&original.pin);
+    toast("Cliente actualizado"+(reenviar?" · Email reenviado":""));cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 async function eliminarKio(id){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminado");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
 async function suspenderKio(id,activo){var c=kioscoClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:activo?"activo":"inactivo"});toast(activo?"Activado":"Suspendido");cargarTodo();}catch(e){toast(e.message,false);}}

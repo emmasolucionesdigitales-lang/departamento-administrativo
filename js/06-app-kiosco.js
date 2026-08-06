@@ -179,8 +179,16 @@ function abrirEditarRep(id){
 }
 async function guardarEdicionRep(id){
   var cobro=getCobroData(),dueno=getDuenoData();
-  try{await dbControl.collection("licencias").doc(id).update(Object.assign({pin:Number(document.getElementById("e-pin").value),negocio:document.getElementById("e-neg").value.trim(),email:document.getElementById("e-ema").value.trim(),celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()},dueno,cobro));toast("Licencia actualizada");cerrarModalBtn();cargarTodo();}
-  catch(e){toast(e.message,false);}
+  var original=licencias.find(function(x){return x.id===id;});
+  var neg=document.getElementById("e-neg").value.trim();
+  var ema=document.getElementById("e-ema").value.trim();
+  var pin=Number(document.getElementById("e-pin").value);
+  try{
+    await dbControl.collection("licencias").doc(id).update(Object.assign({pin:pin,negocio:neg,email:ema,celular:document.getElementById("e-cel").value.trim(),notas:document.getElementById("e-not").value.trim()},dueno,cobro));
+    var reenviar=ema&&validarEmail(ema)&&ema!==(original&&original.email);
+    if(reenviar)await enviarCodigoBrevo("reparto",neg,ema,id,pin);
+    toast("Licencia actualizada"+(reenviar?" · Email reenviado":""));cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 async function cambiarEstadoRep(id,estado){if(!confirm((estado==="inactivo"?"Desactivar":"Activar")+" esta licencia?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"Desactivada":"Activada");cargarTodo();}catch(e){toast(e.message,false);}}
 async function resetDispositivo(id){

@@ -15,6 +15,7 @@ function abrirEditarMulti(id){
     '</div></div>';
 }
 async function guardarEdicionMulti(id){
+  var original=repartoMultiNegocios.find(function(x){return x.id===id;});
   var nom=(document.getElementById("em-nom").value||"").trim();
   var ema=(document.getElementById("em-ema").value||"").trim();
   var cel=(document.getElementById("em-cel").value||"").trim();
@@ -23,8 +24,12 @@ async function guardarEdicionMulti(id){
   var pin=Number(document.getElementById("em-pin").value);
   var dueno=getDuenoData();
   if(!nom){toast("El nombre es obligatorio",false);return;}
-  try{await dbRepartoMulti.collection("negocios").doc(id).update(Object.assign({nombre:nom,ownerEmail:ema,celular:cel,notas:notas,codigoActivacion:cod,pin:pin},dueno));toast("Negocio actualizado");cerrarModalBtn();cargarTodo();}
-  catch(e){toast(e.message,false);}
+  try{
+    await dbRepartoMulti.collection("negocios").doc(id).update(Object.assign({nombre:nom,ownerEmail:ema,celular:cel,notas:notas,codigoActivacion:cod,pin:pin},dueno));
+    var reenviar=ema&&validarEmail(ema)&&ema!==(original&&original.ownerEmail);
+    if(reenviar)await enviarCodigoBrevo("reparto-multi",nom,ema,cod,pin);
+    toast("Negocio actualizado"+(reenviar?" · Email reenviado":""));cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
 }
 async function bloquearNegocioMulti(id,bloquear,nombre){if(!confirm((bloquear?"Bloquear":"Desbloquear")+" "+nombre+"?"))return;try{await dbRepartoMulti.collection("negocios").doc(id).update({bloqueado:bloquear});toast(bloquear?"Bloqueado":"Desbloqueado");cargarTodo();}catch(e){toast(e.message,false);}}
 async function eliminarNegocioMulti(id,nombre){if(!confirm("Eliminar negocio "+nombre+"? Esta accion no se puede deshacer."))return;try{var neg=repartoMultiNegocios.find(function(n){return n.id===id;});var pr=[];if(neg&&neg.repartidores)neg.repartidores.forEach(function(r){pr.push(dbRepartoMulti.collection("users").doc(r.uid).delete());});pr.push(dbRepartoMulti.collection("negocios").doc(id).delete());await Promise.all(pr);toast("Negocio eliminado");cargarTodo();}catch(e){toast(e.message,false);}}

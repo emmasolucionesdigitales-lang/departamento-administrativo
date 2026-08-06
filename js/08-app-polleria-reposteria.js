@@ -35,7 +35,18 @@ function abrirEditarPoll(id){
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-orange" style="flex:1" onclick="guardarEdicionPoll(\''+id+'\')">Guardar</button><button class="btn btn-danger btn-sm" onclick="eliminarPoll(\''+id+'\')">🗑</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
-async function guardarEdicionPoll(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:document.getElementById("pe-nom").value.trim(),email:document.getElementById("pe-ema").value.trim(),celular:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,estado:document.getElementById("pe-activo").value==="1"?"activo":"inactivo"},dueno,cobro));toast("Polleria actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
+async function guardarEdicionPoll(id){
+  var cobro=getCobroData(),dueno=getDuenoData();
+  var original=polleriaClientes.find(function(x){return x.id===id;});
+  var nom=document.getElementById("pe-nom").value.trim();
+  var ema=document.getElementById("pe-ema").value.trim();
+  try{
+    await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:nom,email:ema,celular:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,estado:document.getElementById("pe-activo").value==="1"?"activo":"inactivo"},dueno,cobro));
+    var reenviar=ema&&validarEmail(ema)&&ema!==(original&&original.email);
+    if(reenviar)await enviarCodigoBrevo("polleria",nom,ema,id,original&&original.pin);
+    toast("Polleria actualizada"+(reenviar?" · Email reenviado":""));cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
 async function eliminarPoll(id){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm("Eliminar a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).delete();toast("Eliminada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
 async function suspenderPoll(id,activo){var c=polleriaClientes.find(function(x){return x.id===id;});if(!confirm((activo?"Activar":"Suspender")+" a "+(c?c.negocio:id)+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:activo?"activo":"inactivo"});toast(activo?"Activada":"Suspendida");cargarTodo();}catch(e){toast(e.message,false);}}
 async function resetDispositivoPoll(id){
@@ -111,7 +122,19 @@ function abrirEditarReposteria(id){
       '<div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-pink" style="flex:1" onclick="guardarEdicionReposteria(\''+id+'\')">Guardar</button><button class="btn" onclick="cerrarModalBtn()">Cancelar</button></div>'+
     '</div></div>';
 }
-async function guardarEdicionReposteria(id){var cobro=getCobroData(),dueno=getDuenoData();try{await dbControl.collection("licencias").doc(id).update(Object.assign({pin:Number(document.getElementById("er-pin").value),negocio:document.getElementById("er-neg").value.trim(),email:document.getElementById("er-ema").value.trim(),celular:document.getElementById("er-cel").value.trim(),notas:document.getElementById("er-not").value.trim()},dueno,cobro));toast("Licencia actualizada");cerrarModalBtn();cargarTodo();}catch(e){toast(e.message,false);}}
+async function guardarEdicionReposteria(id){
+  var cobro=getCobroData(),dueno=getDuenoData();
+  var original=reposteriaLicencias.find(function(x){return x.id===id;});
+  var neg=document.getElementById("er-neg").value.trim();
+  var ema=document.getElementById("er-ema").value.trim();
+  var pin=Number(document.getElementById("er-pin").value);
+  try{
+    await dbControl.collection("licencias").doc(id).update(Object.assign({pin:pin,negocio:neg,email:ema,celular:document.getElementById("er-cel").value.trim(),notas:document.getElementById("er-not").value.trim()},dueno,cobro));
+    var reenviar=ema&&validarEmail(ema)&&ema!==(original&&original.email);
+    if(reenviar)await enviarCodigoBrevo("reposteria",neg,ema,id,pin);
+    toast("Licencia actualizada"+(reenviar?" · Email reenviado":""));cerrarModalBtn();cargarTodo();
+  }catch(e){toast(e.message,false);}
+}
 async function cambiarEstadoReposteria(id,estado){var l=reposteriaLicencias.find(function(x){return x.id===id;});var n=l?l.negocio||id:id;if(!confirm((estado==="inactivo"?"Desactivar":"Activar")+" a "+n+"?"))return;try{await dbControl.collection("licencias").doc(id).update({estado:estado});toast(estado==="inactivo"?"Desactivada":"Activada");cargarTodo();}catch(e){toast(e.message,false);}}
 async function resetDispositivoReposteria(id){
   var l=reposteriaLicencias.find(function(x){return x.id===id;});var n=l?l.negocio||id:id;
