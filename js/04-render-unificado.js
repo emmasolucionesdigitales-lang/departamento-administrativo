@@ -1,4 +1,3 @@
-
 /* ─── LOGO SVG ─── */
 function logoSVG(size){return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="'+size+'" height="'+size+'" style="flex-shrink:0"><line x1="12" y1="16" x2="34" y2="38" stroke="var(--c-4a9eff)" stroke-width="2" opacity="0.4"/><line x1="76" y1="16" x2="54" y2="38" stroke="var(--c-4a9eff)" stroke-width="2" opacity="0.4"/><line x1="12" y1="72" x2="34" y2="50" stroke="var(--c-8090a8)" stroke-width="2" opacity="0.4"/><line x1="76" y1="72" x2="54" y2="50" stroke="var(--c-8090a8)" stroke-width="2" opacity="0.4"/><circle cx="10" cy="14" r="6" fill="var(--c-4a9eff)"/><circle cx="78" cy="14" r="6" fill="var(--c-8090a8)"/><circle cx="10" cy="74" r="6" fill="var(--c-8090a8)"/><circle cx="78" cy="74" r="6" fill="var(--c-4a9eff)"/><circle cx="44" cy="44" r="20" fill="var(--c-181e26)" stroke="var(--c-4a9eff)" stroke-width="1"/><rect x="34" y="35" width="14" height="2.5" rx="1" fill="var(--c-c0c8d0)"/><rect x="34" y="43" width="10" height="2.5" rx="1" fill="var(--c-c0c8d0)"/><rect x="34" y="51" width="14" height="2.5" rx="1" fill="var(--c-c0c8d0)"/></svg>';}
 
@@ -167,7 +166,15 @@ function cobroBadge(c){
 }
 
 /* ─── BREVO ─── */
-const BREVO_KEY="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";
+/* Cada app tiene su propia clave API en Brevo (reparto y reparto-multi comparten la misma). */
+const BREVO_KEYS={
+  reparto:"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",
+  "reparto-multi":"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",
+  kiosco:"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",
+  "emma-control":"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",
+  polleria:"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",
+  reposteria:"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"
+};
 const CONTACTO_WHATSAPP="5493816040339";
 const CONTACTO_EMAIL="carabajalponce1980@gmail.com";
 async function enviarCodigoBrevo(app,negocio,email,codigo,pin,negocioId){
@@ -175,10 +182,12 @@ async function enviarCodigoBrevo(app,negocio,email,codigo,pin,negocioId){
   const nombres={reparto:"Sistema de Reparto","reparto-multi":"Reparto Multi",kiosco:"Mi Kiosco","emma-control":"Emma Control",polleria:"Gestion Polleria",reposteria:"Dulce Gestion"};
   const tiposUrl={reparto:"reparto","reparto-multi":"repartomulti",kiosco:"kiosco","emma-control":"gestion",polleria:"polleria",reposteria:"reposteria"};
   const appNombre=nombres[app]||app;
+  const apiKey=BREVO_KEYS[app];
+  if(!apiKey){console.warn("Sin API key de Brevo configurada para app:",app);if(typeof toast==="function")toast("No hay clave de Brevo configurada para "+appNombre,false);return;}
   const linkAcceso=(typeof getAppAccessUrl==="function")?getAppAccessUrl(tiposUrl[app]||app,codigo,negocioId):"";
   const botonLink=linkAcceso?"<div style='text-align:center;margin:24px 0'><a href='"+linkAcceso+"' style='display:inline-block;background:#185FA5;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px'>Descargar / Ingresar a "+appNombre+"</a></div>":"";
   try{
-    await fetch("https://api.brevo.com/v3/smtp/email",{method:"POST",headers:{"Content-Type":"application/json","api-key":BREVO_KEY},body:JSON.stringify({
+    const r=await fetch("https://api.brevo.com/v3/smtp/email",{method:"POST",headers:{"Content-Type":"application/json","api-key":apiKey},body:JSON.stringify({
       sender:{name:"Emma Soluciones Digitales",email:"carabajalponce1980@gmail.com"},
       to:[{email:email,name:negocio||email}],
       subject:"Codigo de activacion — "+appNombre,
@@ -208,7 +217,14 @@ async function enviarCodigoBrevo(app,negocio,email,codigo,pin,negocioId){
         "<p style='font-size:12px;color:#999'>Emma Soluciones Digitales</p>"+
       "</div>"
     })});
-  }catch(e){console.warn("Brevo error:",e);}
+    if(!r.ok){
+      const txt=await r.text().catch(function(){return"";});
+      throw new Error("Brevo "+r.status+": "+txt);
+    }
+  }catch(e){
+    console.warn("Brevo error:",e);
+    if(typeof toast==="function")toast("No se pudo enviar el mail a "+email+" ("+(e.message||e)+")",false);
+  }
 }
 
 /* ─── CAMPOS COBRO / DUENO ─── */
