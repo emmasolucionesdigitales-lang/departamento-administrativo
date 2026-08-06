@@ -17,7 +17,7 @@ async function crearClienteKio(){
     // Repostería y Emma Control. Así el panel no necesita una cuenta
     // aparte para administrar Kiosco.
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"kiosco",estado:"activo",plan:plan,pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
-    if(ema)await enviarCodigoBrevo("kiosco",nom,ema,cod,pin);
+    if(ema)await enviarCodigoBrevo("kiosco",nom,ema,cod,pin,id);
     toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("kiosco",nom,cod,getAppAccessUrl("kiosco",cod,id));
   }catch(e){toast(e.message,false);}
 }
@@ -45,7 +45,7 @@ async function guardarEdicionKio(id){
   try{
     await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:nom,email:ema,celular:document.getElementById("ke-tel").value.trim(),plan:document.getElementById("ke-plan").value,vencimiento:document.getElementById("ke-venc").value||null,estado:document.getElementById("ke-activo").value==="1"?"activo":"inactivo"},dueno,cobro));
     var reenviar=ema&&validarEmail(ema)&&ema!==(original&&original.email);
-    if(reenviar)await enviarCodigoBrevo("kiosco",nom,ema,id,original&&original.pin);
+    if(reenviar)await enviarCodigoBrevo("kiosco",nom,ema,id,original&&original.pin,original&&original.negocioId);
     toast("Cliente actualizado"+(reenviar?" · Email reenviado":""));cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }

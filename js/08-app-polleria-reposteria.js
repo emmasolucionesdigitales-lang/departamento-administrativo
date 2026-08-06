@@ -15,7 +15,7 @@ async function crearClientePoll(){
     // Mismo cambio que en Kiosco: un solo lugar (licencias compartidas)
     // en vez de escribir también en la base propia de Pollería.
     await dbControl.collection("licencias").doc(cod).set(Object.assign({app:"polleria",estado:"activo",plan:plan,pin:pin,negocioId:id,negocio:nom,email:ema,celular:tel,vencimiento:venc,deviceId:"",aceptoTerminos:false,creadoEn:new Date().toISOString()},dueno,cobro));
-    if(ema)await enviarCodigoBrevo("polleria",nom,ema,cod,pin);
+    if(ema)await enviarCodigoBrevo("polleria",nom,ema,cod,pin,id);
     toast(nom+" — Codigo: "+cod+" — PIN: "+pin+(ema?" · Email enviado":""));cargarTodo();mostrarModalQR("polleria",nom,cod,getAppAccessUrl("polleria",cod,id));
   }catch(e){toast(e.message,false);}
 }
@@ -43,7 +43,7 @@ async function guardarEdicionPoll(id){
   try{
     await dbControl.collection("licencias").doc(id).update(Object.assign({negocio:nom,email:ema,celular:document.getElementById("pe-tel").value.trim(),plan:document.getElementById("pe-plan").value,vencimiento:document.getElementById("pe-venc").value||null,estado:document.getElementById("pe-activo").value==="1"?"activo":"inactivo"},dueno,cobro));
     var reenviar=ema&&validarEmail(ema)&&ema!==(original&&original.email);
-    if(reenviar)await enviarCodigoBrevo("polleria",nom,ema,id,original&&original.pin);
+    if(reenviar)await enviarCodigoBrevo("polleria",nom,ema,id,original&&original.pin,original&&original.negocioId);
     toast("Polleria actualizada"+(reenviar?" · Email reenviado":""));cerrarModalBtn();cargarTodo();
   }catch(e){toast(e.message,false);}
 }

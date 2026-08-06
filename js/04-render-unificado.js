@@ -168,16 +168,45 @@ function cobroBadge(c){
 
 /* ─── BREVO ─── */
 const BREVO_KEY="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";
-async function enviarCodigoBrevo(app,negocio,email,codigo,pin){
+const CONTACTO_WHATSAPP="5493816040339";
+const CONTACTO_EMAIL="carabajalponce1980@gmail.com";
+async function enviarCodigoBrevo(app,negocio,email,codigo,pin,negocioId){
   if(!email||!/\S+@\S+\.\S+/.test(email))return;
   const nombres={reparto:"Sistema de Reparto","reparto-multi":"Reparto Multi",kiosco:"Mi Kiosco","emma-control":"Emma Control",polleria:"Gestion Polleria",reposteria:"Dulce Gestion"};
+  const tiposUrl={reparto:"reparto","reparto-multi":"repartomulti",kiosco:"kiosco","emma-control":"gestion",polleria:"polleria",reposteria:"reposteria"};
   const appNombre=nombres[app]||app;
+  const linkAcceso=(typeof getAppAccessUrl==="function")?getAppAccessUrl(tiposUrl[app]||app,codigo,negocioId):"";
+  const botonLink=linkAcceso?"<div style='text-align:center;margin:24px 0'><a href='"+linkAcceso+"' style='display:inline-block;background:#185FA5;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px'>Descargar / Ingresar a "+appNombre+"</a></div>":"";
   try{
     await fetch("https://api.brevo.com/v3/smtp/email",{method:"POST",headers:{"Content-Type":"application/json","api-key":BREVO_KEY},body:JSON.stringify({
       sender:{name:"Emma Soluciones Digitales",email:"carabajalponce1980@gmail.com"},
       to:[{email:email,name:negocio||email}],
       subject:"Codigo de activacion — "+appNombre,
-      htmlContent:"<div style='font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px'><h2 style='color:#185FA5'>Bienvenido a "+appNombre+"</h2><p>Hola <b>"+negocio+"</b>, tu licencia fue creada.</p><div style='background:#f0f4f8;border-radius:12px;padding:20px;text-align:center;margin:20px 0'><p style='font-size:13px;color:#666'>Codigo</p><div style='font-size:28px;font-weight:700;font-family:monospace;letter-spacing:4px;color:#185FA5'>"+codigo+"</div><p style='font-size:13px;color:#666;margin-top:12px'>PIN</p><div style='font-size:32px;font-weight:700;color:#333'>"+pin+"</div></div><p style='font-size:12px;color:#999'>Emma Soluciones Digitales</p></div>"
+      htmlContent:"<div style='font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px'>"+
+        "<h2 style='color:#185FA5'>Bienvenido a "+appNombre+"</h2>"+
+        "<p>Hola <b>"+negocio+"</b>, tu licencia fue creada.</p>"+
+        "<div style='background:#f0f4f8;border-radius:12px;padding:20px;text-align:center;margin:20px 0'>"+
+          "<p style='font-size:13px;color:#666'>Codigo</p>"+
+          "<div style='font-size:28px;font-weight:700;font-family:monospace;letter-spacing:4px;color:#185FA5'>"+codigo+"</div>"+
+          "<p style='font-size:13px;color:#666;margin-top:12px'>PIN</p>"+
+          "<div style='font-size:32px;font-weight:700;color:#333'>"+pin+"</div>"+
+        "</div>"+
+        botonLink+
+        "<div style='background:#fafafa;border:1px solid #eee;border-radius:8px;padding:16px 20px;margin:20px 0'>"+
+          "<p style='font-size:13px;color:#333;font-weight:700;margin:0 0 8px'>Como acceder</p>"+
+          "<ol style='font-size:13px;color:#555;margin:0;padding-left:18px;line-height:1.6'>"+
+            "<li>Toca el boton de arriba (o abri el link) para ingresar a "+appNombre+".</li>"+
+            "<li>Cuando te pida activarte, apreta el boton \"Activar\".</li>"+
+            "<li>Ingresa el <b>Codigo</b> que te mandamos arriba.</li>"+
+            "<li>Ingresa el <b>PIN</b>.</li>"+
+            "<li>Listo, ya podes empezar a usarlo.</li>"+
+          "</ol>"+
+        "</div>"+
+        "<p style='font-size:13px;color:#555'>Cualquier duda o problema para activar, escribinos:</p>"+
+        "<p style='font-size:13px;color:#333;margin:4px 0'>WhatsApp: <a href='https://wa.me/"+CONTACTO_WHATSAPP+"' style='color:#185FA5;text-decoration:none'>+"+CONTACTO_WHATSAPP+"</a></p>"+
+        "<p style='font-size:13px;color:#333;margin:4px 0 20px'>Email: <a href='mailto:"+CONTACTO_EMAIL+"' style='color:#185FA5;text-decoration:none'>"+CONTACTO_EMAIL+"</a></p>"+
+        "<p style='font-size:12px;color:#999'>Emma Soluciones Digitales</p>"+
+      "</div>"
     })});
   }catch(e){console.warn("Brevo error:",e);}
 }
